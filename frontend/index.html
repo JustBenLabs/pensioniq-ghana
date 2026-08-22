@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="PensionIQ Ghana - SSNIT retirement planning and actuarial pension estimation platform."
+    >
+
+    <title>PensionIQ Ghana</title>
+
+    <link
+        rel="stylesheet"
+        href="styles.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                P
+            </div>
+
+            <div class="brand-text">
+
+                <h1>
+                    PensionIQ Ghana
+                </h1>
+
+                <span>
+                    Retirement Intelligence Platform
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="status-badge">
+
+            <span class="status-dot"></span>
+
+            Actuarial Engine Online
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN PAGE
+    ====================================================== -->
+
+    <main class="page">
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <span class="eyebrow">
+                    SSNIT RETIREMENT PLANNING
+                </span>
+
+                <h2>
+                    Understand your pension
+                    <span>
+                        before retirement.
+                    </span>
+                </h2>
+
+                <p>
+                    Estimate your SSNIT retirement benefits,
+                    understand your pension right and explore
+                    how different retirement ages could affect
+                    your future pension.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             BASIC PENSION CALCULATOR
+        ================================================== -->
+
+        <section class="calculator-layout">
+
+
+            <!-- LEFT SIDE -->
+
+            <div class="calculator-card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-label">
+                            Pension Calculator
+                        </p>
+
+                        <h3>
+                            Retirement Information
+                        </h3>
+
+                    </div>
+
+
+                    <div class="step-badge">
+                        Step 1
+                    </div>
+
+                </div>
+
+
+                <form id="pension-form">
+
+
+                    <!-- DATE OF BIRTH -->
+
+                    <div class="input-group">
+
+                        <label for="dob">
+                            Date of Birth
+                        </label>
+
+                        <p class="helper-text">
+                            Enter your official date of birth.
+                        </p>
+
+                        <input
+                            type="date"
+                            id="dob"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- RETIREMENT DATE -->
+
+                    <div class="input-group">
+
+                        <label for="retirement-date">
+                            Expected Retirement Date
+                        </label>
+
+                        <p class="helper-text">
+                            The date you expect to retire.
+                        </p>
+
+                        <input
+                            type="date"
+                            id="retirement-date"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- CONTRIBUTION MONTHS -->
+
+                    <div class="input-group">
+
+                        <label for="contribution-months">
+                            Total Contribution Months
+                        </label>
+
+                        <p class="helper-text">
+                            Example: 240 months represents
+                            20 contribution years.
+                        </p>
+
+                        <input
+                            type="number"
+                            id="contribution-months"
+                            min="0"
+                            placeholder="e.g. 240"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- SALARY -->
+
+                    <div class="input-group">
+
+                        <label for="salary">
+                            Best 3-Year Average Annual Salary
+                        </label>
+
+                        <p class="helper-text">
+                            Enter the annual pensionable salary
+                            in Ghana cedis.
+                        </p>
+
+                        <div class="money-input">
+
+                            <span>
+                                GH¢
+                            </span>
+
+                            <input
+                                type="number"
+                                id="salary"
+                                min="0"
+                                step="0.01"
+                                placeholder="72000"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- BUTTON -->
+
+                    <button
+                        id="calculate-button"
+                        type="submit"
+                        class="primary-button"
+                    >
+
+                        <span id="button-text">
+                            Calculate My Pension
+                        </span>
+
+                    </button>
+
+
+                    <p class="form-security">
+                        Your information is used only for this
+                        calculation.
+                    </p>
+
+
+                </form>
+
+            </div>
+
+
+
+            <!-- RIGHT INFORMATION PANEL -->
+
+            <aside class="info-panel">
+
+                <p class="section-label">
+                    How it works
+                </p>
+
+                <h3>
+                    Your estimate is powered by our
+                    actuarial calculation engine.
+                </h3>
+
+
+                <div class="process-list">
+
+
+                    <div class="process-item">
+
+                        <div class="process-number">
+                            1
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Eligibility
+                            </strong>
+
+                            <p>
+                                We determine the applicable
+                                retirement-benefit route.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="process-item">
+
+                        <div class="process-number">
+                            2
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Pension Right
+                            </strong>
+
+                            <p>
+                                Contribution months determine
+                                your earned pension percentage.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="process-item">
+
+                        <div class="process-number">
+                            3
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Benefit Estimate
+                            </strong>
+
+                            <p>
+                                Your salary basis and retirement
+                                age are used to estimate the benefit.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="process-item">
+
+                        <div class="process-number">
+                            4
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Actuarial Analysis
+                            </strong>
+
+                            <p>
+                                PensionIQ can compare retirement
+                                strategies using discounting and
+                                mortality assumptions.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="important-note">
+
+                    <strong>
+                        Important
+                    </strong>
+
+                    <p>
+                        PensionIQ Ghana is an independent
+                        retirement-planning and estimation tool.
+                        It is not an official SSNIT platform.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+
+
+        <!-- =================================================
+             GLOBAL ERROR MESSAGE
+        ================================================== -->
+
+        <section
+            id="error-message"
+            class="error-box hidden"
+        >
+        </section>
+
+
+
+        <!-- =================================================
+             BASIC RETIREMENT RESULT
+        ================================================== -->
+
+        <section
+            id="result-section"
+            class="results-section hidden"
+        >
+
+            <div class="result-header">
+
+                <div>
+
+                    <p class="section-label">
+                        Your Result
+                    </p>
+
+                    <h3>
+                        Retirement Benefit Estimate
+                    </h3>
+
+                </div>
+
+
+                <span
+                    id="eligibility-badge"
+                    class="eligible-badge"
+                >
+                    Eligible
+                </span>
+
+            </div>
+
+
+
+            <!-- MONTHLY PENSION -->
+
+            <div class="pension-highlight">
+
+                <p>
+                    Estimated Monthly Pension
+                </p>
+
+                <h2 id="monthly-pension">
+                    GH¢0.00
+                </h2>
+
+                <span>
+                    Estimated initial monthly retirement benefit
+                </span>
+
+            </div>
+
+
+
+            <!-- RESULT GRID -->
+
+            <div class="result-grid">
+
+
+                <div class="result-item">
+
+                    <span>
+                        Benefit Type
+                    </span>
+
+                    <strong id="benefit-type">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="result-item">
+
+                    <span>
+                        Retirement Age
+                    </span>
+
+                    <strong id="retirement-age">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="result-item">
+
+                    <span>
+                        Contribution Months
+                    </span>
+
+                    <strong id="result-contribution-months">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="result-item">
+
+                    <span>
+                        Contribution Years
+                    </span>
+
+                    <strong id="contribution-years">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="result-item">
+
+                    <span>
+                        Pension Right
+                    </span>
+
+                    <strong id="pension-right">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="result-item">
+
+                    <span>
+                        Calculation Status
+                    </span>
+
+                    <strong id="calculation-status">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="result-item">
+
+                    <span>
+                        Scheme
+                    </span>
+
+                    <strong>
+                        Act 766 / Act 883
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- CONTRIBUTION PROGRESS -->
+
+            <div class="contribution-progress-card">
+
+                <div class="progress-heading">
+
+                    <div>
+
+                        <span class="progress-title">
+                            Pension Right Progress
+                        </span>
+
+                        <p>
+                            Your position between the minimum
+                            contribution requirement and the
+                            maximum pension-right threshold.
+                        </p>
+
+                    </div>
+
+
+                    <strong id="progress-percentage">
+                        0%
+                    </strong>
+
+                </div>
+
+
+
+                <div class="progress-labels">
+
+                    <span>
+
+                        180 months
+
+                        <small>
+                            Minimum
+                        </small>
+
+                    </span>
+
+
+                    <span>
+
+                        420 months
+
+                        <small>
+                            Maximum
+                        </small>
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="progress-track">
+
+                    <div
+                        id="progress-bar"
+                        class="progress-bar"
+                    >
+                    </div>
+
+                </div>
+
+
+
+                <div class="progress-member-position">
+
+                    <strong id="progress-current-months">
+                        0 months
+                    </strong>
+
+                    <span id="progress-message">
+                        -
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DISCLAIMER -->
+
+            <div class="disclaimer">
+
+                <strong>
+                    Estimated calculation
+                </strong>
+
+                <p>
+                    This result is provided for educational
+                    and retirement-planning purposes.
+                    Official SSNIT records and benefit
+                    determinations govern actual payments.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RETIREMENT PLANNER
+        ================================================== -->
+
+        <section class="comparison-section">
+
+            <div class="comparison-header">
+
+                <div>
+
+                    <p class="section-label">
+                        Retirement Planner
+                    </p>
+
+                    <h3>
+                        Compare Retirement Ages
+                    </h3>
+
+                    <p>
+                        Explore estimated retirement outcomes
+                        from age 55 through age 60.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- COMPARISON FORM -->
+
+            <div class="comparison-form">
+
+
+                <div class="input-group">
+
+                    <label for="comparison-dob">
+                        Date of Birth
+                    </label>
+
+                    <input
+                        type="date"
+                        id="comparison-dob"
+                    >
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label for="months-at-55">
+                        Contribution Months at Age 55
+                    </label>
+
+                    <p class="helper-text">
+                        Future contributions are projected
+                        from this starting point.
+                    </p>
+
+                    <input
+                        type="number"
+                        id="months-at-55"
+                        min="0"
+                        placeholder="e.g. 240"
+                    >
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label for="comparison-salary">
+                        Best 3-Year Average Annual Salary
+                    </label>
+
+                    <div class="money-input">
+
+                        <span>
+                            GH¢
+                        </span>
+
+                        <input
+                            type="number"
+                            id="comparison-salary"
+                            min="0"
+                            step="0.01"
+                            placeholder="72000"
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SEX -->
+
+                <div class="input-group">
+
+                    <label for="comparison-sex">
+                        Sex
+                    </label>
+
+                    <p class="helper-text">
+                        Used for mortality-adjusted
+                        actuarial analysis.
+                    </p>
+
+                    <select id="comparison-sex">
+
+                        <option value="Male">
+                            Male
+                        </option>
+
+                        <option value="Female">
+                            Female
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- DISCOUNT RATE -->
+
+                <div class="input-group">
+
+                    <label for="discount-rate">
+                        Annual Discount Rate
+                    </label>
+
+                    <p class="helper-text">
+                        Annual effective rate used for
+                        present-value calculations.
+                    </p>
+
+                    <div class="percentage-input">
+
+                        <input
+                            type="number"
+                            id="discount-rate"
+                            min="0"
+                            step="0.1"
+                            value="8"
+                        >
+
+                        <span>
+                            %
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PROJECTION AGE -->
+
+                <div class="input-group">
+
+                    <label for="projection-age">
+                        Projection End Age
+                    </label>
+
+                    <p class="helper-text">
+                        Pension cash flows are projected
+                        through this age.
+                    </p>
+
+                    <input
+                        type="number"
+                        id="projection-age"
+                        min="61"
+                        max="100"
+                        value="80"
+                    >
+
+                </div>
+
+
+
+                <button
+                    type="button"
+                    id="compare-button"
+                    class="primary-button comparison-button"
+                >
+                    Compare Retirement Ages
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 COMPARISON RESULTS
+            ================================================== -->
+
+            <div
+                id="comparison-results"
+                class="comparison-results hidden"
+            >
+
+
+                <!-- =============================================
+                     MONTHLY PENSION CHART
+                ============================================== -->
+
+                <div class="comparison-chart-card">
+
+                    <div class="chart-heading">
+
+                        <span class="progress-title">
+                            Monthly Pension by Retirement Age
+                        </span>
+
+                        <p>
+                            Compare estimated monthly pension
+                            amounts from age 55 to age 60.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="retirement-chart"
+                        class="retirement-chart"
+                    >
+                    </div>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     BREAK EVEN ANALYSIS
+                ============================================== -->
+
+                <div class="breakeven-card">
+
+                    <div class="breakeven-heading">
+
+                        <span class="progress-title">
+                            Retirement Break-Even Analysis
+                        </span>
+
+                        <p>
+                            Estimate when waiting until age 60
+                            catches up with taking pension earlier.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="breakeven-results"
+                        class="breakeven-grid"
+                    >
+                    </div>
+
+
+                    <div class="analysis-note">
+
+                        <strong>
+                            How to interpret this
+                        </strong>
+
+                        <p>
+                            This is an undiscounted cash-flow
+                            comparison. It assumes constant monthly
+                            pensions and ignores inflation,
+                            indexation, mortality and the time
+                            value of money.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     ORDINARY PRESENT VALUE
+                ============================================== -->
+
+                <div class="pv-card">
+
+                    <div class="pv-heading">
+
+                        <span class="progress-title">
+                            Present Value Retirement Comparison
+                        </span>
+
+                        <p>
+                            Compare future pension payments
+                            after discounting them to age 55.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="pv-results"
+                        class="pv-grid"
+                    >
+                    </div>
+
+
+                    <div class="analysis-note">
+
+                        <strong>
+                            Financial assumption
+                        </strong>
+
+                        <p id="pv-assumption-text">
+                            Future pension payments are
+                            discounted to age 55.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     MORTALITY ADJUSTED EPV
+                ============================================== -->
+
+                <div class="epv-card">
+
+                    <div class="epv-heading">
+
+                        <div>
+
+                            <span class="progress-title">
+                                Mortality-Adjusted Retirement Value
+                            </span>
+
+                            <p>
+                                Expected present value of each
+                                retirement strategy after allowing
+                                for survival probabilities.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- EPV SUMMARY -->
+
+                    <div
+                        id="epv-summary"
+                        class="epv-summary"
+                    >
+
+                        <span>
+                            Mortality-adjusted actuarial analysis
+                        </span>
+
+                        <strong>
+                            Awaiting calculation
+                        </strong>
+
+                    </div>
+
+
+
+                    <!-- EPV CHART -->
+
+                    <div
+                        id="epv-chart"
+                        class="epv-chart"
+                    >
+                    </div>
+
+
+
+                    <!-- EPV TABLE -->
+
+                    <div class="epv-table-wrapper">
+
+                        <table class="comparison-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Age
+                                    </th>
+
+                                    <th>
+                                        Monthly Pension
+                                    </th>
+
+                                    <th>
+                                        Pension Right
+                                    </th>
+
+                                    <th>
+                                        EPV
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="epv-table-body">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- MORTALITY SOURCE -->
+
+                    <div class="analysis-note mortality-note">
+
+                        <strong>
+                            Mortality Basis
+                        </strong>
+
+                        <p id="mortality-basis-text">
+                            Mortality source information will
+                            appear after calculation.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     DETAILED RETIREMENT TABLE
+                ============================================== -->
+
+                <div class="detailed-comparison-card">
+
+                    <div class="chart-heading">
+
+                        <span class="progress-title">
+                            Detailed Retirement Comparison
+                        </span>
+
+                        <p>
+                            Review contribution months,
+                            pension rights and estimated
+                            monthly benefits side by side.
+                        </p>
+
+                    </div>
+
+
+                    <div class="comparison-table-wrapper">
+
+                        <table class="comparison-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Age
+                                    </th>
+
+                                    <th>
+                                        Months
+                                    </th>
+
+                                    <th>
+                                        Pension Right
+                                    </th>
+
+                                    <th>
+                                        Monthly Pension
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="comparison-body">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =============================================
+                     ASSUMPTIONS
+                ============================================== -->
+
+                <div class="comparison-assumption">
+
+                    <strong>
+                        Projection assumptions
+                    </strong>
+
+                    <p>
+                        Salary basis is held constant and
+                        continuous contributions of 12 months
+                        per additional year are assumed.
+                        Mortality-adjusted values currently use
+                        Ghana population mortality rather than
+                        an official SSNIT pensioner mortality table.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer>
+
+            <div class="footer-brand">
+                PensionIQ Ghana
+            </div>
+
+            <p>
+                Actuarial technology for better
+                retirement decisions.
+            </p>
+
+            <small>
+                Independent educational and retirement-planning
+                platform. Not affiliated with or operated by SSNIT.
+            </small>
+
+        </footer>
+
+
+    </main>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

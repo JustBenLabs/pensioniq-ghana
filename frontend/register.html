@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account | PensionIQ Ghana</title>
+
+    <link
+        rel="stylesheet"
+        href="auth.css"
+    >
+</head>
+
+
+<body>
+
+    <main class="auth-page">
+
+        <section class="auth-brand-panel">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    P
+                </div>
+
+                <div>
+
+                    <h1>
+                        PensionIQ Ghana
+                    </h1>
+
+                    <span>
+                        Retirement Intelligence Platform
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="brand-message">
+
+                <span class="eyebrow">
+                    CREATE YOUR ACCOUNT
+                </span>
+
+                <h2>
+                    Start understanding your pension today.
+                </h2>
+
+                <p>
+                    Build your contribution history,
+                    monitor your pension right and explore
+                    retirement scenarios.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="auth-form-panel">
+
+            <div class="auth-container register-container">
+
+                <div class="auth-heading">
+
+                    <span class="eyebrow">
+                        GET STARTED
+                    </span>
+
+                    <h2>
+                        Create your account
+                    </h2>
+
+                    <p>
+                        Enter your basic information to create
+                        your PensionIQ profile.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="register-error"
+                    class="message error-message hidden"
+                >
+                </div>
+
+
+                <div
+                    id="register-success"
+                    class="message success-message hidden"
+                >
+                </div>
+
+
+                <form
+                    id="register-form"
+                    class="register-form"
+                >
+
+                    <div class="form-group">
+
+                        <label for="first-name">
+                            First Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="first-name"
+                            autocomplete="given-name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="last-name">
+                            Last Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="last-name"
+                            autocomplete="family-name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="date-of-birth">
+                            Date of Birth
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date-of-birth"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="sex">
+                            Sex
+                        </label>
+
+                        <select
+                            id="sex"
+                            required
+                        >
+
+                            <option value="">
+                                Select
+                            </option>
+
+                            <option value="Male">
+                                Male
+                            </option>
+
+                            <option value="Female">
+                                Female
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="contribution-months">
+                            Current Contribution Months
+                        </label>
+
+                        <input
+                            type="number"
+                            id="contribution-months"
+                            min="0"
+                            value="0"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group full-width">
+
+                        <label for="salary">
+                            Best 3-Year Average Annual Salary
+                        </label>
+
+                        <div class="money-field">
+
+                            <span>
+                                GH¢
+                            </span>
+
+                            <input
+                                type="number"
+                                id="salary"
+                                min="0"
+                                step="0.01"
+                                value="0"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group full-width">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <small>
+                            Use at least 8 characters.
+                        </small>
+
+                    </div>
+
+
+                    <div class="form-group full-width">
+
+                        <label for="confirm-password">
+                            Confirm Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirm-password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="register-button"
+                        class="primary-button full-width"
+                    >
+                        Create Account
+                    </button>
+
+                </form>
+
+
+                <div class="auth-switch">
+
+                    <span>
+                        Already have an account?
+                    </span>
+
+                    <a href="login.html">
+                        Sign in
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="register.js"></script>
+
+</body>
+
+</html>

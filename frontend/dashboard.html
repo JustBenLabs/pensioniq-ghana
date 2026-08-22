@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="PensionIQ Ghana authenticated member pension dashboard."
+    >
+
+    <title>
+        Member Dashboard | PensionIQ Ghana
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                P
+            </div>
+
+            <div class="brand-text">
+
+                <h1>
+                    PensionIQ Ghana
+                </h1>
+
+                <span>
+                    Member Dashboard
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a
+                href="index.html"
+                class="calculator-link"
+            >
+                Retirement Calculator
+            </a>
+
+
+            <button
+                type="button"
+                id="logout-button"
+                class="logout-button"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         PAGE
+    ====================================================== -->
+
+    <main class="page">
+
+
+        <!-- =================================================
+             PAGE INTRO
+        ================================================== -->
+
+        <section class="dashboard-intro">
+
+            <span class="eyebrow">
+                MEMBER PORTAL
+            </span>
+
+            <h2>
+                Your pension position,
+                all in one place.
+            </h2>
+
+            <p>
+                Monitor your contribution history,
+                pension-right progress and retirement readiness.
+            </p>
+
+        </section>
+
+
+
+        <!-- =================================================
+             ERROR
+        ================================================== -->
+
+        <div
+            id="dashboard-error"
+            class="error-box hidden"
+        >
+        </div>
+
+
+
+        <!-- =================================================
+             LOADING
+        ================================================== -->
+
+        <section
+            id="dashboard-loading"
+            class="dashboard-loading"
+        >
+
+            <div class="loading-spinner">
+            </div>
+
+            <strong>
+                Loading your PensionIQ dashboard...
+            </strong>
+
+            <span>
+                Verifying your account and pension information.
+            </span>
+
+        </section>
+
+
+
+        <!-- =================================================
+             DASHBOARD
+        ================================================== -->
+
+        <section
+            id="dashboard"
+            class="dashboard hidden"
+        >
+
+
+            <!-- =============================================
+                 WELCOME
+            ============================================== -->
+
+            <section class="welcome-card">
+
+                <div>
+
+                    <span class="eyebrow light">
+                        MEMBER OVERVIEW
+                    </span>
+
+                    <h2 id="member-name">
+                        -
+                    </h2>
+
+                    <p id="member-summary">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="member-avatar">
+
+                    <span id="member-initials">
+                        PI
+                    </span>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 TOP METRICS
+            ============================================== -->
+
+            <section class="metric-grid">
+
+
+                <article class="metric-card">
+
+                    <span>
+                        Contribution Months
+                    </span>
+
+                    <strong id="metric-months">
+                        0
+                    </strong>
+
+                    <small id="metric-years">
+                        0 contribution years
+                    </small>
+
+                </article>
+
+
+
+                <article class="metric-card">
+
+                    <span>
+                        Pension Right
+                    </span>
+
+                    <strong id="metric-pension-right">
+                        -
+                    </strong>
+
+                    <small>
+                        Current estimated pension percentage
+                    </small>
+
+                </article>
+
+
+
+                <article class="metric-card">
+
+                    <span>
+                        Contribution Health
+                    </span>
+
+                    <strong id="metric-health">
+                        -
+                    </strong>
+
+                    <small id="metric-health-description">
+                        -
+                    </small>
+
+                </article>
+
+
+
+                <article class="metric-card">
+
+                    <span>
+                        Missing Records
+                    </span>
+
+                    <strong id="metric-missing">
+                        0
+                    </strong>
+
+                    <small>
+                        Gaps in records stored in PensionIQ
+                    </small>
+
+                </article>
+
+
+            </section>
+
+
+
+            <!-- =============================================
+                 PENSION POSITION
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Pension Position
+                        </span>
+
+                        <h3>
+                            Pension Right Progress
+                        </h3>
+
+                    </div>
+
+
+                    <span
+                        id="eligibility-badge"
+                        class="status-badge"
+                    >
+                        -
+                    </span>
+
+                </div>
+
+
+
+                <div class="pension-progress-header">
+
+                    <div>
+
+                        <strong id="position-months">
+                            0 months
+                        </strong>
+
+                        <span id="position-message">
+                            -
+                        </span>
+
+                    </div>
+
+
+                    <strong id="position-right">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="progress-labels">
+
+                    <span>
+                        180 months
+                        <small>Minimum</small>
+                    </span>
+
+                    <span>
+                        420 months
+                        <small>Maximum</small>
+                    </span>
+
+                </div>
+
+
+
+                <div class="progress-track">
+
+                    <div
+                        id="pension-progress-bar"
+                        class="progress-bar"
+                    >
+                    </div>
+
+                </div>
+
+
+
+                <div class="position-details">
+
+
+                    <div>
+
+                        <span>
+                            Months to Minimum
+                        </span>
+
+                        <strong id="months-to-minimum">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Months to Maximum
+                        </span>
+
+                        <strong id="months-to-maximum">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Maximum Right Reached
+                        </span>
+
+                        <strong id="maximum-right-reached">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 ADD / EDIT CONTRIBUTION
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Contribution Records
+                        </span>
+
+                        <h3>
+                            Add Monthly Contribution
+                        </h3>
+
+                        <p class="card-description">
+                            Add or update a monthly contribution
+                            record in your PensionIQ history.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <form
+                    id="contribution-form"
+                    class="contribution-form"
+                >
+
+
+                    <!-- YEAR -->
+
+                    <div class="form-group">
+
+                        <label for="contribution-year">
+                            Year
+                        </label>
+
+                        <input
+                            type="number"
+                            id="contribution-year"
+                            min="1900"
+                            max="2100"
+                            placeholder="2026"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- MONTH -->
+
+                    <div class="form-group">
+
+                        <label for="contribution-month">
+                            Month
+                        </label>
+
+                        <select
+                            id="contribution-month"
+                            required
+                        >
+
+                            <option value="">
+                                Select month
+                            </option>
+
+                            <option value="1">
+                                January
+                            </option>
+
+                            <option value="2">
+                                February
+                            </option>
+
+                            <option value="3">
+                                March
+                            </option>
+
+                            <option value="4">
+                                April
+                            </option>
+
+                            <option value="5">
+                                May
+                            </option>
+
+                            <option value="6">
+                                June
+                            </option>
+
+                            <option value="7">
+                                July
+                            </option>
+
+                            <option value="8">
+                                August
+                            </option>
+
+                            <option value="9">
+                                September
+                            </option>
+
+                            <option value="10">
+                                October
+                            </option>
+
+                            <option value="11">
+                                November
+                            </option>
+
+                            <option value="12">
+                                December
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- EARNINGS -->
+
+                    <div class="form-group">
+
+                        <label for="contribution-earnings">
+                            Insurable Earnings
+                        </label>
+
+                        <div class="money-field">
+
+                            <span>
+                                GH¢
+                            </span>
+
+                            <input
+                                type="number"
+                                id="contribution-earnings"
+                                min="0"
+                                step="0.01"
+                                placeholder="6000"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- RECORDED FIRST TIER -->
+
+                    <div class="form-group">
+
+                        <label for="recorded-first-tier">
+                            Recorded First-Tier Contribution
+                        </label>
+
+                        <div class="money-field">
+
+                            <span>
+                                GH¢
+                            </span>
+
+                            <input
+                                type="number"
+                                id="recorded-first-tier"
+                                min="0"
+                                step="0.01"
+                                placeholder="810"
+                            >
+
+                        </div>
+
+                        <small>
+                            Enter the amount shown on your
+                            contribution record, if available.
+                        </small>
+
+                    </div>
+
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            id="add-contribution-button"
+                            class="primary-button"
+                        >
+                            Add Contribution
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="cancel-edit-button"
+                            class="secondary-button hidden"
+                        >
+                            Cancel Edit
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+
+                <div
+                    id="contribution-success"
+                    class="success-message hidden"
+                >
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 CONTRIBUTION HISTORY
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Contribution Records
+                        </span>
+
+                        <h3>
+                            Contribution History
+                        </h3>
+
+                        <p class="card-description">
+                            Review, edit or remove monthly
+                            contribution records.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div
+                    id="contribution-history-empty"
+                    class="empty-state hidden"
+                >
+                    No contribution records have been added yet.
+                </div>
+
+
+
+                <div
+                    id="contribution-history-wrapper"
+                    class="table-wrapper"
+                >
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Period
+                                </th>
+
+                                <th>
+                                    Insurable Earnings
+                                </th>
+
+                                <th>
+                                    First Tier
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            id="contribution-history-body"
+                        >
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 CONTRIBUTION HEALTH
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Contribution Analysis
+                        </span>
+
+                        <h3>
+                            Contribution Health
+                        </h3>
+
+                    </div>
+
+
+                    <span
+                        id="health-status-badge"
+                        class="status-badge"
+                    >
+                        -
+                    </span>
+
+                </div>
+
+
+
+                <div class="health-grid">
+
+
+                    <div class="health-item">
+
+                        <span>
+                            Detailed Records
+                        </span>
+
+                        <strong id="detailed-records">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <span>
+                            Continuity
+                        </span>
+
+                        <strong id="continuity-ratio">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <span>
+                            Missing Months
+                        </span>
+
+                        <strong id="missing-count">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <span>
+                            Amount Mismatches
+                        </span>
+
+                        <strong id="mismatch-count">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <span>
+                            Total Insurable Earnings
+                        </span>
+
+                        <strong id="total-earnings">
+                            GH¢0.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <span>
+                            Recorded First Tier
+                        </span>
+
+                        <strong id="total-first-tier">
+                            GH¢0.00
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="alignment-box">
+
+                    <span>
+                        Record Alignment
+                    </span>
+
+                    <strong id="record-alignment">
+                        -
+                    </strong>
+
+                    <p id="alignment-description">
+                        -
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 MISSING MONTHS
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Record Gaps
+                        </span>
+
+                        <h3>
+                            Missing Contribution Months
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="missing-months-list"
+                    class="month-list"
+                >
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 CONTRIBUTION VALIDATION
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="section-label">
+                            Contribution Validation
+                        </span>
+
+                        <h3>
+                            Monthly Amount Checks
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Period
+                                </th>
+
+                                <th>
+                                    Earnings
+                                </th>
+
+                                <th>
+                                    Recorded
+                                </th>
+
+                                <th>
+                                    Expected
+                                </th>
+
+                                <th>
+                                    Difference
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="amount-check-body">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+
+                <div
+                    id="no-contribution-data"
+                    class="empty-state hidden"
+                >
+                    No detailed contribution records
+                    have been added yet.
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 MEMBER PROFILE
+            ============================================== -->
+
+            <section class="dashboard-card">
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                Profile
+            </span>
+
+            <h3>
+                Member Information
+            </h3>
+
+            <p class="card-description">
+                Review and update your PensionIQ profile.
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="edit-profile-button"
+            class="profile-edit-button"
+        >
+            Edit Profile
+        </button>
+
+    </div>
+
+
+    <!-- ==========================================
+         PROFILE DISPLAY
+    =========================================== -->
+
+    <div
+        id="profile-display"
+        class="profile-grid"
+    >
+
+        <div>
+
+            <span>
+                First Name
+            </span>
+
+            <strong id="profile-first-name">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Last Name
+            </span>
+
+            <strong id="profile-last-name">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Date of Birth
+            </span>
+
+            <strong id="profile-dob">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Current Age
+            </span>
+
+            <strong id="profile-age">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Sex
+            </span>
+
+            <strong id="profile-sex">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Contribution Months
+            </span>
+
+            <strong id="profile-contribution-months">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Salary Basis
+            </span>
+
+            <strong id="profile-salary">
+                -
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         EDIT PROFILE FORM
+    =========================================== -->
+
+    <form
+        id="profile-form"
+        class="profile-form hidden"
+    >
+
+
+        <div class="form-group">
+
+            <label for="profile-first-name-input">
+                First Name
+            </label>
+
+            <input
+                type="text"
+                id="profile-first-name-input"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="profile-last-name-input">
+                Last Name
+            </label>
+
+            <input
+                type="text"
+                id="profile-last-name-input"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="profile-dob-input">
+                Date of Birth
+            </label>
+
+            <input
+                type="date"
+                id="profile-dob-input"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="profile-sex-input">
+                Sex
+            </label>
+
+            <select
+                id="profile-sex-input"
+                required
+            >
+
+                <option value="Male">
+                    Male
+                </option>
+
+                <option value="Female">
+                    Female
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="profile-contribution-months-input">
+                Total Contribution Months
+            </label>
+
+            <input
+                type="number"
+                id="profile-contribution-months-input"
+                min="0"
+                step="1"
+                required
+            >
+
+            <small>
+                This is your declared total contribution history.
+                Detailed monthly records are tracked separately.
+            </small>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="profile-salary-input">
+                Best 3-Year Average Annual Salary
+            </label>
+
+            <div class="money-field">
+
+                <span>
+                    GH¢
+                </span>
+
+                <input
+                    type="number"
+                    id="profile-salary-input"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                id="save-profile-button"
+                class="primary-button"
+            >
+                Save Profile
+            </button>
+
+
+            <button
+                type="button"
+                id="cancel-profile-button"
+                class="secondary-button"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <div
+        id="profile-success"
+        class="success-message hidden"
+    >
+    </div>
+
+</section>
+<!-- =============================================
+     ACCOUNT SETTINGS
+============================================= -->
+
+<section class="dashboard-card">
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                Account Settings
+            </span>
+
+            <h3>
+                Security
+            </h3>
+
+            <p class="card-description">
+                Update the password used to access
+                your PensionIQ account.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="security-setting">
+
+        <div>
+
+            <strong>
+                Password
+            </strong>
+
+            <p>
+                Change your account password.
+                You will need to sign in again afterward.
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="open-password-form-button"
+            class="profile-edit-button"
+        >
+            Change Password
+        </button>
+
+    </div>
+
+
+    <!-- PASSWORD FORM -->
+
+    <form
+        id="password-form"
+        class="password-form hidden"
+    >
+
+        <div class="form-group">
+
+            <label for="current-password">
+                Current Password
+            </label>
+
+            <input
+                type="password"
+                id="current-password"
+                autocomplete="current-password"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="new-password">
+                New Password
+            </label>
+
+            <input
+                type="password"
+                id="new-password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+            >
+
+            <small>
+                Use at least 8 characters.
+            </small>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="confirm-new-password">
+                Confirm New Password
+            </label>
+
+            <input
+                type="password"
+                id="confirm-new-password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                id="save-password-button"
+                class="primary-button"
+            >
+                Change Password
+            </button>
+
+
+            <button
+                type="button"
+                id="cancel-password-button"
+                class="secondary-button"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <div
+        id="password-success"
+        class="success-message hidden"
+    >
+    </div>
+
+</section>
+
+
+            <!-- =============================================
+                 DISCLAIMER
+            ============================================== -->
+
+            <section class="disclaimer">
+
+                <strong>
+                    Important
+                </strong>
+
+                <p>
+                    PensionIQ contribution-health results describe
+                    the records currently stored in this application.
+                    Missing records do not automatically prove that
+                    SSNIT failed to receive a contribution.
+                </p>
+
+            </section>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer>
+
+            <strong>
+                PensionIQ Ghana
+            </strong>
+
+            <p>
+                Retirement Intelligence Platform
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <script src="dashboard.js"></script>
+
+</body>
+
+</html>

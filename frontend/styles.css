@@ -1,0 +1,2659 @@
+/* ==========================================================
+   RESET
+========================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+:root {
+
+    --primary: #123d33;
+    --primary-dark: #0b2c25;
+    --primary-light: #edf4f1;
+
+    --accent: #d8a527;
+    --accent-light: #fbf2da;
+
+    --background: #f4f7f6;
+    --surface: #ffffff;
+    --surface-soft: #f9fbfa;
+
+    --text: #17211e;
+    --muted: #68746f;
+
+    --border: #dce5e1;
+
+    --success: #16794c;
+    --success-light: #e8f7ef;
+
+    --danger: #a93434;
+    --danger-light: #fceaea;
+
+    --shadow:
+        0 12px 32px rgba(15, 45, 37, 0.07);
+
+    --radius-large: 18px;
+    --radius-medium: 13px;
+    --radius-small: 9px;
+}
+
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f7faf9 0%,
+            var(--background) 100%
+        );
+
+    color: var(--text);
+
+    min-height: 100vh;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.topbar {
+
+    min-height: 82px;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border-bottom:
+        1px solid var(--border);
+
+    padding:
+        0 7%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    backdrop-filter:
+        blur(14px);
+}
+
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.brand-icon {
+
+    width: 45px;
+
+    height: 45px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+    box-shadow:
+        0 7px 18px rgba(18, 61, 51, 0.18);
+}
+
+
+.brand-text h1 {
+
+    font-size: 19px;
+
+    line-height: 1.2;
+}
+
+
+.brand-text span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.status-badge {
+
+    font-size: 12px;
+
+    background:
+        var(--success-light);
+
+    color:
+        var(--success);
+
+    padding:
+        8px 13px;
+
+    border-radius:
+        30px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-weight: 650;
+}
+
+
+.status-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    background:
+        var(--success);
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 0 4px rgba(22, 121, 76, 0.1);
+}
+
+
+/* ==========================================================
+   PAGE
+========================================================== */
+
+.page {
+
+    width: 88%;
+
+    max-width: 1180px;
+
+    margin:
+        0 auto;
+}
+
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.hero {
+
+    padding:
+        68px 0 48px;
+}
+
+
+.hero-content {
+
+    max-width: 760px;
+}
+
+
+.eyebrow,
+.section-label {
+
+    display: inline-block;
+
+    color:
+        var(--primary);
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1.5px;
+
+    text-transform:
+        uppercase;
+}
+
+
+.hero h2 {
+
+    max-width:
+        720px;
+
+    font-size:
+        clamp(
+            38px,
+            5vw,
+            56px
+        );
+
+    line-height:
+        1.05;
+
+    letter-spacing:
+        -2px;
+
+    margin-top:
+        14px;
+
+    margin-bottom:
+        20px;
+}
+
+
+.hero h2 span {
+
+    display:
+        block;
+
+    color:
+        var(--primary);
+}
+
+
+.hero p {
+
+    max-width:
+        650px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        17px;
+
+    line-height:
+        1.7;
+}
+
+
+/* ==========================================================
+   CALCULATOR LAYOUT
+========================================================== */
+
+.calculator-layout {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(280px, 0.8fr);
+
+    gap:
+        28px;
+
+    align-items:
+        stretch;
+}
+
+
+/* ==========================================================
+   COMMON CARDS
+========================================================== */
+
+.calculator-card,
+.results-section,
+.comparison-section {
+
+    background:
+        var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius-large);
+
+    box-shadow:
+        var(--shadow);
+}
+
+
+.calculator-card {
+
+    padding:
+        34px;
+}
+
+
+.section-heading,
+.result-header {
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    margin-bottom:
+        31px;
+}
+
+
+.section-heading h3,
+.result-header h3 {
+
+    margin-top:
+        7px;
+
+    font-size:
+        24px;
+
+    letter-spacing:
+        -0.4px;
+}
+
+
+.step-badge {
+
+    background:
+        var(--primary-light);
+
+    color:
+        var(--primary);
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    padding:
+        7px 12px;
+
+    border-radius:
+        30px;
+
+    white-space:
+        nowrap;
+}
+
+
+/* ==========================================================
+   FORM ELEMENTS
+========================================================== */
+
+.input-group {
+
+    margin-bottom:
+        22px;
+}
+
+
+.input-group label {
+
+    display:
+        block;
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+
+    margin-bottom:
+        4px;
+}
+
+
+.helper-text {
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+
+    margin-bottom:
+        9px;
+}
+
+
+.input-group input,
+.input-group select {
+
+    width:
+        100%;
+
+    min-height:
+        47px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        10px;
+
+    padding:
+        12px 14px;
+
+    font-family:
+        inherit;
+
+    font-size:
+        14px;
+
+    background:
+        white;
+
+    color:
+        var(--text);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.input-group select {
+
+    cursor:
+        pointer;
+}
+
+
+.input-group input:hover,
+.input-group select:hover {
+
+    border-color:
+        #bac8c2;
+}
+
+
+.input-group input:focus,
+.input-group select:focus {
+
+    outline:
+        none;
+
+    border-color:
+        var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(18, 61, 51, 0.08);
+}
+
+
+/* ==========================================================
+   MONEY INPUT
+========================================================== */
+
+.money-input {
+
+    position:
+        relative;
+}
+
+
+.money-input > span {
+
+    position:
+        absolute;
+
+    left:
+        14px;
+
+    top:
+        50%;
+
+    transform:
+        translateY(-50%);
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+
+    color:
+        var(--primary);
+
+    pointer-events:
+        none;
+}
+
+
+.money-input input {
+
+    padding-left:
+        56px;
+}
+
+
+/* ==========================================================
+   PERCENTAGE INPUT
+========================================================== */
+
+.percentage-input {
+
+    position:
+        relative;
+}
+
+
+.percentage-input span {
+
+    position:
+        absolute;
+
+    right:
+        15px;
+
+    top:
+        50%;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        var(--muted);
+
+    font-weight:
+        700;
+
+    pointer-events:
+        none;
+}
+
+
+.percentage-input input {
+
+    padding-right:
+        45px;
+}
+
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.primary-button {
+
+    width:
+        100%;
+
+    min-height:
+        50px;
+
+    border:
+        none;
+
+    border-radius:
+        10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    color:
+        white;
+
+    font-family:
+        inherit;
+
+    font-size:
+        14px;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+
+    box-shadow:
+        0 8px 18px
+        rgba(18, 61, 51, 0.15);
+}
+
+
+.primary-button:hover {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 11px 24px
+        rgba(18, 61, 51, 0.21);
+}
+
+
+.primary-button:active {
+
+    transform:
+        translateY(0);
+}
+
+
+.primary-button:disabled {
+
+    opacity:
+        0.62;
+
+    cursor:
+        wait;
+
+    transform:
+        none;
+}
+
+
+.form-security {
+
+    text-align:
+        center;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    margin-top:
+        13px;
+}
+
+
+/* ==========================================================
+   INFO PANEL
+========================================================== */
+
+.info-panel {
+
+    padding:
+        34px;
+
+    border-radius:
+        var(--radius-large);
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    box-shadow:
+        0 15px 35px
+        rgba(15, 45, 37, 0.16);
+}
+
+
+.info-panel .section-label {
+
+    color:
+        #b9d5cc;
+}
+
+
+.info-panel h3 {
+
+    font-size:
+        24px;
+
+    line-height:
+        1.35;
+
+    letter-spacing:
+        -0.3px;
+
+    margin-top:
+        8px;
+
+    margin-bottom:
+        31px;
+}
+
+
+.process-list {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        25px;
+}
+
+
+.process-item {
+
+    display:
+        flex;
+
+    gap:
+        15px;
+
+    align-items:
+        flex-start;
+}
+
+
+.process-number {
+
+    min-width:
+        32px;
+
+    width:
+        32px;
+
+    height:
+        32px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(255, 255, 255, 0.11);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.12);
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+
+.process-item strong {
+
+    font-size:
+        13px;
+}
+
+
+.process-item p {
+
+    color:
+        #c6d7d2;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.55;
+
+    margin-top:
+        5px;
+}
+
+
+.important-note {
+
+    margin-top:
+        34px;
+
+    padding:
+        18px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    border-radius:
+        12px;
+}
+
+
+.important-note strong {
+
+    font-size:
+        12px;
+}
+
+
+.important-note p {
+
+    color:
+        #ceddd9;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.6;
+
+    margin-top:
+        7px;
+}
+
+
+/* ==========================================================
+   ERROR MESSAGE
+========================================================== */
+
+.error-box {
+
+    margin-top:
+        25px;
+
+    background:
+        var(--danger-light);
+
+    color:
+        var(--danger);
+
+    border:
+        1px solid
+        #f2cccc;
+
+    border-radius:
+        11px;
+
+    padding:
+        16px 18px;
+
+    font-size:
+        13px;
+}
+
+
+/* ==========================================================
+   BASIC RESULTS
+========================================================== */
+
+.results-section {
+
+    margin-top:
+        30px;
+
+    padding:
+        34px;
+}
+
+
+.eligible-badge {
+
+    background:
+        var(--success-light);
+
+    color:
+        var(--success);
+
+    padding:
+        8px 13px;
+
+    border-radius:
+        30px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+}
+
+
+.pension-highlight {
+
+    padding:
+        31px;
+
+    border-radius:
+        15px;
+
+    margin-bottom:
+        24px;
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+}
+
+
+.pension-highlight::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        180px;
+
+    height:
+        180px;
+
+    right:
+        -70px;
+
+    top:
+        -75px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(255, 255, 255, 0.04);
+}
+
+
+.pension-highlight p {
+
+    color:
+        #c5d7d1;
+
+    font-size:
+        12px;
+}
+
+
+.pension-highlight h2 {
+
+    font-size:
+        42px;
+
+    line-height:
+        1.1;
+
+    letter-spacing:
+        -1px;
+
+    margin:
+        8px 0;
+}
+
+
+.pension-highlight span {
+
+    color:
+        #b7ccc5;
+
+    font-size:
+        11px;
+}
+
+
+/* ==========================================================
+   RESULT GRID
+========================================================== */
+
+.result-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap:
+        12px;
+}
+
+
+.result-item {
+
+    min-height:
+        89px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        11px;
+
+    padding:
+        16px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    gap:
+        7px;
+
+    background:
+        var(--surface-soft);
+}
+
+
+.result-item span {
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        0.6px;
+
+    text-transform:
+        uppercase;
+}
+
+
+.result-item strong {
+
+    font-size:
+        14px;
+}
+
+
+/* ==========================================================
+   CONTRIBUTION PROGRESS
+========================================================== */
+
+.contribution-progress-card {
+
+    margin-top:
+        25px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        14px;
+
+    padding:
+        23px;
+
+    background:
+        var(--surface-soft);
+}
+
+
+.progress-heading {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-start;
+
+    gap:
+        20px;
+
+    margin-bottom:
+        24px;
+}
+
+
+.progress-title {
+
+    display:
+        block;
+
+    font-size:
+        14px;
+
+    font-weight:
+        800;
+}
+
+
+.progress-heading p {
+
+    max-width:
+        600px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+
+    margin-top:
+        5px;
+}
+
+
+.progress-heading > strong {
+
+    color:
+        var(--primary);
+
+    font-size:
+        22px;
+}
+
+
+.progress-labels {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    margin-bottom:
+        9px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+}
+
+
+.progress-labels span {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        2px;
+}
+
+
+.progress-labels span:last-child {
+
+    text-align:
+        right;
+}
+
+
+.progress-labels small {
+
+    color:
+        var(--muted);
+
+    font-weight:
+        400;
+}
+
+
+.progress-track {
+
+    width:
+        100%;
+
+    height:
+        11px;
+
+    background:
+        #e1e9e5;
+
+    border-radius:
+        30px;
+
+    overflow:
+        hidden;
+}
+
+
+.progress-bar {
+
+    width:
+        0%;
+
+    height:
+        100%;
+
+    border-radius:
+        30px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            #347768
+        );
+
+    transition:
+        width 0.75s ease;
+}
+
+
+.progress-member-position {
+
+    margin-top:
+        14px;
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        20px;
+}
+
+
+.progress-member-position strong {
+
+    color:
+        var(--primary);
+
+    font-size:
+        12px;
+}
+
+
+.progress-member-position span {
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    text-align:
+        right;
+}
+
+
+/* ==========================================================
+   DISCLAIMER
+========================================================== */
+
+.disclaimer {
+
+    margin-top:
+        25px;
+
+    padding:
+        17px;
+
+    background:
+        #f5f8f7;
+
+    border-radius:
+        11px;
+}
+
+
+.disclaimer strong {
+
+    font-size:
+        12px;
+}
+
+
+.disclaimer p {
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.6;
+
+    margin-top:
+        5px;
+}
+
+
+/* ==========================================================
+   RETIREMENT COMPARISON SECTION
+========================================================== */
+
+.comparison-section {
+
+    margin-top:
+        32px;
+
+    padding:
+        34px;
+}
+
+
+.comparison-header h3 {
+
+    margin-top:
+        7px;
+
+    font-size:
+        26px;
+
+    letter-spacing:
+        -0.5px;
+}
+
+
+.comparison-header > div > p:last-child {
+
+    color:
+        var(--muted);
+
+    margin-top:
+        7px;
+
+    font-size:
+        13px;
+}
+
+
+.comparison-form {
+
+    margin-top:
+        30px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap:
+        17px 20px;
+
+    align-items:
+        end;
+
+    padding:
+        25px;
+
+    background:
+        var(--surface-soft);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        14px;
+}
+
+
+.comparison-form .input-group {
+
+    margin-bottom:
+        0;
+}
+
+
+.comparison-button {
+
+    grid-column:
+        1 / -1;
+
+    margin-top:
+        4px;
+}
+
+
+.comparison-results {
+
+    margin-top:
+        30px;
+}
+
+
+/* ==========================================================
+   SHARED ANALYSIS CARD
+========================================================== */
+
+.comparison-chart-card,
+.breakeven-card,
+.pv-card,
+.epv-card,
+.detailed-comparison-card {
+
+    padding:
+        24px;
+
+    margin-bottom:
+        25px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        14px;
+
+    background:
+        var(--surface-soft);
+}
+
+
+.chart-heading,
+.breakeven-heading,
+.pv-heading,
+.epv-heading {
+
+    margin-bottom:
+        22px;
+}
+
+
+.chart-heading p,
+.breakeven-heading p,
+.pv-heading p,
+.epv-heading p {
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.55;
+
+    margin-top:
+        5px;
+}
+
+
+/* ==========================================================
+   MONTHLY PENSION CHART
+========================================================== */
+
+.retirement-chart {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        15px;
+}
+
+
+.chart-row {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        60px 1fr 125px;
+
+    gap:
+        14px;
+
+    align-items:
+        center;
+}
+
+
+.chart-age {
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+
+.chart-track {
+
+    width:
+        100%;
+
+    height:
+        23px;
+
+    background:
+        #e2e9e6;
+
+    border-radius:
+        30px;
+
+    overflow:
+        hidden;
+}
+
+
+.chart-bar {
+
+    width:
+        0;
+
+    height:
+        100%;
+
+    border-radius:
+        30px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            #347768
+        );
+
+    transition:
+        width 0.8s ease;
+}
+
+
+.chart-row.age-60 .chart-bar {
+
+    background:
+        linear-gradient(
+            90deg,
+            #c8971d,
+            var(--accent)
+        );
+}
+
+
+.chart-amount {
+
+    color:
+        var(--primary);
+
+    text-align:
+        right;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+
+.chart-row.age-60 .chart-amount {
+
+    color:
+        #896716;
+}
+
+
+/* ==========================================================
+   BREAK EVEN
+========================================================== */
+
+.breakeven-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap:
+        11px;
+}
+
+
+.breakeven-item {
+
+    padding:
+        15px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        11px;
+
+    background:
+        white;
+}
+
+
+.breakeven-item span {
+
+    display:
+        block;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    margin-bottom:
+        7px;
+}
+
+
+.breakeven-item strong {
+
+    display:
+        block;
+
+    color:
+        var(--primary);
+
+    font-size:
+        17px;
+
+    margin-bottom:
+        5px;
+}
+
+
+.breakeven-item small {
+
+    display:
+        block;
+
+    color:
+        var(--muted);
+
+    font-size:
+        9px;
+
+    line-height:
+        1.45;
+}
+
+
+/* ==========================================================
+   ANALYSIS NOTE
+========================================================== */
+
+.analysis-note,
+.comparison-assumption {
+
+    margin-top:
+        20px;
+
+    padding:
+        16px;
+
+    background:
+        #f1f5f3;
+
+    border-radius:
+        10px;
+}
+
+
+.analysis-note strong,
+.comparison-assumption strong {
+
+    font-size:
+        11px;
+}
+
+
+.analysis-note p,
+.comparison-assumption p {
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    line-height:
+        1.65;
+
+    margin-top:
+        5px;
+}
+
+
+/* ==========================================================
+   PRESENT VALUE
+========================================================== */
+
+.pv-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap:
+        12px;
+}
+
+
+.pv-item {
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        11px;
+
+    background:
+        white;
+
+    padding:
+        16px;
+}
+
+
+.pv-item span {
+
+    display:
+        block;
+
+    color:
+        var(--muted);
+
+    font-size:
+        10px;
+
+    margin-bottom:
+        7px;
+}
+
+
+.pv-item strong {
+
+    display:
+        block;
+
+    color:
+        var(--primary);
+
+    font-size:
+        17px;
+}
+
+
+.pv-item small {
+
+    display:
+        block;
+
+    color:
+        var(--muted);
+
+    font-size:
+        9px;
+
+    line-height:
+        1.5;
+
+    margin-top:
+        6px;
+}
+
+
+/* ==========================================================
+   MORTALITY EPV
+========================================================== */
+
+.epv-card {
+
+    background:
+        linear-gradient(
+            180deg,
+            #fbfdfc 0%,
+            #f6faf8 100%
+        );
+
+    border-color:
+        #cbdcd5;
+}
+
+
+.epv-summary {
+
+    margin-bottom:
+        24px;
+
+    padding:
+        21px;
+
+    border-radius:
+        13px;
+
+    color:
+        white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+}
+
+
+.epv-summary::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        140px;
+
+    height:
+        140px;
+
+    right:
+        -55px;
+
+    bottom:
+        -65px;
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+}
+
+
+.epv-summary span {
+
+    display:
+        block;
+
+    color:
+        #c7d8d2;
+
+    font-size:
+        10px;
+
+    margin-bottom:
+        6px;
+}
+
+
+.epv-summary strong {
+
+    display:
+        block;
+
+    font-size:
+        24px;
+
+    letter-spacing:
+        -0.4px;
+}
+
+
+.epv-summary p {
+
+    max-width:
+        550px;
+
+    color:
+        #c6d7d1;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.5;
+
+    margin-top:
+        6px;
+}
+
+
+/* ==========================================================
+   EPV CHART
+========================================================== */
+
+.epv-chart {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        15px;
+
+    margin-bottom:
+        28px;
+}
+
+
+.epv-chart-row {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        60px 1fr 130px;
+
+    gap:
+        14px;
+
+    align-items:
+        center;
+}
+
+
+.epv-chart-age {
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+
+.epv-chart-track {
+
+    width:
+        100%;
+
+    height:
+        23px;
+
+    background:
+        #e2e9e6;
+
+    border-radius:
+        30px;
+
+    overflow:
+        hidden;
+}
+
+
+.epv-chart-bar {
+
+    height:
+        100%;
+
+    width:
+        0;
+
+    border-radius:
+        30px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            #3b826f
+        );
+
+    transition:
+        width 0.8s ease;
+}
+
+
+.epv-chart-value {
+
+    color:
+        var(--primary);
+
+    text-align:
+        right;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+}
+
+
+.epv-table-wrapper,
+.comparison-table-wrapper {
+
+    width:
+        100%;
+
+    overflow-x:
+        auto;
+}
+
+
+/* ==========================================================
+   TABLES
+========================================================== */
+
+.comparison-table {
+
+    width:
+        100%;
+
+    min-width:
+        600px;
+
+    border-collapse:
+        collapse;
+}
+
+
+.comparison-table th {
+
+    padding:
+        12px 13px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    color:
+        var(--muted);
+
+    text-align:
+        left;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.55px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+
+.comparison-table td {
+
+    padding:
+        15px 13px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    font-size:
+        12px;
+
+    vertical-align:
+        middle;
+}
+
+
+.comparison-table tbody tr {
+
+    transition:
+        background 0.15s ease;
+}
+
+
+.comparison-table tbody tr:hover {
+
+    background:
+        #f4f8f6;
+}
+
+
+.comparison-table td:nth-child(4) {
+
+    color:
+        var(--primary);
+
+    font-weight:
+        750;
+}
+
+
+.recommended-tag {
+
+    display:
+        inline-block;
+
+    padding:
+        5px 8px;
+
+    background:
+        var(--success-light);
+
+    color:
+        var(--success);
+
+    border-radius:
+        20px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+
+/* ==========================================================
+   MORTALITY NOTE
+========================================================== */
+
+.mortality-note {
+
+    border-left:
+        3px solid var(--primary);
+}
+
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+footer {
+
+    padding:
+        52px 0 46px;
+
+    text-align:
+        center;
+
+    color:
+        var(--muted);
+}
+
+
+.footer-brand {
+
+    color:
+        var(--text);
+
+    font-size:
+        14px;
+
+    font-weight:
+        800;
+
+    margin-bottom:
+        4px;
+}
+
+
+footer p {
+
+    font-size:
+        11px;
+}
+
+
+footer small {
+
+    display:
+        block;
+
+    max-width:
+        600px;
+
+    margin:
+        8px auto 0;
+
+    font-size:
+        9px;
+
+    line-height:
+        1.5;
+}
+
+
+/* ==========================================================
+   UTILITY
+========================================================== */
+
+.hidden {
+
+    display:
+        none !important;
+}
+
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (
+    max-width: 900px
+) {
+
+    .topbar {
+
+        padding:
+            0 5%;
+    }
+
+
+    .page {
+
+        width:
+            91%;
+    }
+
+
+    .calculator-layout {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .info-panel {
+
+        min-height:
+            auto;
+    }
+
+
+    .result-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .breakeven-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .pv-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (
+    max-width: 600px
+) {
+
+    .topbar {
+
+        min-height:
+            72px;
+
+        padding:
+            0 4%;
+    }
+
+
+    .brand-icon {
+
+        width:
+            39px;
+
+        height:
+            39px;
+
+        font-size:
+            19px;
+    }
+
+
+    .brand-text h1 {
+
+        font-size:
+            16px;
+    }
+
+
+    .brand-text span {
+
+        font-size:
+            9px;
+    }
+
+
+    .status-badge {
+
+        display:
+            none;
+    }
+
+
+    .page {
+
+        width:
+            93%;
+    }
+
+
+    .hero {
+
+        padding:
+            42px 0 33px;
+    }
+
+
+    .hero h2 {
+
+        font-size:
+            36px;
+
+        letter-spacing:
+            -1.3px;
+    }
+
+
+    .hero p {
+
+        font-size:
+            14px;
+    }
+
+
+    .calculator-card,
+    .info-panel,
+    .results-section,
+    .comparison-section {
+
+        padding:
+            22px;
+
+        border-radius:
+            14px;
+    }
+
+
+    .section-heading h3,
+    .result-header h3,
+    .comparison-header h3 {
+
+        font-size:
+            21px;
+    }
+
+
+    .result-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .pension-highlight {
+
+        padding:
+            24px;
+    }
+
+
+    .pension-highlight h2 {
+
+        font-size:
+            34px;
+    }
+
+
+    .progress-heading {
+
+        flex-direction:
+            column;
+    }
+
+
+    .progress-member-position {
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start;
+    }
+
+
+    .progress-member-position span {
+
+        text-align:
+            left;
+    }
+
+
+    .comparison-form {
+
+        grid-template-columns:
+            1fr;
+
+        padding:
+            18px;
+    }
+
+
+    .comparison-button {
+
+        grid-column:
+            auto;
+    }
+
+
+    .comparison-chart-card,
+    .breakeven-card,
+    .pv-card,
+    .epv-card,
+    .detailed-comparison-card {
+
+        padding:
+            18px;
+    }
+
+
+    .chart-row {
+
+        grid-template-columns:
+            48px 1fr;
+    }
+
+
+    .chart-amount {
+
+        grid-column:
+            2;
+
+        text-align:
+            left;
+
+        font-size:
+            11px;
+    }
+
+
+    .breakeven-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .pv-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .epv-chart-row {
+
+        grid-template-columns:
+            48px 1fr;
+    }
+
+
+    .epv-chart-value {
+
+        grid-column:
+            2;
+
+        text-align:
+            left;
+
+        font-size:
+            11px;
+    }
+
+
+    .epv-summary strong {
+
+        font-size:
+            21px;
+    }
+
+
+    footer {
+
+        padding:
+            40px 0;
+    }
+
+}
+
+
+/* ==========================================================
+   VERY SMALL SCREENS
+========================================================== */
+
+@media (
+    max-width: 380px
+) {
+
+    .hero h2 {
+
+        font-size:
+            31px;
+    }
+
+
+    .calculator-card,
+    .info-panel,
+    .results-section,
+    .comparison-section {
+
+        padding:
+            18px;
+    }
+
+
+    .pension-highlight h2 {
+
+        font-size:
+            29px;
+    }
+
+}
