@@ -89,17 +89,35 @@ app = FastAPI(
 # CORS
 # ============================================================
 
+# ==========================================================
+# CORS CONFIGURATION
+# ==========================================================
+
+FRONTEND_BASE_URL = os.getenv(
+    "PENSIONIQ_FRONTEND_BASE_URL",
+    "http://127.0.0.1:5500",
+).rstrip("/")
+
+allowed_origins = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "https://pensioniq-ghana.web.app",
+    "https://pensioniq-ghana.firebaseapp.com",
+]
+
+if FRONTEND_BASE_URL not in allowed_origins:
+    allowed_origins.append(
+        FRONTEND_BASE_URL
+    )
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5500",
-        "http://localhost:5500",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # ============================================================
 # PROJECT PATHS
@@ -1130,41 +1148,11 @@ def forgot_password(
     # Build frontend reset URL
     # --------------------------------------------------------
 
-    FRONTEND_BASE_URL = (
-        os.getenv(
-            "PENSIONIQ_FRONTEND_BASE_URL"
-        )
-    )
-
-
-    allowed_origins = [
-        "http://127.0.0.1:5500",
-        "http://localhost:5500",
-    ]
-
-
-    if FRONTEND_BASE_URL:
-
-        allowed_origins.append(
-            FRONTEND_BASE_URL.rstrip("/")
-        )
-
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=allowed_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
-
     reset_url = (
         f"{FRONTEND_BASE_URL}/"
         f"reset-password.html"
         f"?token={raw_token}"
     )
-
 
     # --------------------------------------------------------
     # Development / production delivery
