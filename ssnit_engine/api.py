@@ -1130,17 +1130,37 @@ def forgot_password(
     # Build frontend reset URL
     # --------------------------------------------------------
 
-    frontend_base_url = (
+    FRONTEND_BASE_URL = (
         os.getenv(
-            "PENSIONIQ_FRONTEND_BASE_URL",
-            "http://127.0.0.1:5500",
+            "PENSIONIQ_FRONTEND_BASE_URL"
         )
-        .rstrip("/")
+    )
+
+
+    allowed_origins = [
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+    ]
+
+
+    if FRONTEND_BASE_URL:
+
+        allowed_origins.append(
+            FRONTEND_BASE_URL.rstrip("/")
+        )
+
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
 
     reset_url = (
-        f"{frontend_base_url}/"
+        f"{FRONTEND_BASE_URL}/"
         f"reset-password.html"
         f"?token={raw_token}"
     )
