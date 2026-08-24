@@ -5,11 +5,7 @@
 
 
 const API_BASE_URL =
-    window.location.hostname === "127.0.0.1"
-    ||
-    window.location.hostname === "localhost"
-        ? "http://127.0.0.1:8000"
-        : "https://pensioniq-ghana.onrender.com";
+    window.PENSIONIQ_API_BASE_URL;
 
 
 const forgotPasswordForm =
@@ -52,7 +48,6 @@ async function requestPasswordReset(
 
     event.preventDefault();
 
-
     hideMessages();
 
 
@@ -74,9 +69,7 @@ async function requestPasswordReset(
     }
 
 
-    setLoading(
-        true
-    );
+    setLoading(true);
 
 
     try {
@@ -86,14 +79,11 @@ async function requestPasswordReset(
                 `${API_BASE_URL}/auth/forgot-password`,
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
@@ -141,17 +131,23 @@ async function requestPasswordReset(
 
     catch (error) {
 
+        console.error(
+            "Password reset request error:",
+            error
+        );
+
+
         showError(
             error.message
+            ||
+            "Unable to connect to PensionIQ."
         );
 
     }
 
     finally {
 
-        setLoading(
-            false
-        );
+        setLoading(false);
 
     }
 

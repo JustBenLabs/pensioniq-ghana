@@ -5,11 +5,7 @@
 
 
 const API_BASE_URL =
-    window.location.hostname === "127.0.0.1"
-    ||
-    window.location.hostname === "localhost"
-        ? "http://127.0.0.1:8000"
-        : "https://pensioniq-ghana.onrender.com";
+    window.PENSIONIQ_API_BASE_URL;
 
 
 const resetPasswordForm =
@@ -43,7 +39,7 @@ const invalidResetLink =
 
 
 // ==========================================================
-// READ RESET TOKEN
+// TOKEN
 // ==========================================================
 
 const queryParameters =
@@ -59,7 +55,7 @@ const resetToken =
 
 
 // ==========================================================
-// INVALID / MISSING TOKEN
+// INVALID TOKEN
 // ==========================================================
 
 if (
@@ -95,7 +91,6 @@ async function resetPassword(
 ) {
 
     event.preventDefault();
-
 
     hideMessages();
 
@@ -150,9 +145,7 @@ async function resetPassword(
     }
 
 
-    setLoading(
-        true
-    );
+    setLoading(true);
 
 
     try {
@@ -162,14 +155,11 @@ async function resetPassword(
                 `${API_BASE_URL}/auth/reset-password`,
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
@@ -216,15 +206,9 @@ async function resetPassword(
         showSuccess(
             data.message
             ||
-            (
-                "Password reset successfully. "
-                +
-                "Redirecting you to sign in..."
-            )
+            "Password reset successfully."
         );
 
-
-        // Remove reset token from address bar.
 
         window.history.replaceState(
             {},
@@ -247,17 +231,23 @@ async function resetPassword(
 
     catch (error) {
 
+        console.error(
+            "Reset password error:",
+            error
+        );
+
+
         showError(
             error.message
+            ||
+            "Unable to connect to PensionIQ."
         );
 
     }
 
     finally {
 
-        setLoading(
-            false
-        );
+        setLoading(false);
 
     }
 

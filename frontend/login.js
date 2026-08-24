@@ -1,9 +1,15 @@
+// ==========================================================
+// PENSIONIQ GHANA
+// LOGIN
+// ==========================================================
+
+
 const API_BASE_URL =
-    window.location.hostname === "127.0.0.1"
-    ||
-    window.location.hostname === "localhost"
-        ? "http://127.0.0.1:8000"
-        : "https://pensioniq-ghana.onrender.com";
+    window.PENSIONIQ_API_BASE_URL;
+
+
+const ACCESS_TOKEN_KEY =
+    "pensioniq_access_token";
 
 
 const loginForm =
@@ -25,19 +31,9 @@ const errorBox =
 
 
 // ==========================================================
-// REDIRECT IF ALREADY AUTHENTICATED
+// PREFILL EMAIL AFTER REGISTRATION
 // ==========================================================
 
-if (
-    sessionStorage.getItem(
-        "pensioniq_access_token"
-    )
-) {
-
-    window.location.href =
-        "dashboard.html";
-
-}
 const queryParameters =
     new URLSearchParams(
         window.location.search
@@ -56,6 +52,22 @@ if (registeredEmail) {
         "email"
     ).value =
         registeredEmail;
+
+}
+
+
+// ==========================================================
+// REDIRECT IF ALREADY AUTHENTICATED
+// ==========================================================
+
+if (
+    sessionStorage.getItem(
+        ACCESS_TOKEN_KEY
+    )
+) {
+
+    window.location.href =
+        "dashboard.html";
 
 }
 
@@ -158,19 +170,11 @@ loginForm.addEventListener(
             }
 
 
-            // ----------------------------------------------
-            // Store JWT for this browser session
-            // ----------------------------------------------
-
             sessionStorage.setItem(
-                "pensioniq_access_token",
+                ACCESS_TOKEN_KEY,
                 data.access_token
             );
 
-
-            // ----------------------------------------------
-            // Open dashboard
-            // ----------------------------------------------
 
             window.location.href =
                 "dashboard.html";
@@ -179,8 +183,16 @@ loginForm.addEventListener(
 
         catch (error) {
 
+            console.error(
+                "Login error:",
+                error
+            );
+
+
             showError(
                 error.message
+                ||
+                "Unable to connect to PensionIQ."
             );
 
         }
