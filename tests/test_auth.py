@@ -1843,4 +1843,44 @@ def test_random_password_reset_token_is_rejected(
             "Invalid or expired "
             "password reset token."
         )
-    )    
+    ) 
+def test_login_rate_limit_blocks_excessive_attempts(
+    client,
+):
+    """
+    Login should be rate limited after
+    10 attempts from the same IP within
+    the configured time window.
+    """
+
+    login_data = {
+        "email": "rate-limit-test@example.com",
+        "password": "WrongPassword123!",
+    }
+
+    # First 10 attempts should reach
+    # the normal login logic.
+    for _ in range(10):
+        response = client.post(
+            "/auth/login",
+            json=login_data,
+        )
+
+        assert response.status_code != 429
+
+    # The 11th attempt should be blocked.
+    blocked_response = client.post(
+        "/auth/login",
+        json=login_data,
+    )
+
+    assert blocked_response.status_code == 429
+
+    assert blocked_response.json() == {
+        "detail": (
+            "Too many requests. "
+            "Please try again later."
+        )
+    }
+
+    assert "Retry-After" in blocked_response.headers       

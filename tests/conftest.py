@@ -17,6 +17,12 @@ from sqlalchemy.orm import (
 from sqlalchemy.pool import (
     StaticPool,
 )
+from ssnit_engine.rate_limit import (
+    forgot_password_rate_limit,
+    login_rate_limit,
+    register_rate_limit,
+    reset_password_rate_limit,
+)
 
 
 # ============================================================
@@ -156,3 +162,25 @@ def db_session(
     finally:
 
         db.close()
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiters():
+    """
+    Ensure every test starts with fresh
+    rate-limit state.
+    """
+
+    limiters = (
+        login_rate_limit,
+        register_rate_limit,
+        forgot_password_rate_limit,
+        reset_password_rate_limit,
+    )
+
+    for limiter in limiters:
+        limiter.reset()
+
+    yield
+
+    for limiter in limiters:
+        limiter.reset()        

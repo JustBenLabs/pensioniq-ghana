@@ -67,6 +67,12 @@ from ssnit_engine.mortality import (
     load_pensioniq_mortality_csv,
     pension_expected_present_value,
 )
+from ssnit_engine.rate_limit import (
+    forgot_password_rate_limit,
+    login_rate_limit,
+    register_rate_limit,
+    reset_password_rate_limit,
+)
 
 
 # ============================================================
@@ -518,7 +524,12 @@ def health():
 # ============================================================
 
 
-@app.post("/auth/register")
+@app.post(
+    "/auth/register",
+    dependencies=[
+        Depends(register_rate_limit)
+    ],
+)
 def register(
     request: RegisterRequest,
     db: Session = Depends(
@@ -762,7 +773,12 @@ def register(
 # ============================================================
 
 
-@app.post("/auth/login")
+@app.post(
+    "/auth/login",
+    dependencies=[
+        Depends(login_rate_limit)
+    ],
+)
 def login(
     request: LoginRequest,
     db: Session = Depends(
@@ -1023,7 +1039,14 @@ def change_password(
 # ============================================================
 
 
-@app.post("/auth/forgot-password")
+@app.post(
+    "/auth/forgot-password",
+    dependencies=[
+        Depends(
+            forgot_password_rate_limit
+        )
+    ],
+)
 def forgot_password(
     request: ForgotPasswordRequest,
 
@@ -1238,7 +1261,14 @@ def forgot_password(
 # ============================================================
 
 
-@app.post("/auth/reset-password")
+@app.post(
+    "/auth/reset-password",
+    dependencies=[
+        Depends(
+            reset_password_rate_limit
+        )
+    ],
+)
 def reset_password(
     request: ResetPasswordRequest,
 
