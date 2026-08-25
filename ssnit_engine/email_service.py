@@ -1,222 +1,134 @@
+import html
+import json
 import os
-import smtplib
-
-from email.message import EmailMessage
+import urllib.error
+import urllib.request
 
 
 def send_password_reset_email(
     recipient_email: str,
     reset_url: str,
 ) -> None:
+    """
+    Send a PensionIQ Ghana password-reset email
+    using the Resend HTTPS API.
+    """
 
-    smtp_host = os.getenv(
-        "PENSIONIQ_SMTP_HOST"
-    )
+    api_key = os.getenv("RESEND_API_KEY")
 
-    smtp_port = int(
-        os.getenv(
-            "PENSIONIQ_SMTP_PORT",
-            "587",
+    if not api_key:
+        raise RuntimeError(
+            "RESEND_API_KEY is not configured."
         )
-    )
-
-    smtp_username = os.getenv(
-        "PENSIONIQ_SMTP_USERNAME"
-    )
-
-    smtp_password = os.getenv(
-        "PENSIONIQ_SMTP_PASSWORD"
-    )
 
     from_email = os.getenv(
-        "PENSIONIQ_FROM_EMAIL"
+        "PENSIONIQ_FROM_EMAIL",
+        "PensionIQ Ghana <onboarding@resend.dev>",
     )
 
-    from_name = os.getenv(
-        "PENSIONIQ_FROM_NAME",
-        "PensionIQ Ghana",
+    safe_reset_url = html.escape(
+        reset_url,
+        quote=True,
     )
 
+    payload = {
+        "from": from_email,
+        "to": [recipient_email],
+        "subject": "Reset your PensionIQ Ghana password",
+        "html": f"""
+        <div style="
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        ">
+            <h2>PensionIQ Ghana</h2>
 
-    if not all(
-        [
-            smtp_host,
-            smtp_username,
-            smtp_password,
-            from_email,
-        ]
-    ):
+            <p>
+                We received a request to reset the password
+                for your PensionIQ Ghana account.
+            </p>
+
+            <p>
+                Click the button below to create a new password.
+            </p>
+
+            <p style="margin: 30px 0;">
+                <a
+                    href="{safe_reset_url}"
+                    style="
+                        background-color: #111827;
+                        color: white;
+                        padding: 12px 20px;
+                        text-decoration: none;
+                        border-radius: 6px;
+                        display: inline-block;
+                    "
+                >
+                    Reset Password
+                </a>
+            </p>
+
+            <p>
+                This password-reset link expires in 15 minutes.
+            </p>
+
+            <p>
+                If you did not request this password reset,
+                you can ignore this email.
+            </p>
+
+            <hr>
+
+            <p style="font-size: 12px;">
+                PensionIQ Ghana provides pension estimates
+                and analytical tools. It is not an official
+                SSNIT platform.
+            </p>
+        </div>
+        """,
+        "text": (
+            "PensionIQ Ghana\n\n"
+            "We received a request to reset your password.\n\n"
+            f"Reset your password here:\n{reset_url}\n\n"
+            "This link expires in 15 minutes.\n\n"
+            "If you did not request this password reset, "
+            "you can ignore this email."
+        ),
+    }
+
+    request = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "PensionIQ-Ghana/1.0",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(
+            request,
+            timeout=30,
+        ) as response:
+            if response.status not in (200, 201):
+                raise RuntimeError(
+                    f"Resend returned status {response.status}."
+                )
+
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode(
+            "utf-8",
+            errors="replace",
+        )
 
         raise RuntimeError(
-            "SMTP email configuration is incomplete."
-        )
+            f"Resend API error {exc.code}: {error_body}"
+        ) from exc
 
-
-    message = EmailMessage()
-
-    message["Subject"] = (
-        "Reset your PensionIQ password"
-    )
-
-    message["From"] = (
-        f"{from_name} <{from_email}>"
-    )
-
-    message["To"] = recipient_email
-
-
-    message.set_content(
-        f"""
-Hello,
-
-We received a request to reset the password for your PensionIQ Ghana account.
-
-Use the link below to choose a new password:
-
-{reset_url}
-
-This link expires in 15 minutes and can only be used once.
-
-If you did not request a password reset, you can ignore this email.
-
-PensionIQ Ghana
-Retirement Intelligence Platform
-"""
-    )
-
-
-    message.add_alternative(
-        f"""
-<!DOCTYPE html>
-
-<html>
-
-<body
-    style="
-        font-family: Arial, sans-serif;
-        background: #f4f7f6;
-        padding: 30px;
-        color: #17211e;
-    "
->
-
-    <div
-        style="
-            max-width: 560px;
-            margin: auto;
-            background: white;
-            padding: 32px;
-            border-radius: 14px;
-        "
-    >
-
-        <h2
-            style="
-                color: #123d33;
-                margin-top: 0;
-            "
-        >
-            Reset your PensionIQ password
-        </h2>
-
-        <p>
-            We received a request to reset the
-            password for your PensionIQ Ghana account.
-        </p>
-
-        <p>
-            Click the button below to choose
-            a new password.
-        </p>
-
-        <p style="margin: 28px 0;">
-
-            <a
-                href="{reset_url}"
-                style="
-                    display: inline-block;
-                    padding: 13px 22px;
-                    background: #123d33;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 8px;
-                    font-weight: bold;
-                "
-            >
-                Reset Password
-            </a>
-
-        </p>
-
-        <p
-            style="
-                font-size: 13px;
-                color: #68756f;
-            "
-        >
-            This link expires in 15 minutes
-            and can only be used once.
-        </p>
-
-        <p
-            style="
-                font-size: 13px;
-                color: #68756f;
-            "
-        >
-            If you did not request a password reset,
-            simply ignore this email.
-        </p>
-
-        <hr
-            style="
-                border: 0;
-                border-top: 1px solid #dce5e1;
-                margin: 28px 0;
-            "
-        >
-
-        <strong>
-            PensionIQ Ghana
-        </strong>
-
-        <p
-            style="
-                margin-top: 3px;
-                font-size: 11px;
-                color: #68756f;
-            "
-        >
-            Retirement Intelligence Platform
-        </p>
-
-    </div>
-
-</body>
-
-</html>
-""",
-        subtype="html",
-    )
-
-
-    with smtplib.SMTP(
-        smtp_host,
-        smtp_port,
-        timeout=20,
-    ) as smtp:
-
-        smtp.ehlo()
-
-        smtp.starttls()
-
-        smtp.ehlo()
-
-        smtp.login(
-            smtp_username,
-            smtp_password,
-        )
-
-        smtp.send_message(
-            message
-        )
+    except urllib.error.URLError as exc:
+        raise RuntimeError(
+            f"Unable to connect to Resend: {exc.reason}"
+        ) from exc

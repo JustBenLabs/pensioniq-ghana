@@ -1222,12 +1222,9 @@ def forgot_password(
         # to the person making the request.
 
         print(
-            "Password reset email delivery failed:"
-        )
-
-        print(
-            type(exc).__name__
-        )
+        f"Password reset email delivery failed: "
+        f"{type(exc).__name__}: {exc}"
+    )
 
 
     # --------------------------------------------------------
