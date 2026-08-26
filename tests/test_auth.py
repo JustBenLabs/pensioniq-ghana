@@ -2554,4 +2554,68 @@ def test_update_contribution_rejects_recorded_amount_with_too_many_decimals(
         "detail":
             "Recorded First-Tier contribution "
             "cannot have more than 2 decimal places."
-    }    
+    }
+
+def test_registration_rejects_salary_with_too_many_decimals(
+    client,
+):
+    response = client.post(
+        "/auth/register",
+        json={
+            "email":
+                "salary-precision@example.com",
+            "password":
+                "StrongPassword123!",
+            "first_name":
+                "Salary",
+            "last_name":
+                "Test",
+            "date_of_birth":
+                "1995-01-01",
+            "sex":
+                "Male",
+            "contribution_months":
+                0,
+            "best_three_year_average_annual_salary":
+                "72000.123",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Salary cannot have more than "
+            "2 decimal places."
+    }
+
+
+def test_profile_update_rejects_salary_with_too_many_decimals(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "best_three_year_average_annual_salary":
+                "72000.123",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Salary cannot have more than "
+            "2 decimal places."
+    }        

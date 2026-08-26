@@ -822,19 +822,10 @@ def register(
         )
 
 
-    if (
-        request
-        .best_three_year_average_annual_salary
-        <
-        0
-    ):
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Salary cannot be negative."
-            ),
-        )
+    validate_currency_amount(
+    request.best_three_year_average_annual_salary,
+    "Salary",
+)
 
 
     if (
@@ -2871,30 +2862,24 @@ def update_member(
         final_contribution_months,
     )
 
-
     if (
         "best_three_year_average_annual_salary"
         in updates
     ):
-
         salary = updates[
             "best_three_year_average_annual_salary"
         ]
 
-
-        if (
-            salary is None
-            or
-            salary < 0
-        ):
-
+        if salary is None:
             raise HTTPException(
                 status_code=400,
-                detail=(
-                    "Salary cannot be negative."
-                ),
+                detail="Salary cannot be empty.",
             )
 
+        validate_currency_amount(
+            salary,
+            "Salary",
+        )
 
     for field, value in updates.items():
 
