@@ -1884,3 +1884,152 @@ def test_login_rate_limit_blocks_excessive_attempts(
     }
 
     assert "Retry-After" in blocked_response.headers       
+def test_registration_rejects_future_date_of_birth(
+    client,
+):
+    future_dob = (
+        date.today()
+        +
+        timedelta(days=1)
+    )
+
+    response = client.post(
+        "/auth/register",
+        json={
+            "email":
+                "future-dob@example.com",
+            "password":
+                "StrongPassword123!",
+            "first_name":
+                "Future",
+            "last_name":
+                "Member",
+            "date_of_birth":
+                future_dob.isoformat(),
+            "sex":
+                "Male",
+            "contribution_months":
+                0,
+            "best_three_year_average_annual_salary":
+                "0",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Date of birth cannot be "
+            "in the future."
+    }
+
+
+def test_registration_rejects_member_younger_than_15(
+    client,
+):
+    young_dob = (
+        date.today()
+        -
+        timedelta(days=365 * 10)
+    )
+
+    response = client.post(
+        "/auth/register",
+        json={
+            "email":
+                "young-member@example.com",
+            "password":
+                "StrongPassword123!",
+            "first_name":
+                "Young",
+            "last_name":
+                "Member",
+            "date_of_birth":
+                young_dob.isoformat(),
+            "sex":
+                "Female",
+            "contribution_months":
+                0,
+            "best_three_year_average_annual_salary":
+                "0",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Member must be at least "
+            "15 years old."
+    }
+
+
+def test_registration_rejects_implausibly_old_member(
+    client,
+):
+    response = client.post(
+        "/auth/register",
+        json={
+            "email":
+                "old-member@example.com",
+            "password":
+                "StrongPassword123!",
+            "first_name":
+                "Old",
+            "last_name":
+                "Member",
+            "date_of_birth":
+                "1900-01-01",
+            "sex":
+                "Male",
+            "contribution_months":
+                0,
+            "best_three_year_average_annual_salary":
+                "0",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Date of birth produces an "
+            "implausible member age."
+    }
+
+
+def test_profile_update_rejects_future_date_of_birth(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    future_dob = (
+        date.today()
+        +
+        timedelta(days=1)
+    )
+
+    response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                future_dob.isoformat(),
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Date of birth cannot be "
+            "in the future."
+    }    

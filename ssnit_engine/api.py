@@ -418,7 +418,47 @@ def calculate_current_age(
         age -= 1
 
     return age
+def validate_member_date_of_birth(
+    date_of_birth: date,
+) -> None:
+    """
+    Validate a member's date of birth for
+    PensionIQ profile/account data.
 
+    These are application-level plausibility
+    checks, not official SSNIT eligibility rules.
+    """
+
+    if date_of_birth > date.today():
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Date of birth cannot be "
+                "in the future."
+            ),
+        )
+
+    age = calculate_current_age(
+        date_of_birth
+    )
+
+    if age < 15:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Member must be at least "
+                "15 years old."
+            ),
+        )
+
+    if age > 120:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Date of birth produces an "
+                "implausible member age."
+            ),
+        )
 
 def extract_pension_right(
     result,
@@ -620,19 +660,9 @@ def register(
         )
 
 
-    if (
-        request.date_of_birth
-        >
-        date.today()
-    ):
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Date of birth cannot "
-                "be in the future."
-            ),
-        )
+    validate_member_date_of_birth(
+    request.date_of_birth
+)
 
 
     if request.sex not in {
@@ -2645,30 +2675,23 @@ def update_member(
         )
 
 
-    if (
-        "date_of_birth" in updates
-        and
-        (
-            updates[
-                "date_of_birth"
-            ]
-            is None
-            or
-            updates[
-                "date_of_birth"
-            ]
-            >
-            date.today()
-        )
-    ):
+    if "date_of_birth" in updates:
+        date_of_birth = updates[
+            "date_of_birth"
+        ]
 
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Invalid date of birth."
-            ),
-        )
+        if date_of_birth is None:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Date of birth cannot "
+                    "be empty."
+                ),
+            )
 
+        validate_member_date_of_birth(
+            date_of_birth
+        )
 
     if (
         "sex" in updates
