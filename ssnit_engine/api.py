@@ -460,6 +460,48 @@ def validate_member_date_of_birth(
             ),
         )
 
+def validate_contribution_period(
+    year: int,
+    month: int,
+) -> None:
+    """
+    Validate a contribution year and month.
+
+    PensionIQ does not allow contribution
+    records for future periods.
+    """
+
+    if year < 1900:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid contribution year.",
+        )
+
+    if month < 1 or month > 12:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Month must be between "
+                "1 and 12."
+            ),
+        )
+
+    today = date.today()
+
+    if (
+        year,
+        month,
+    ) > (
+        today.year,
+        today.month,
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Contribution period cannot "
+                "be in the future."
+            ),
+        )
 def extract_pension_right(
     result,
 ) -> str | None:
@@ -2914,29 +2956,10 @@ def create_contribution(
         )
 
 
-    if request.year < 1900:
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Invalid contribution year."
-            ),
-        )
-
-
-    if (
-        request.month < 1
-        or
-        request.month > 12
-    ):
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Month must be between "
-                "1 and 12."
-            ),
-        )
+    validate_contribution_period(
+    request.year,
+    request.month,
+)
 
 
     if (
@@ -3320,31 +3343,10 @@ def update_contribution(
         "insurable_earnings",
         record.insurable_earnings,
     )
-
-
-    if new_year < 1900:
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Invalid contribution year."
-            ),
-        )
-
-
-    if (
-        new_month < 1
-        or
-        new_month > 12
-    ):
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Month must be between "
-                "1 and 12."
-            ),
-        )
+    validate_contribution_period(
+    new_year,
+    new_month,
+)
 
 
     if new_earnings < 0:

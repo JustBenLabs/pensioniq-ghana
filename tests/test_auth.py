@@ -2147,4 +2147,106 @@ def test_profile_update_revalidates_existing_months_when_dob_changes(
         "detail":
             "Contribution months are not "
             "plausible for the member's age."
-    }    
+    }
+def test_create_contribution_rejects_future_period(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    today = date.today()
+
+    future_year = today.year + 1
+
+    response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                future_year,
+            "month":
+                1,
+            "insurable_earnings":
+                "5000",
+            "recorded_first_tier_contribution":
+                "675",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution period cannot "
+            "be in the future."
+    }
+
+
+def test_update_contribution_rejects_future_period(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    today = date.today()
+
+    create_response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                today.year,
+            "month":
+                1,
+            "insurable_earnings":
+                "5000",
+            "recorded_first_tier_contribution":
+                "675",
+        },
+    )
+
+    assert create_response.status_code == 200
+
+    contribution_id = (
+        create_response.json()["id"]
+    )
+
+    response = client.put(
+        (
+            f"/members/{member_id}/"
+            f"contributions/{contribution_id}"
+        ),
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                today.year + 1,
+            "month":
+                1,
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution period cannot "
+            "be in the future."
+    }        
