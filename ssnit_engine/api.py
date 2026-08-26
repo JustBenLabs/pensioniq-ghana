@@ -502,6 +502,46 @@ def validate_contribution_period(
                 "be in the future."
             ),
         )
+
+def validate_contribution_period_for_member(
+    date_of_birth: date,
+    year: int,
+    month: int,
+) -> None:
+    """
+    Validate a contribution period against
+    the member's age.
+
+    This is a PensionIQ data-quality check,
+    not an official SSNIT determination.
+    """
+
+    validate_contribution_period(
+        year,
+        month,
+    )
+
+    earliest_contribution_date = (
+        birthday_at_age(
+            date_of_birth,
+            15,
+        )
+    )
+
+    if (
+        year,
+        month,
+    ) < (
+        earliest_contribution_date.year,
+        earliest_contribution_date.month,
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Contribution period is not "
+                "plausible for the member's age."
+            ),
+        )    
 def extract_pension_right(
     result,
 ) -> str | None:
@@ -2956,11 +2996,11 @@ def create_contribution(
         )
 
 
-    validate_contribution_period(
+    validate_contribution_period_for_member(
+    member.date_of_birth,
     request.year,
     request.month,
 )
-
 
     if (
         request.insurable_earnings
@@ -3343,7 +3383,8 @@ def update_contribution(
         "insurable_earnings",
         record.insurable_earnings,
     )
-    validate_contribution_period(
+    validate_contribution_period_for_member(
+    member.date_of_birth,
     new_year,
     new_month,
 )

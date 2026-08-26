@@ -2249,4 +2249,139 @@ def test_update_contribution_rejects_future_period(
         "detail":
             "Contribution period cannot "
             "be in the future."
+    }
+
+
+def test_create_contribution_rejects_period_before_plausible_start_age(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    # Test registration helper uses an adult DOB.
+    # Move the profile DOB to a known value so the
+    # age-boundary test is deterministic.
+    profile_response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                "2000-06-15",
+            "contribution_months":
+                0,
+        },
+    )
+
+    assert profile_response.status_code == 200
+
+    response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                2010,
+            "month":
+                3,
+            "insurable_earnings":
+                "5000",
+            "recorded_first_tier_contribution":
+                "675",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution period is not "
+            "plausible for the member's age."
+    }
+
+
+def test_update_contribution_rejects_period_before_plausible_start_age(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    profile_response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                "2000-06-15",
+            "contribution_months":
+                0,
+        },
+    )
+
+    assert profile_response.status_code == 200
+
+    create_response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                2020,
+            "month":
+                1,
+            "insurable_earnings":
+                "5000",
+            "recorded_first_tier_contribution":
+                "675",
+        },
+    )
+
+    assert create_response.status_code == 200
+
+    contribution_id = (
+        create_response.json()["id"]
+    )
+
+    response = client.put(
+        (
+            f"/members/{member_id}/"
+            f"contributions/{contribution_id}"
+        ),
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                2010,
+            "month":
+                3,
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution period is not "
+            "plausible for the member's age."
     }        
