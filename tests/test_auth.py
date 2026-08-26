@@ -2618,4 +2618,78 @@ def test_profile_update_rejects_salary_with_too_many_decimals(
         "detail":
             "Salary cannot have more than "
             "2 decimal places."
-    }        
+    }
+
+def test_profile_update_rejects_dob_inconsistent_with_existing_contribution_record(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    # Establish a member profile where
+    # a 2020 contribution is plausible.
+    profile_response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                "1990-01-01",
+            "contribution_months":
+                0,
+        },
+    )
+
+    assert profile_response.status_code == 200
+
+    # Create a valid historical contribution.
+    contribution_response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "year":
+                2020,
+            "month":
+                1,
+            "insurable_earnings":
+                "5000.00",
+            "recorded_first_tier_contribution":
+                "675.00",
+        },
+    )
+
+    assert contribution_response.status_code == 200
+
+    # A DOB of 2010 would imply the member
+    # was only 10 years old in January 2020.
+    response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                "2010-01-01",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Date of birth is not "
+            "consistent with existing "
+            "contribution records."
+    }            

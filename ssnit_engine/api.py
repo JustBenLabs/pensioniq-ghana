@@ -460,6 +460,34 @@ def validate_member_date_of_birth(
             ),
         )
 
+def validate_member_dob_against_contribution_records(
+    date_of_birth: date,
+    contribution_records,
+) -> None:
+    earliest_contribution_date = (
+        birthday_at_age(
+            date_of_birth,
+            15,
+        )
+    )
+
+    for record in contribution_records:
+        if (
+            record.year,
+            record.month,
+        ) < (
+            earliest_contribution_date.year,
+            earliest_contribution_date.month,
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Date of birth is not "
+                    "consistent with existing "
+                    "contribution records."
+                ),
+            )    
+
 def validate_contribution_period(
     year: int,
     month: int,
@@ -2832,13 +2860,9 @@ def update_member(
 
 
     if (
-        "contribution_months"
-        in updates
+        "contribution_months" in updates
         and
-        updates[
-            "contribution_months"
-        ]
-        is None
+        updates["contribution_months"] is None
     ):
         raise HTTPException(
             status_code=400,
@@ -2847,6 +2871,8 @@ def update_member(
                 "cannot be empty."
             ),
         )
+
+
     final_date_of_birth = updates.get(
         "date_of_birth",
         member.date_of_birth,
@@ -2862,6 +2888,26 @@ def update_member(
         final_contribution_months,
     )
 
+
+    if "date_of_birth" in updates:
+        existing_contributions = (
+            db.scalars(
+                select(
+                    ContributionRecord
+                )
+                .where(
+                    ContributionRecord.member_id
+                    ==
+                    member_id
+                )
+            )
+            .all()
+        )
+
+        validate_member_dob_against_contribution_records(
+            final_date_of_birth,
+            existing_contributions,
+        )
     if (
         "best_three_year_average_annual_salary"
         in updates
