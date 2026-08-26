@@ -124,6 +124,52 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.middleware("http")
+async def add_security_headers(
+    request,
+    call_next,
+):
+    response = await call_next(request)
+
+    # Prevent browsers from guessing MIME/content types.
+    response.headers[
+        "X-Content-Type-Options"
+    ] = "nosniff"
+
+    # Prevent this API from being embedded in frames.
+    response.headers[
+        "X-Frame-Options"
+    ] = "DENY"
+
+    # Avoid leaking URL/referrer information.
+    response.headers[
+        "Referrer-Policy"
+    ] = "no-referrer"
+
+    # PensionIQ does not need access to these browser features.
+    response.headers[
+        "Permissions-Policy"
+    ] = (
+        "camera=(), "
+        "microphone=(), "
+        "geolocation=()"
+    )
+
+    # Tell browsers to use HTTPS for the public Render service.
+    forwarded_proto = request.headers.get(
+        "x-forwarded-proto",
+        request.url.scheme,
+    )
+
+    if forwarded_proto == "https":
+        response.headers[
+            "Strict-Transport-Security"
+        ] = (
+            "max-age=31536000; "
+            "includeSubDomains"
+        )
+
+    return response
 
 # ============================================================
 # PROJECT PATHS

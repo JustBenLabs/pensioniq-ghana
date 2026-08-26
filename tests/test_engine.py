@@ -83,3 +83,38 @@ def test_not_yet_old_age_eligible_under_55():
     )
     assert result.eligible is False
     assert result.routed_benefit == "NOT_YET_ELIGIBLE"
+def test_health_endpoint_has_security_headers(
+    client,
+):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+
+    assert (
+        response.headers[
+            "x-content-type-options"
+        ]
+        == "nosniff"
+    )
+
+    assert (
+        response.headers[
+            "x-frame-options"
+        ]
+        == "DENY"
+    )
+
+    assert (
+        response.headers[
+            "referrer-policy"
+        ]
+        == "no-referrer"
+    )
+
+    assert (
+        response.headers[
+            "permissions-policy"
+        ]
+        ==
+        "camera=(), microphone=(), geolocation=()"
+    )
