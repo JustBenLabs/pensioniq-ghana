@@ -563,7 +563,50 @@ def hash_password_reset_token(
     return hashlib.sha256(
         token.encode("utf-8")
     ).hexdigest()
+def validate_contribution_months_for_age(
+    date_of_birth: date,
+    contribution_months: int,
+) -> None:
+    """
+    Check whether contribution months are
+    plausible for the member's age.
 
+    This is a PensionIQ data-quality check,
+    not an official SSNIT determination.
+    """
+
+    if contribution_months < 0:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Contribution months "
+                "cannot be negative."
+            ),
+        )
+
+    age = calculate_current_age(
+        date_of_birth
+    )
+
+    # Allow one full extra year as a generous
+    # calendar-month buffer.
+    maximum_plausible_months = max(
+        0,
+        (age - 15 + 1) * 12,
+    )
+
+    if (
+        contribution_months
+        >
+        maximum_plausible_months
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Contribution months are not "
+                "plausible for the member's age."
+            ),
+        )
 # ============================================================
 # AUTHORIZATION
 # ============================================================
@@ -662,6 +705,10 @@ def register(
 
     validate_member_date_of_birth(
     request.date_of_birth
+)
+    validate_contribution_months_for_age(
+    request.date_of_birth,
+    request.contribution_months,
 )
 
 
@@ -2714,28 +2761,33 @@ def update_member(
     if (
         "contribution_months"
         in updates
+        and
+        updates[
+            "contribution_months"
+        ]
+        is None
     ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Contribution months "
+                "cannot be empty."
+            ),
+        )
+    final_date_of_birth = updates.get(
+        "date_of_birth",
+        member.date_of_birth,
+    )
 
-        if (
-            updates[
-                "contribution_months"
-            ]
-            is None
-            or
-            updates[
-                "contribution_months"
-            ]
-            <
-            0
-        ):
+    final_contribution_months = updates.get(
+        "contribution_months",
+        member.contribution_months,
+    )
 
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "Contribution months "
-                    "cannot be negative."
-                ),
-            )
+    validate_contribution_months_for_age(
+        final_date_of_birth,
+        final_contribution_months,
+    )
 
 
     if (

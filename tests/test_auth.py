@@ -2033,3 +2033,118 @@ def test_profile_update_rejects_future_date_of_birth(
             "Date of birth cannot be "
             "in the future."
     }    
+def test_registration_rejects_implausible_contribution_months(
+    client,
+):
+    response = client.post(
+        "/auth/register",
+        json={
+            "email":
+                "implausible-months@example.com",
+            "password":
+                "StrongPassword123!",
+            "first_name":
+                "Test",
+            "last_name":
+                "Member",
+            "date_of_birth":
+                "2006-01-01",
+            "sex":
+                "Male",
+            "contribution_months":
+                400,
+            "best_three_year_average_annual_salary":
+                "0",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution months are not "
+            "plausible for the member's age."
+    }
+
+
+def test_profile_update_rejects_implausible_contribution_months(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                "2006-01-01",
+            "contribution_months":
+                400,
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution months are not "
+            "plausible for the member's age."
+    }
+
+
+def test_profile_update_revalidates_existing_months_when_dob_changes(
+    client,
+):
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    # First give the member a plausible
+    # contribution history for the original DOB.
+    update_response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "contribution_months": 120,
+        },
+    )
+
+    assert update_response.status_code == 200
+
+    # Now make the member much younger.
+    # The existing 120 months should no longer
+    # be plausible for the proposed DOB.
+    response = client.put(
+        f"/members/{member_id}",
+        headers=(
+            authorization_headers(
+                token
+            )
+        ),
+        json={
+            "date_of_birth":
+                "2010-01-01",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Contribution months are not "
+            "plausible for the member's age."
+    }    
