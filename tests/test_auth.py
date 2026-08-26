@@ -2385,3 +2385,173 @@ def test_update_contribution_rejects_period_before_plausible_start_age(
             "Contribution period is not "
             "plausible for the member's age."
     }        
+def test_create_contribution_rejects_earnings_with_too_many_decimals(
+    client,
+):
+    token, member_id = register_and_login(
+        client
+    )
+
+    today = date.today()
+
+    response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "year": today.year,
+            "month": 1,
+            "insurable_earnings":
+                "5000.123",
+            "recorded_first_tier_contribution":
+                "675.00",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Insurable earnings cannot have "
+            "more than 2 decimal places."
+    }
+
+
+def test_create_contribution_rejects_recorded_amount_with_too_many_decimals(
+    client,
+):
+    token, member_id = register_and_login(
+        client
+    )
+
+    today = date.today()
+
+    response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "year": today.year,
+            "month": 1,
+            "insurable_earnings":
+                "5000.00",
+            "recorded_first_tier_contribution":
+                "675.999",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Recorded First-Tier contribution "
+            "cannot have more than 2 decimal places."
+    }
+
+
+def test_update_contribution_rejects_earnings_with_too_many_decimals(
+    client,
+):
+    token, member_id = register_and_login(
+        client
+    )
+
+    today = date.today()
+
+    create_response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "year": today.year,
+            "month": 1,
+            "insurable_earnings":
+                "5000.00",
+            "recorded_first_tier_contribution":
+                "675.00",
+        },
+    )
+
+    assert create_response.status_code == 200
+
+    contribution_id = (
+        create_response.json()["id"]
+    )
+
+    response = client.put(
+        (
+            f"/members/{member_id}/"
+            f"contributions/{contribution_id}"
+        ),
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "insurable_earnings":
+                "5000.123",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Insurable earnings cannot have "
+            "more than 2 decimal places."
+    }
+
+
+def test_update_contribution_rejects_recorded_amount_with_too_many_decimals(
+    client,
+):
+    token, member_id = register_and_login(
+        client
+    )
+
+    today = date.today()
+
+    create_response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "year": today.year,
+            "month": 1,
+            "insurable_earnings":
+                "5000.00",
+            "recorded_first_tier_contribution":
+                "675.00",
+        },
+    )
+
+    assert create_response.status_code == 200
+
+    contribution_id = (
+        create_response.json()["id"]
+    )
+
+    response = client.put(
+        (
+            f"/members/{member_id}/"
+            f"contributions/{contribution_id}"
+        ),
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "recorded_first_tier_contribution":
+                "675.999",
+        },
+    )
+
+    assert response.status_code == 400
+
+    assert response.json() == {
+        "detail":
+            "Recorded First-Tier contribution "
+            "cannot have more than 2 decimal places."
+    }    

@@ -2997,45 +2997,21 @@ def create_contribution(
 
 
     validate_contribution_period_for_member(
-    member.date_of_birth,
-    request.year,
-    request.month,
-)
+        member.date_of_birth,
+        request.year,
+        request.month,
+    )
 
-    if (
-        request.insurable_earnings
-        <
-        0
-    ):
+    validate_currency_amount(
+        request.insurable_earnings,
+        "Insurable earnings",
+    )
 
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Insurable earnings "
-                "cannot be negative."
-            ),
+    if request.recorded_first_tier_contribution is not None:
+        validate_currency_amount(
+            request.recorded_first_tier_contribution,
+            "Recorded First-Tier contribution",
         )
-
-
-    if (
-        request
-        .recorded_first_tier_contribution
-        is not None
-        and
-        request
-        .recorded_first_tier_contribution
-        <
-        0
-    ):
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Recorded First-Tier contribution "
-                "cannot be negative."
-            ),
-        )
-
 
     existing = db.scalar(
         select(
@@ -3383,11 +3359,15 @@ def update_contribution(
         "insurable_earnings",
         record.insurable_earnings,
     )
+    validate_currency_amount(
+        new_earnings,
+        "Insurable earnings",
+    )
     validate_contribution_period_for_member(
-    member.date_of_birth,
-    new_year,
-    new_month,
-)
+        member.date_of_birth,
+        new_year,
+        new_month,
+    )
 
 
     if new_earnings < 0:
@@ -3405,79 +3385,22 @@ def update_contribution(
         "recorded_first_tier_contribution"
         in updates
     ):
-
         recorded_amount = updates[
             "recorded_first_tier_contribution"
         ]
 
-
-        if (
-            recorded_amount
-            is not None
-            and
-            recorded_amount < 0
-        ):
-
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "Recorded First-Tier contribution "
-                    "cannot be negative."
+        if recorded_amount is not None:
+            validate_currency_amount(
+                recorded_amount,
+                (
+                    "Recorded First-Tier "
+                    "contribution"
                 ),
             )
 
-
-    duplicate = db.scalar(
-        select(
-            ContributionRecord
-        )
-        .where(
-            ContributionRecord.member_id
-            ==
-            member_id,
-
-            ContributionRecord.year
-            ==
-            new_year,
-
-            ContributionRecord.month
-            ==
-            new_month,
-
-            ContributionRecord.id
-            !=
-            contribution_id,
-        )
-    )
-
-
-    if duplicate is not None:
-
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                "Another contribution record "
-                "already exists for this "
-                "member and month."
-            ),
-        )
-
-
-    for field, value in updates.items():
-
-        setattr(
-            record,
-            field,
-            value,
-        )
-
-
-    db.commit()
-
-    db.refresh(
-        record
-    )
-
+            record.recorded_first_tier_contribution = (
+                recorded_amount
+            )
 
     return {
 
@@ -3519,6 +3442,48 @@ def update_contribution(
                 ),
         },
     }
+
+
+def validate_currency_amount(
+    value: Decimal,
+    field_name: str,
+) -> None:
+    """
+    Validate a monetary amount supplied to PensionIQ.
+    """
+
+    if not value.is_finite():
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"{field_name} must be "
+                "a finite amount."
+            ),
+        )
+
+    if value < 0:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"{field_name} cannot "
+                "be negative."
+            ),
+        )
+
+    normalized_value = value.normalize()
+
+    if (
+        normalized_value.as_tuple().exponent
+        <
+        -2
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"{field_name} cannot have "
+                "more than 2 decimal places."
+            ),
+        )
 
 
 # ============================================================
