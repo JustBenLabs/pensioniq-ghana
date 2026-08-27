@@ -591,6 +591,25 @@ def extract_pension_right(
 
     return str(right)
 
+def extract_result_detail(
+    result,
+    key: str,
+) -> str | None:
+
+    if not isinstance(
+        result.details,
+        dict,
+    ):
+        return None
+
+    value = result.details.get(
+        key
+    )
+
+    if value is None:
+        return None
+
+    return str(value)
 
 def validate_sex(
     sex: str,
@@ -1824,6 +1843,22 @@ def retirement(
         response_data[
             "contribution_months"
         ] = request.contribution_months
+
+
+        response_data[
+            "monthly_salary_basis"
+        ] = extract_result_detail(
+            result,
+            "monthly_salary_basis",
+        )
+
+
+        response_data[
+            "retirement_age_factor"
+        ] = extract_result_detail(
+            result,
+            "reduction_factor",
+        )
 
 
         return response_data

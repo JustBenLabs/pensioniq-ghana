@@ -118,3 +118,61 @@ def test_health_endpoint_has_security_headers(
         ==
         "camera=(), microphone=(), geolocation=()"
     )
+def test_retirement_api_exposes_full_pension_calculation_details(
+    client,
+):
+    response = client.post(
+        "/benefits/retirement",
+        json={
+            "date_of_birth": "1966-08-20",
+            "retirement_date": "2026-08-20",
+            "contribution_months": 240,
+            "best_three_year_average_annual_salary": "72000",
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert (
+        D(data["monthly_salary_basis"])
+        ==
+        D("6000.00")
+    )
+
+    assert (
+        D(data["retirement_age_factor"])
+        ==
+        D("1")
+    )
+
+
+def test_retirement_api_exposes_reduced_pension_factor(
+    client,
+):
+    response = client.post(
+        "/benefits/retirement",
+        json={
+            "date_of_birth": "1969-08-20",
+            "retirement_date": "2026-08-20",
+            "contribution_months": 240,
+            "best_three_year_average_annual_salary": "72000",
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert (
+        D(data["monthly_salary_basis"])
+        ==
+        D("6000.00")
+    )
+
+    assert (
+        D(data["retirement_age_factor"])
+        ==
+        D("0.75")
+    )
