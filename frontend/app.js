@@ -478,10 +478,16 @@ function displayCalculationBreakdown(
 ) {
 
     const annualSalary =
-        Number(salary);
+    Number(salary);
 
     const monthlySalaryBasis =
-        annualSalary / 12;
+    data.monthly_salary_basis !== null
+    &&
+    data.monthly_salary_basis !== undefined
+        ? Number(
+            data.monthly_salary_basis
+        )
+        : null;
 
 
     const pensionRight =
@@ -515,11 +521,19 @@ function displayCalculationBreakdown(
 
 
     document.getElementById(
-        "calc-monthly-salary"
-    ).textContent =
+    "calc-monthly-salary"
+).textContent =
+    monthlySalaryBasis !== null
+    &&
+    Number.isFinite(
+        monthlySalaryBasis
+    )
+        ?
         formatBreakdownCurrency(
             monthlySalaryBasis
-        );
+        )
+        :
+        "Not Applicable";
 
 
     document.getElementById(
@@ -572,24 +586,14 @@ function displayCalculationBreakdown(
         );
 
 
-    let retirementFactor =
-        null;
-
-
-    if (
-        monthlyBenefit !== null
-        &&
-        Number.isFinite(monthlyBenefit)
-        &&
-        pensionBeforeAgeFactor > 0
-    ) {
-
-        retirementFactor =
-            monthlyBenefit
-            /
-            pensionBeforeAgeFactor;
-
-    }
+    const retirementFactor =
+    data.retirement_age_factor !== null
+    &&
+    data.retirement_age_factor !== undefined
+        ? Number(
+            data.retirement_age_factor
+        )
+        : null;
 
 
     if (
@@ -621,44 +625,58 @@ function displayCalculationBreakdown(
     );
 
 
-const retirementAgeNumber =
+    const retirementAgeNumber =
     Number(
         retirementAge
     );
 
 
-const retirementAgeMessages = {
-    55:
-        "Retirement at age 55 applies a 60% early-retirement factor.",
-    56:
-        "Retirement at age 56 applies a 67.5% early-retirement factor.",
-    57:
-        "Retirement at age 57 applies a 75% early-retirement factor.",
-    58:
-        "Retirement at age 58 applies an 82.5% early-retirement factor.",
-    59:
-        "Retirement at age 59 applies a 90% early-retirement factor.",
-    60:
-        "Age 60 is the full pension age, so no early-retirement reduction is applied."
-};
-
-
 if (
-    retirementAgeMessages[
-        retirementAgeNumber
-    ]
+    retirementFactor !== null
+    &&
+    Number.isFinite(
+        retirementFactor
+    )
 ) {
 
-    retirementFactorExplanation.textContent =
-        retirementAgeMessages[
-            retirementAgeNumber
-        ];
+    if (
+        retirementAgeNumber < 60
+        &&
+        retirementFactor === 1
+    ) {
+
+        retirementFactorExplanation.textContent =
+            `The calculation applies a 100% retirement-age factor at age `
+            +
+            `${retirementAgeNumber}. No early-retirement reduction was `
+            +
+            `applied under the benefit route returned by the actuarial engine.`;
+
+    }
+    else if (
+        retirementAgeNumber < 60
+    ) {
+
+        retirementFactorExplanation.textContent =
+            `Retirement at age ${retirementAgeNumber} applies a `
+            +
+            `${(
+                retirementFactor * 100
+            ).toFixed(1)}% retirement-age factor in this calculation.`;
+
+    }
+    else {
+
+        retirementFactorExplanation.textContent =
+            "Age 60 is the full pension age, so a 100% retirement-age factor is applied.";
+
+    }
 
 }
 else {
 
     retirementFactorExplanation.textContent =
-        "The retirement-age adjustment depends on the applicable retirement-benefit route.";
+        "A retirement-age adjustment is not applicable for this result.";
 
 }
 
