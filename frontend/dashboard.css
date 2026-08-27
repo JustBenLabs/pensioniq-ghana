@@ -1631,3 +1631,926 @@ footer strong {
     }
 
 }
+
+/* ==========================================================
+   PENSIONIQ DESIGN SYSTEM V1
+   FINTECH DASHBOARD REFRESH
+========================================================== */
+
+:root {
+    --primary: #0f766e;
+    --primary-dark: #0b3b4a;
+    --primary-light: #e8f6f4;
+
+    --navy: #0b1f33;
+    --navy-soft: #12354a;
+
+    --accent: #d4a72c;
+    --accent-light: #fff7df;
+
+    --background: #f2f6fa;
+    --surface: #ffffff;
+    --surface-soft: #f7fafc;
+    --surface-teal: #edf8f6;
+    --surface-blue: #eef4fa;
+
+    --text: #172538;
+    --muted: #66758a;
+
+    --border: #dbe4ec;
+
+    --success: #15803d;
+    --success-light: #eaf8ef;
+
+    --warning: #a16207;
+    --warning-light: #fff7df;
+
+    --danger: #b42318;
+    --danger-light: #fff0ee;
+
+    --shadow-soft:
+        0 8px 24px
+        rgba(15, 35, 55, 0.06);
+
+    --shadow-card:
+        0 14px 36px
+        rgba(15, 35, 55, 0.09);
+
+    --radius-card: 18px;
+}
+
+
+/* ==========================================================
+   GLOBAL PAGE
+========================================================== */
+
+body {
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(15, 118, 110, 0.08),
+            transparent 30%
+        ),
+        linear-gradient(
+            180deg,
+            #f8fbfd 0%,
+            var(--background) 100%
+        );
+
+    color: var(--text);
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.topbar {
+    min-height: 82px;
+
+    padding:
+        0
+        clamp(20px, 5vw, 72px);
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--navy-soft)
+        );
+
+    border-bottom: none;
+
+    box-shadow:
+        0 8px 28px
+        rgba(4, 20, 34, 0.16);
+
+    backdrop-filter: none;
+}
+
+
+.brand-icon {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #18a999,
+            var(--primary)
+        );
+
+    box-shadow:
+        0 6px 16px
+        rgba(15, 118, 110, 0.28);
+
+    font-size: 22px;
+}
+
+
+.brand-text h1 {
+    color: #ffffff;
+
+    font-size: 19px;
+
+    letter-spacing: -0.02em;
+}
+
+
+.brand-text span {
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.68
+        );
+
+    font-size: 11px;
+
+    letter-spacing: 0.03em;
+}
+
+
+.header-actions {
+    gap: 12px;
+}
+
+
+.calculator-link {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+
+    padding:
+        0
+        17px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.09
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
+
+    border-radius: 11px;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.calculator-link:hover {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.16
+        );
+
+    transform:
+        translateY(-1px);
+}
+
+
+.logout-button {
+    min-height: 42px;
+
+    padding:
+        0
+        17px;
+
+    background: #ffffff;
+
+    color: var(--navy);
+
+    border-radius: 11px;
+
+    font-size: 12px;
+
+    box-shadow:
+        0 5px 14px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+.logout-button:hover {
+    background: #eef4f7;
+}
+
+
+/* ==========================================================
+   PAGE WIDTH
+========================================================== */
+
+.page {
+    width:
+        min(
+            92%,
+            1220px
+        );
+
+    max-width: none;
+}
+
+
+/* ==========================================================
+   DASHBOARD INTRO
+========================================================== */
+
+.dashboard-intro {
+    padding:
+        54px
+        0
+        34px;
+}
+
+
+.dashboard-intro h2 {
+    max-width: 680px;
+
+    margin-top: 10px;
+
+    color: var(--navy);
+
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            42px
+        );
+
+    line-height: 1.08;
+
+    letter-spacing: -0.035em;
+}
+
+
+.dashboard-intro p {
+    max-width: 650px;
+
+    margin-top: 14px;
+
+    color: var(--muted);
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+.eyebrow,
+.section-label {
+    color: var(--primary);
+
+    font-size: 10px;
+
+    letter-spacing: 1.6px;
+}
+
+
+/* ==========================================================
+   WELCOME CARD
+========================================================== */
+
+.welcome-card {
+    position: relative;
+
+    overflow: hidden;
+
+    padding:
+        30px
+        34px;
+
+    border: none;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            #114b57
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 18px 42px
+        rgba(11, 31, 51, 0.18);
+}
+
+
+.welcome-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    right: -100px;
+    top: -130px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+}
+
+
+.welcome-card h2 {
+    color: #ffffff;
+
+    font-size: 27px;
+
+    letter-spacing: -0.025em;
+}
+
+
+.welcome-card p {
+    margin-top: 7px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.72
+        );
+}
+
+
+.eyebrow.light {
+    color: #77ddd1;
+}
+
+
+.member-avatar {
+    position: relative;
+
+    z-index: 1;
+
+    background:
+        linear-gradient(
+            135deg,
+            #22b8a7,
+            var(--primary)
+        );
+
+    border:
+        3px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
+
+    color: white;
+
+    box-shadow:
+        0 10px 24px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* ==========================================================
+   METRIC CARDS
+========================================================== */
+
+.metric-grid {
+    gap: 18px;
+
+    margin-top: 22px;
+}
+
+
+.metric-card {
+    position: relative;
+
+    overflow: hidden;
+
+    padding:
+        24px;
+
+    background: var(--surface);
+
+    border:
+        1px solid
+        rgba(
+            219,
+            228,
+            236,
+            0.9
+        );
+
+    border-radius: var(--radius-card);
+
+    box-shadow: var(--shadow-soft);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.metric-card:hover {
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        var(--shadow-card);
+}
+
+
+.metric-card:nth-child(1) {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            var(--surface-blue)
+        );
+}
+
+
+.metric-card:nth-child(2) {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            var(--surface-teal)
+        );
+}
+
+
+.metric-card:nth-child(3) {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #edf7f1
+        );
+}
+
+
+.metric-card:nth-child(4) {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            var(--accent-light)
+        );
+}
+
+
+.metric-card span {
+    color: var(--muted);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.03em;
+
+    text-transform: uppercase;
+}
+
+
+.metric-card strong {
+    display: block;
+
+    margin-top: 10px;
+
+    color: var(--navy);
+
+    font-size:
+        clamp(
+            26px,
+            3vw,
+            34px
+        );
+
+    line-height: 1.1;
+
+    letter-spacing: -0.035em;
+}
+
+
+.metric-card small {
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--muted);
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================================
+   MAIN DASHBOARD CARDS
+========================================================== */
+
+.dashboard-card {
+    margin-top: 22px;
+
+    padding:
+        clamp(
+            22px,
+            3vw,
+            32px
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.94
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 20px;
+
+    box-shadow: var(--shadow-soft);
+}
+
+
+.card-heading {
+    padding-bottom: 20px;
+
+    border-bottom:
+        1px solid
+        #edf1f5;
+}
+
+
+.card-heading h3 {
+    margin-top: 7px;
+
+    color: var(--navy);
+
+    font-size: 20px;
+
+    letter-spacing: -0.025em;
+}
+
+
+.card-description {
+    margin-top: 8px;
+
+    color: var(--muted);
+
+    line-height: 1.65;
+}
+
+
+/* ==========================================================
+   PENSION PROGRESS
+========================================================== */
+
+.progress-track {
+    height: 12px;
+
+    background: #e9eff4;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+}
+
+
+.progress-bar {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            #26aa97
+        );
+
+    box-shadow:
+        0 0 16px
+        rgba(15, 118, 110, 0.25);
+}
+
+
+/* ==========================================================
+   FORMS
+========================================================== */
+
+.form-group label {
+    color: var(--text);
+
+    font-weight: 700;
+}
+
+
+.form-group input,
+.form-group select,
+.money-field {
+    border-color: var(--border);
+
+    background: #fbfcfd;
+
+    border-radius: 11px;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary);
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(15, 118, 110, 0.11);
+
+    background: #ffffff;
+}
+
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.primary-button {
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #0b5f59
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 7px 18px
+        rgba(15, 118, 110, 0.2);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.primary-button:hover {
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 10px 22px
+        rgba(15, 118, 110, 0.27);
+}
+
+
+.secondary-button,
+.profile-edit-button {
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: var(--navy);
+}
+
+
+/* ==========================================================
+   HEALTH / POSITION ITEMS
+========================================================== */
+
+.health-item,
+.position-details > div,
+.profile-grid > div {
+    background: var(--surface-soft);
+
+    border:
+        1px solid
+        #e6edf3;
+
+    border-radius: 13px;
+}
+
+
+.alignment-box {
+    background:
+        linear-gradient(
+            135deg,
+            var(--surface-teal),
+            #f6fbfa
+        );
+
+    border:
+        1px solid
+        #cfe8e3;
+
+    border-radius: 15px;
+}
+
+
+/* ==========================================================
+   TABLES
+========================================================== */
+
+.table-wrapper {
+    margin-top: 20px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+}
+
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+
+thead {
+    background: #f2f6f9;
+}
+
+
+th {
+    color: #53657a;
+
+    font-size: 10px;
+
+    letter-spacing: 0.05em;
+
+    text-transform: uppercase;
+}
+
+
+tbody tr {
+    transition:
+        background 0.15s ease;
+}
+
+
+tbody tr:hover {
+    background: #f7fafc;
+}
+
+
+/* ==========================================================
+   STATUS / MESSAGES
+========================================================== */
+
+.status-badge {
+    border-radius: 999px;
+
+    font-weight: 750;
+}
+
+
+.success-message {
+    border-radius: 11px;
+
+    background: var(--success-light);
+
+    color: var(--success);
+}
+
+
+.error-box {
+    border-radius: 12px;
+
+    box-shadow: var(--shadow-soft);
+}
+
+
+/* ==========================================================
+   DISCLAIMER
+========================================================== */
+
+.disclaimer {
+    margin-top: 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #eef3f7
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 16px;
+
+    color: var(--muted);
+}
+
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (
+    max-width: 760px
+) {
+
+    .topbar {
+        padding:
+            14px
+            18px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .header-actions {
+        width: 100%;
+
+        justify-content:
+            space-between;
+    }
+
+
+    .calculator-link,
+    .logout-button {
+        flex: 1;
+
+        justify-content: center;
+    }
+
+
+    .page {
+        width: 92%;
+    }
+
+
+    .dashboard-intro {
+        padding-top: 34px;
+    }
+
+
+    .welcome-card {
+        padding: 24px;
+
+        border-radius: 18px;
+    }
+
+
+    .dashboard-card {
+        padding: 20px;
+    }
+
+}
