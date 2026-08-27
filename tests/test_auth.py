@@ -4,8 +4,15 @@ from datetime import (
     datetime,
     timedelta,
 )
+import jwt
 
 from sqlalchemy import select
+from ssnit_engine.auth import (
+    JWT_ALGORITHM,
+    JWT_SECRET,
+    JWT_ISSUER,
+    JWT_AUDIENCE,
+)
 
 from ssnit_engine.database.models import (
     Member,
@@ -2692,4 +2699,129 @@ def test_profile_update_rejects_dob_inconsistent_with_existing_contribution_reco
             "Date of birth is not "
             "consistent with existing "
             "contribution records."
-    }            
+    } 
+
+# ============================================================
+# JWT CLAIM VALIDATION
+# ============================================================
+
+
+def test_access_token_with_wrong_issuer_is_rejected(
+    client,
+):
+
+    token, _ = register_and_login(
+        client
+    )
+
+
+    payload = jwt.decode(
+        token,
+        options={
+            "verify_signature": False
+        },
+    )
+
+
+    payload["iss"] = (
+        "malicious-api"
+    )
+
+
+    forged_token = jwt.encode(
+        payload,
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+
+
+    response = client.get(
+        "/auth/me",
+        headers=authorization_headers(
+            forged_token
+        ),
+    )
+
+
+    assert response.status_code == 401
+
+
+def test_access_token_with_wrong_audience_is_rejected(
+    client,
+):
+
+    token, _ = register_and_login(
+        client
+    )
+
+
+    payload = jwt.decode(
+        token,
+        options={
+            "verify_signature": False
+        },
+    )
+
+
+    payload["aud"] = (
+        "unauthorized-client"
+    )
+
+
+    forged_token = jwt.encode(
+        payload,
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+
+
+    response = client.get(
+        "/auth/me",
+        headers=authorization_headers(
+            forged_token
+        ),
+    )
+
+
+    assert response.status_code == 401
+
+
+def test_access_token_missing_required_claim_is_rejected(
+    client,
+):
+
+    token, _ = register_and_login(
+        client
+    )
+
+
+    payload = jwt.decode(
+        token,
+        options={
+            "verify_signature": False
+        },
+    )
+
+
+    payload.pop(
+        "iss",
+        None,
+    )
+
+
+    forged_token = jwt.encode(
+        payload,
+        JWT_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+
+
+    response = client.get(
+        "/auth/me",
+        headers=authorization_headers(
+            forged_token
+        ),
+    )
+
+
+    assert response.status_code == 401               

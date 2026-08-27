@@ -92,6 +92,10 @@ JWT_ALGORITHM = "HS256"
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
+JWT_ISSUER = "pensioniq-ghana-api"
+
+JWT_AUDIENCE = "pensioniq-ghana-web"
+
 
 # ============================================================
 # PASSWORD HASHING
@@ -154,22 +158,28 @@ def create_access_token(
 
     payload = {
 
-        "sub":
-            str(user_id),
+    "sub":
+        str(user_id),
 
-        "type":
-            "access",
+    "type":
+        "access",
 
-        "iat":
-            now,
+    "iat":
+        now,
 
-        "exp":
-            expires_at,
+    "exp":
+        expires_at,
 
-        "ver":
-            token_version,
+    "ver":
+        token_version,
 
-    }
+    "iss":
+        JWT_ISSUER,
+
+    "aud":
+        JWT_AUDIENCE,
+
+}
 
 
     return jwt.encode(
@@ -237,14 +247,32 @@ def get_current_user(
 
         payload = jwt.decode(
 
-            token,
+    token,
 
-            JWT_SECRET,
+    JWT_SECRET,
 
-            algorithms=[
-                JWT_ALGORITHM
-            ],
-        )
+    algorithms=[
+        JWT_ALGORITHM
+    ],
+
+    issuer=
+        JWT_ISSUER,
+
+    audience=
+        JWT_AUDIENCE,
+
+    options={
+        "require": [
+            "sub",
+            "type",
+            "iat",
+            "exp",
+            "ver",
+            "iss",
+            "aud",
+        ]
+    },
+)
 
 
         if (
