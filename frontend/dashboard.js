@@ -516,22 +516,59 @@ function getAccessToken() {
 }
 
 
-function logout() {
+async function logout() {
 
-    sessionStorage.removeItem(
-        ACCESS_TOKEN_KEY
-    );
-
-
-    currentMemberId =
-        null;
+    const token =
+        getAccessToken();
 
 
-    window.location.href =
-        "login.html";
+    try {
+
+        if (token) {
+
+            await fetch(
+                `${API_BASE_URL}/auth/logout`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Server logout failed:",
+            error
+        );
+
+    }
+    finally {
+
+        // Always remove the local token,
+        // even if the network request fails.
+
+        sessionStorage.removeItem(
+            ACCESS_TOKEN_KEY
+        );
+
+
+        currentMemberId =
+            null;
+
+
+        window.location.href =
+            "login.html";
+
+    }
 
 }
-
 
 function redirectToLogin() {
 

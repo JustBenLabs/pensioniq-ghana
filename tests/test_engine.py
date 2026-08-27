@@ -176,3 +176,85 @@ def test_retirement_api_exposes_reduced_pension_factor(
         ==
         D("0.75")
     )
+    
+def test_logout_invalidates_existing_access_token(
+    client,
+):
+    register_response = client.post(
+        "/auth/register",
+        json={
+            "email":
+                "logout-test@example.com",
+            "password":
+                "StrongPassword123!",
+            "first_name":
+                "Logout",
+            "last_name":
+                "Test",
+            "date_of_birth":
+                "1990-01-01",
+            "sex":
+                "Male",
+            "contribution_months":
+                120,
+            "best_three_year_average_annual_salary":
+                "36000.00",
+        },
+    )
+
+    assert (
+        register_response.status_code
+        in
+        (200, 201)
+    )
+
+
+    login_response = client.post(
+        "/auth/login",
+        json={
+            "email":
+                "logout-test@example.com",
+            "password":
+                "StrongPassword123!",
+        },
+    )
+
+    assert login_response.status_code == 200
+
+
+    token = (
+        login_response
+        .json()[
+            "access_token"
+        ]
+    )
+
+
+    headers = {
+        "Authorization":
+            f"Bearer {token}"
+    }
+
+
+    before_logout = client.get(
+        "/auth/me",
+        headers=headers,
+    )
+
+    assert before_logout.status_code == 200
+
+
+    logout_response = client.post(
+        "/auth/logout",
+        headers=headers,
+    )
+
+    assert logout_response.status_code == 200
+
+
+    after_logout = client.get(
+        "/auth/me",
+        headers=headers,
+    )
+
+    assert after_logout.status_code == 401

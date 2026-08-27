@@ -1207,6 +1207,23 @@ def auth_me(
         },
     }
 
+@app.post("/auth/logout")
+def auth_logout(
+    current_user: User = Depends(
+        get_current_user
+    ),
+    db: Session = Depends(
+        get_db
+    ),
+):
+    current_user.token_version += 1
+
+    db.commit()
+
+    return {
+        "message":
+            "Signed out successfully."
+    }
 # ============================================================
 # AUTHENTICATION — CHANGE PASSWORD
 # ============================================================
