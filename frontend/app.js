@@ -558,6 +558,10 @@ function displayCalculationBreakdown(
             "Not Applicable";
 
     }
+    displayPensionRightExplanation(
+    contributionMonths,
+    pensionRight
+);
 
 
     const pensionBeforeAgeFactor =
@@ -709,6 +713,142 @@ else {
             )
             :
             "Not Applicable";
+}
+
+// ==========================================================
+// PENSION RIGHT EXPLANATION
+// ==========================================================
+
+function displayPensionRightExplanation(
+    contributionMonths,
+    pensionRight
+) {
+
+    const months =
+        Number(
+            contributionMonths
+        );
+
+    const explanation =
+        document.getElementById(
+            "pension-right-explanation-text"
+        );
+
+    const formula =
+        document.getElementById(
+            "pension-right-formula"
+        );
+
+
+    if (
+        !Number.isFinite(months)
+    ) {
+
+        explanation.textContent =
+            "Contribution information is unavailable.";
+
+        formula.textContent =
+            "-";
+
+        return;
+    }
+
+
+    // Less than 180 months
+    if (months < 180) {
+
+        const monthsRemaining =
+            180 - months;
+
+        explanation.textContent =
+            `You currently have ${months.toLocaleString()} `
+            +
+            `contribution months. The ordinary monthly `
+            +
+            `pension route in this PensionIQ model `
+            +
+            `requires at least 180 contribution months.`;
+
+        formula.textContent =
+            `${monthsRemaining.toLocaleString()} `
+            +
+            `more contribution month`
+            +
+            `${monthsRemaining === 1 ? "" : "s"} `
+            +
+            `to reach 180 months.`;
+
+        return;
+    }
+
+
+    // Maximum pension right
+    if (months >= 420) {
+
+        explanation.textContent =
+            `You have ${months.toLocaleString()} `
+            +
+            `contribution months. The maximum pension `
+            +
+            `right used by this model is 60%.`;
+
+        formula.textContent =
+            "420 or more contribution months → 60.000%";
+
+        return;
+    }
+
+
+    // Between 180 and 419 months
+    const additionalMonths =
+        months - 180;
+
+    const pensionRightPercentage =
+        pensionRight !== null
+        &&
+        Number.isFinite(
+            pensionRight
+        )
+            ?
+            pensionRight * 100
+            :
+            null;
+
+
+    explanation.textContent =
+        `The first 180 contribution months provide `
+        +
+        `a pension right of 37.5%. Each additional `
+        +
+        `contribution month adds 0.09375 percentage `
+        +
+        `points. You have ${additionalMonths.toLocaleString()} `
+        +
+        `additional month`
+        +
+        `${additionalMonths === 1 ? "" : "s"}.`;
+
+
+    if (
+        pensionRightPercentage !== null
+    ) {
+
+        formula.textContent =
+            `37.5% + `
+            +
+            `(${additionalMonths.toLocaleString()} × 0.09375%) `
+            +
+            `= ${pensionRightPercentage.toFixed(3)}%`;
+
+    }
+    else {
+
+        formula.textContent =
+            `37.5% + `
+            +
+            `(${additionalMonths.toLocaleString()} × 0.09375%)`;
+
+    }
 }
 
 

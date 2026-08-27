@@ -2809,3 +2809,35 @@ footer small {
     font-size: 0.9rem;
     line-height: 1.6;
 }
+/* ==========================================================
+   PENSION RIGHT EXPLANATION
+========================================================== */
+
+.pension-right-explanation {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+
+.pension-right-explanation-header {
+    margin-bottom: 8px;
+}
+
+
+.pension-right-explanation p {
+    margin: 0;
+    line-height: 1.65;
+}
+
+
+.pension-right-formula {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #ffffff;
+    font-weight: 700;
+    line-height: 1.6;
+}
