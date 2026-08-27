@@ -74,6 +74,15 @@ from ssnit_engine.rate_limit import (
     reset_password_rate_limit,
 )
 
+APP_ENV = os.getenv(
+    "APP_ENV",
+    "development",
+).lower()
+
+IS_PRODUCTION = (
+    APP_ENV == "production"
+)
+
 
 # ============================================================
 # FASTAPI APPLICATION
@@ -87,6 +96,21 @@ app = FastAPI(
         "and actuarial estimation API for PensionIQ Ghana. "
         "Official SSNIT records and determinations govern "
         "actual pension benefits."
+    ),
+    docs_url=(
+        None
+        if IS_PRODUCTION
+        else "/docs"
+    ),
+    redoc_url=(
+        None
+        if IS_PRODUCTION
+        else "/redoc"
+    ),
+    openapi_url=(
+        None
+        if IS_PRODUCTION
+        else "/openapi.json"
     ),
 )
 
