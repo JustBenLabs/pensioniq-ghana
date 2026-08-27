@@ -2841,3 +2841,7 @@ footer small {
     font-weight: 700;
     line-height: 1.6;
 }
+
+.auth-pending body {
+    visibility: hidden;
+}
