@@ -563,3 +563,929 @@ body {
 .forgot-password-row a:hover {
     text-decoration: underline;
 }
+
+/* ==========================================================
+   PENSIONIQ DESIGN SYSTEM V1
+   AUTHENTICATION REFRESH
+========================================================== */
+
+:root {
+    --primary: #0f766e;
+    --primary-dark: #0b3b4a;
+    --primary-light: #e8f6f4;
+
+    --navy: #0b1f33;
+    --navy-soft: #12354a;
+
+    --accent: #d4a72c;
+
+    --background: #f2f6fa;
+    --surface: #ffffff;
+
+    --text: #172538;
+    --muted: #68788b;
+    --border: #d9e3ec;
+
+    --success: #15803d;
+    --success-light: #eaf8ef;
+
+    --danger: #b42318;
+    --danger-light: #fff0ee;
+
+    --shadow:
+        0 20px 60px
+        rgba(11, 31, 51, 0.12);
+}
+
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+body {
+    background:
+        linear-gradient(
+            180deg,
+            #f8fbfd,
+            var(--background)
+        );
+
+    color: var(--text);
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+}
+
+
+/* ==========================================================
+   MAIN AUTH LAYOUT
+========================================================== */
+
+.auth-page {
+    min-height: 100vh;
+
+    background:
+        var(--background);
+}
+
+
+/* ==========================================================
+   BRAND PANEL
+========================================================== */
+
+.auth-brand-panel {
+    position: relative;
+
+    overflow: hidden;
+
+    padding:
+        clamp(
+            34px,
+            5vw,
+            64px
+        );
+
+    background:
+        linear-gradient(
+            145deg,
+            #081b2e 0%,
+            var(--navy) 45%,
+            #0d4650 100%
+        );
+
+    color: white;
+}
+
+
+/* Decorative glow */
+
+.auth-brand-panel::before {
+    content: "";
+
+    position: absolute;
+
+    width: 430px;
+    height: 430px;
+
+    border-radius: 50%;
+
+    top: -190px;
+    right: -180px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(37, 184, 166, 0.22),
+            rgba(37, 184, 166, 0)
+        );
+
+    pointer-events: none;
+}
+
+
+.auth-brand-panel::after {
+    content: "";
+
+    position: absolute;
+
+    width: 330px;
+    height: 330px;
+
+    border-radius: 50%;
+
+    left: -180px;
+    bottom: -180px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(212, 167, 44, 0.10),
+            rgba(212, 167, 44, 0)
+        );
+
+    pointer-events: none;
+}
+
+
+.brand,
+.brand-message {
+    position: relative;
+
+    z-index: 1;
+}
+
+
+/* ==========================================================
+   BRAND
+========================================================== */
+
+.brand {
+    gap: 14px;
+}
+
+
+.brand-icon {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #22b8a7,
+            var(--primary)
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
+
+    box-shadow:
+        0 10px 24px
+        rgba(
+            0,
+            0,
+            0,
+            0.18
+        );
+
+    color: #ffffff;
+
+    font-size: 23px;
+
+    font-weight: 800;
+}
+
+
+.brand h1 {
+    color: white;
+
+    font-size: 20px;
+
+    letter-spacing: -0.025em;
+}
+
+
+.brand span {
+    margin-top: 4px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.64
+        );
+
+    font-size: 10px;
+
+    letter-spacing: 0.04em;
+}
+
+
+/* ==========================================================
+   BRAND MESSAGE
+========================================================== */
+
+.brand-message {
+    max-width: 540px;
+
+    margin-bottom:
+        clamp(
+            40px,
+            8vh,
+            90px
+        );
+}
+
+
+.eyebrow {
+    color: #74d7cb;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.7px;
+
+    text-transform: uppercase;
+}
+
+
+.brand-message h2 {
+    max-width: 530px;
+
+    margin-top: 16px;
+
+    color: #ffffff;
+
+    font-size:
+        clamp(
+            38px,
+            4.7vw,
+            58px
+        );
+
+    line-height: 1.02;
+
+    letter-spacing: -0.045em;
+}
+
+
+.brand-message p {
+    max-width: 500px;
+
+    margin-top: 22px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.69
+        );
+
+    font-size: 15px;
+
+    line-height: 1.75;
+}
+
+
+/* ==========================================================
+   FORM SIDE
+========================================================== */
+
+.auth-form-panel {
+    padding:
+        55px
+        clamp(
+            28px,
+            7vw,
+            90px
+        );
+
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(15, 118, 110, 0.06),
+            transparent 30%
+        ),
+        linear-gradient(
+            180deg,
+            #fbfdff,
+            #f2f6fa
+        );
+}
+
+
+/* ==========================================================
+   AUTH CONTAINER
+========================================================== */
+
+.auth-container {
+    max-width: 470px;
+
+    padding:
+        34px
+        36px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.94
+        );
+
+    border:
+        1px solid
+        rgba(
+            217,
+            227,
+            236,
+            0.95
+        );
+
+    border-radius: 22px;
+
+    box-shadow: var(--shadow);
+}
+
+
+.register-container {
+    max-width: 660px;
+}
+
+
+/* ==========================================================
+   HEADINGS
+========================================================== */
+
+.auth-heading {
+    margin-bottom: 28px;
+}
+
+
+.auth-heading .eyebrow {
+    color: var(--primary);
+}
+
+
+.auth-heading h2 {
+    margin-top: 8px;
+
+    color: var(--navy);
+
+    font-size:
+        clamp(
+            28px,
+            3vw,
+            35px
+        );
+
+    line-height: 1.1;
+
+    letter-spacing: -0.035em;
+}
+
+
+.auth-heading p {
+    margin-top: 10px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   FORMS
+========================================================== */
+
+.form-group label {
+    margin-bottom: 8px;
+
+    color: #26364a;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.form-group input,
+.form-group select {
+    min-height: 50px;
+
+    padding:
+        13px
+        14px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 11px;
+
+    background: #f9fbfc;
+
+    color: var(--text);
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+
+.form-group input::placeholder {
+    color: #9aa7b5;
+}
+
+
+.form-group input:hover,
+.form-group select:hover {
+    border-color: #b9c8d5;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+
+    border-color: var(--primary);
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(
+            15,
+            118,
+            110,
+            0.10
+        );
+}
+
+
+.form-group small {
+    margin-top: 7px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================================
+   MONEY FIELD
+========================================================== */
+
+.money-field {
+    position: relative;
+}
+
+
+.money-field span {
+    color: var(--muted);
+
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   PRIMARY BUTTON
+========================================================== */
+
+.primary-button {
+    min-height: 50px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #0b5f59
+        );
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px
+        rgba(
+            15,
+            118,
+            110,
+            0.22
+        );
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        opacity 0.18s ease;
+}
+
+
+.primary-button:hover {
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 12px 26px
+        rgba(
+            15,
+            118,
+            110,
+            0.28
+        );
+}
+
+
+.primary-button:active {
+    transform:
+        translateY(0);
+}
+
+
+.primary-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.65;
+
+    transform: none;
+}
+
+
+/* ==========================================================
+   FORGOT PASSWORD
+========================================================== */
+
+.forgot-password-row {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: -7px;
+
+    margin-bottom: 20px;
+}
+
+
+.forgot-password-row a {
+    color: var(--primary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+.forgot-password-row a:hover {
+    text-decoration: underline;
+}
+
+
+/* ==========================================================
+   LOGIN / REGISTER SWITCH
+========================================================== */
+
+.auth-switch {
+    margin-top: 26px;
+
+    padding-top: 22px;
+
+    border-top:
+        1px solid
+        #e9eef3;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+.auth-switch a {
+    margin-left: 4px;
+
+    color: var(--primary);
+
+    font-weight: 750;
+
+    text-decoration: none;
+}
+
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+
+/* ==========================================================
+   AUTH NOTE
+========================================================== */
+
+.auth-note {
+    margin-top: 24px;
+
+    padding: 14px 16px;
+
+    background:
+        #f4f7fa;
+
+    border:
+        1px solid
+        #e4ebf1;
+
+    border-radius: 11px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   MESSAGES
+========================================================== */
+
+.message {
+    margin-bottom: 20px;
+
+    padding: 13px 15px;
+
+    border-radius: 11px;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+.error-message {
+    background: var(--danger-light);
+
+    border:
+        1px solid
+        #f1c7c2;
+
+    color: var(--danger);
+}
+
+
+.success-message {
+    background: var(--success-light);
+
+    border:
+        1px solid
+        #c7ead4;
+
+    color: var(--success);
+}
+
+
+/* ==========================================================
+   REGISTER FORM
+========================================================== */
+
+.register-form {
+    gap:
+        18px
+        16px;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (
+    max-width: 900px
+) {
+
+    .auth-page {
+        grid-template-columns: 1fr;
+    }
+
+
+    .auth-brand-panel {
+        min-height: auto;
+
+        padding:
+            28px
+            7%;
+    }
+
+
+    .brand-message {
+        margin:
+            56px
+            0
+            15px;
+    }
+
+
+    .brand-message h2 {
+        max-width: 650px;
+
+        font-size:
+            clamp(
+                32px,
+                7vw,
+                46px
+            );
+    }
+
+
+    .auth-form-panel {
+        padding:
+            45px
+            7%;
+    }
+
+}
+
+
+@media (
+    max-width: 620px
+) {
+
+    .auth-form-panel {
+        padding:
+            28px
+            18px
+            40px;
+    }
+
+
+    .auth-container {
+        padding:
+            26px
+            20px;
+
+        border-radius: 17px;
+    }
+
+
+    .register-form {
+        grid-template-columns: 1fr;
+    }
+
+
+    .register-form .full-width {
+        grid-column: auto;
+    }
+
+
+    .brand-message {
+        margin-top: 42px;
+    }
+
+
+    .brand-message p {
+        font-size: 13px;
+    }
+
+}
+
+/* ==========================================================
+   PASSWORD RECOVERY POLISH
+========================================================== */
+
+/* Keep recovery forms compact and focused */
+
+#forgot-password-form,
+#reset-password-form {
+    width: 100%;
+}
+
+
+/* Recovery buttons span the form width */
+
+#forgot-password-button,
+#reset-password-button {
+    width: 100%;
+}
+
+
+/* Slightly soften security/recovery information */
+
+#invalid-reset-link,
+#forgot-error,
+#reset-error {
+    border-left:
+        4px solid
+        var(--danger);
+}
+
+
+#forgot-success,
+#reset-success {
+    border-left:
+        4px solid
+        var(--success);
+}
+
+
+/* Reset page has two navigation rows.
+   Make the second one visually lighter. */
+
+.auth-switch + .auth-switch {
+    margin-top: 12px;
+
+    padding-top: 0;
+
+    border-top: none;
+}
+
+
+/* Improve password recovery link spacing */
+
+#forgot-password-form + .auth-switch,
+#reset-password-form + .auth-switch {
+    margin-top: 28px;
+}
+
+
+/* Give recovery form cards a slightly tighter width */
+
+#forgot-password-form,
+#reset-password-form {
+    max-width: 100%;
+}
+
+
+/* Better focus visibility for password fields */
+
+#new-password:focus,
+#confirm-password:focus {
+    border-color: var(--primary);
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(
+            15,
+            118,
+            110,
+            0.10
+        );
+}
+
+
+/* Security note */
+
+.auth-note {
+    position: relative;
+
+    overflow: hidden;
+}
+
+
+.auth-note::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 3px;
+
+    background: var(--primary);
+}
