@@ -1999,6 +1999,24 @@ if (
     return;
 }
 
+if (
+    currentMemberData
+    &&
+    currentMemberData.date_of_birth
+    &&
+    !isContributionPeriodPlausibleForDob(
+        currentMemberData.date_of_birth,
+        year,
+        month
+    )
+) {
+    showError(
+        "Contribution period is not plausible for your age."
+    );
+
+    return;
+}
+
 
     if (
         !Number.isFinite(earnings)
@@ -3365,6 +3383,37 @@ function calculateAge(
     }
 
     return age;
+}
+
+function isContributionPeriodPlausibleForDob(
+    dateOfBirth,
+    year,
+    month
+) {
+    const birthDate =
+        new Date(
+            `${dateOfBirth}T00:00:00`
+        );
+
+    const earliestYear =
+        birthDate.getFullYear() + 15;
+
+    const earliestMonth =
+        birthDate.getMonth() + 1;
+
+    if (year < earliestYear) {
+        return false;
+    }
+
+    if (
+        year === earliestYear
+        &&
+        month < earliestMonth
+    ) {
+        return false;
+    }
+
+    return true;
 }
 
 
