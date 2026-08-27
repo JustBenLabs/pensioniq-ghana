@@ -1360,8 +1360,7 @@ function displayDetailedComparisonTable(
         );
 
 
-    tableBody.innerHTML =
-        "";
+    tableBody.replaceChildren();
 
 
     scenarios.forEach(
@@ -1399,45 +1398,89 @@ function displayDetailedComparisonTable(
                 "Not Applicable";
 
 
-            const status =
-                scenario.retirement_age === 60
-                ?
-                `
-                <span class="recommended-tag">
-                    Full Pension Age
-                </span>
-                `
-                :
-                formatText(
-                    scenario.benefit_type
-                );
+            const ageCell =
+    document.createElement(
+        "td"
+    );
+
+ageCell.textContent =
+    String(
+        scenario.retirement_age
+    );
 
 
-            row.innerHTML = `
+const monthsCell =
+    document.createElement(
+        "td"
+    );
 
-                <td>
-                    ${scenario.retirement_age}
-                </td>
+monthsCell.textContent =
+    Number(
+        scenario.contribution_months
+    ).toLocaleString();
 
-                <td>
-                    ${Number(
-                        scenario.contribution_months
-                    ).toLocaleString()}
-                </td>
 
-                <td>
-                    ${pensionRight}
-                </td>
+const rightCell =
+    document.createElement(
+        "td"
+    );
 
-                <td>
-                    ${pension}
-                </td>
+rightCell.textContent =
+    pensionRight;
 
-                <td>
-                    ${status}
-                </td>
 
-            `;
+const pensionCell =
+    document.createElement(
+        "td"
+    );
+
+pensionCell.textContent =
+    pension;
+
+
+const statusCell =
+    document.createElement(
+        "td"
+    );
+
+
+if (
+    scenario.retirement_age === 60
+) {
+
+    const recommendedTag =
+        document.createElement(
+            "span"
+        );
+
+    recommendedTag.className =
+        "recommended-tag";
+
+    recommendedTag.textContent =
+        "Full Pension Age";
+
+    statusCell.appendChild(
+        recommendedTag
+    );
+
+}
+else {
+
+    statusCell.textContent =
+        formatText(
+            scenario.benefit_type
+        );
+
+}
+
+
+row.append(
+    ageCell,
+    monthsCell,
+    rightCell,
+    pensionCell,
+    statusCell
+);
 
 
             tableBody.appendChild(
@@ -1464,8 +1507,7 @@ function displayRetirementChart(
         );
 
 
-    chart.innerHTML =
-        "";
+    chart.replaceChildren();
 
 
     const pensionValues =
@@ -1530,38 +1572,69 @@ function displayRetirementChart(
                 }`;
 
 
-            row.innerHTML = `
+            const ageLabel =
+    document.createElement(
+        "div"
+    );
 
-                <div class="chart-age">
-                    Age ${scenario.retirement_age}
-                </div>
+ageLabel.className =
+    "chart-age";
 
-                <div class="chart-track">
+ageLabel.textContent =
+    `Age ${scenario.retirement_age}`;
 
-                    <div
-                        class="chart-bar"
-                        style="width: ${width}%"
-                    >
-                    </div>
 
-                </div>
+const track =
+    document.createElement(
+        "div"
+    );
 
-                <div class="chart-amount">
+track.className =
+    "chart-track";
 
-                    ${
-                        pension > 0
-                        ?
-                        formatCurrency(
-                            pension
-                        )
-                        :
-                        "N/A"
-                    }
 
-                </div>
+const bar =
+    document.createElement(
+        "div"
+    );
 
-            `;
+bar.className =
+    "chart-bar";
 
+bar.style.width =
+    `${width}%`;
+
+
+track.appendChild(
+    bar
+);
+
+
+const amount =
+    document.createElement(
+        "div"
+    );
+
+amount.className =
+    "chart-amount";
+
+amount.textContent =
+    (
+        pension > 0
+    )
+        ?
+        formatCurrency(
+            pension
+        )
+        :
+        "N/A";
+
+
+row.append(
+    ageLabel,
+    track,
+    amount
+);
 
             chart.appendChild(
                 row
@@ -1587,8 +1660,7 @@ function displayBreakEvenAnalysis(
         );
 
 
-    container.innerHTML =
-        "";
+    container.replaceChildren();
 
 
     const age60Scenario =
@@ -1606,8 +1678,18 @@ function displayBreakEvenAnalysis(
         !age60Scenario.monthly_benefit
     ) {
 
-        container.innerHTML =
-            "<p>Age 60 pension data is unavailable.</p>";
+        const unavailableMessage =
+    document.createElement(
+        "p"
+    );
+
+unavailableMessage.textContent =
+    "Age 60 pension data is unavailable.";
+
+
+container.appendChild(
+    unavailableMessage
+);
 
         return;
 
@@ -1694,23 +1776,38 @@ function displayBreakEvenAnalysis(
                 }
 
 
-                card.innerHTML = `
+                const ageLabel =
+    document.createElement(
+        "span"
+    );
 
-                    <span>
-                        Retire at Age
-                        ${scenario.retirement_age}
-                    </span>
+ageLabel.textContent =
+    `Retire at Age ${scenario.retirement_age}`;
 
-                    <strong>
-                        ${resultText}
-                    </strong>
 
-                    <small>
-                        ${explanation}
-                    </small>
+const resultValue =
+    document.createElement(
+        "strong"
+    );
 
-                `;
+resultValue.textContent =
+    resultText;
 
+
+const explanationText =
+    document.createElement(
+        "small"
+    );
+
+explanationText.textContent =
+    explanation;
+
+
+card.append(
+    ageLabel,
+    resultValue,
+    explanationText
+);
 
                 container.appendChild(
                     card
@@ -1846,8 +1943,7 @@ function displayPresentValueAnalysis(
         );
 
 
-    container.innerHTML =
-        "";
+    container.replaceChildren();
 
 
     const monthlyRate =
@@ -1943,42 +2039,50 @@ function displayPresentValueAnalysis(
                 0.01;
 
 
-            card.innerHTML = `
+            const ageLabel =
+    document.createElement(
+        "span"
+    );
 
-                <span>
-                    Retire at Age
-                    ${scenario.retirement_age}
-                </span>
-
-                <strong>
-
-                    ${
-                        scenario.presentValue > 0
-                        ?
-                        formatCurrency(
-                            scenario.presentValue
-                        )
-                        :
-                        "N/A"
-                    }
-
-                </strong>
-
-                <small>
-
-                    ${
-                        isHighest
-                        ?
-                        "Highest present value under these assumptions"
-                        :
-                        "Value measured at age 55"
-                    }
-
-                </small>
-
-            `;
+ageLabel.textContent =
+    `Retire at Age ${scenario.retirement_age}`;
 
 
+const value =
+    document.createElement(
+        "strong"
+    );
+
+value.textContent =
+    (
+        scenario.presentValue > 0
+    )
+        ?
+        formatCurrency(
+            scenario.presentValue
+        )
+        :
+        "N/A";
+
+
+const description =
+    document.createElement(
+        "small"
+    );
+
+description.textContent =
+    isHighest
+        ?
+        "Highest present value under these assumptions"
+        :
+        "Value measured at age 55";
+
+
+card.append(
+    ageLabel,
+    value,
+    description
+);
             container.appendChild(
                 card
             );
@@ -2209,8 +2313,7 @@ function displayEPVTable(
         );
 
 
-    tableBody.innerHTML =
-        "";
+    tableBody.replaceChildren();
 
 
     scenarios.forEach(
@@ -2258,26 +2361,50 @@ function displayEPVTable(
                 "N/A";
 
 
-            row.innerHTML = `
+            const ageCell =
+    document.createElement(
+        "td"
+    );
 
-                <td>
-                    ${scenario.retirement_age}
-                </td>
+ageCell.textContent =
+    String(
+        scenario.retirement_age
+    );
 
-                <td>
-                    ${monthlyPension}
-                </td>
 
-                <td>
-                    ${pensionRight}
-                </td>
+const pensionCell =
+    document.createElement(
+        "td"
+    );
 
-                <td>
-                    ${epv}
-                </td>
+pensionCell.textContent =
+    monthlyPension;
 
-            `;
 
+const rightCell =
+    document.createElement(
+        "td"
+    );
+
+rightCell.textContent =
+    pensionRight;
+
+
+const epvCell =
+    document.createElement(
+        "td"
+    );
+
+epvCell.textContent =
+    epv;
+
+
+row.append(
+    ageCell,
+    pensionCell,
+    rightCell,
+    epvCell
+);
 
             tableBody.appendChild(
                 row
@@ -2303,8 +2430,7 @@ function displayEPVChart(
         );
 
 
-    chart.innerHTML =
-        "";
+    chart.replaceChildren();
 
 
     const epvValues =
@@ -2363,37 +2489,69 @@ function displayEPVChart(
                 "epv-chart-row";
 
 
-            row.innerHTML = `
+            const ageLabel =
+    document.createElement(
+        "div"
+    );
 
-                <div class="epv-chart-age">
-                    Age ${scenario.retirement_age}
-                </div>
+ageLabel.className =
+    "epv-chart-age";
 
-                <div class="epv-chart-track">
+ageLabel.textContent =
+    `Age ${scenario.retirement_age}`;
 
-                    <div
-                        class="epv-chart-bar"
-                        style="width: ${width}%"
-                    >
-                    </div>
 
-                </div>
+const track =
+    document.createElement(
+        "div"
+    );
 
-                <div class="epv-chart-value">
+track.className =
+    "epv-chart-track";
 
-                    ${
-                        epv > 0
-                        ?
-                        formatCurrency(
-                            epv
-                        )
-                        :
-                        "N/A"
-                    }
 
-                </div>
+const bar =
+    document.createElement(
+        "div"
+    );
 
-            `;
+bar.className =
+    "epv-chart-bar";
+
+bar.style.width =
+    `${width}%`;
+
+
+track.appendChild(
+    bar
+);
+
+
+const value =
+    document.createElement(
+        "div"
+    );
+
+value.className =
+    "epv-chart-value";
+
+value.textContent =
+    (
+        epv > 0
+    )
+        ?
+        formatCurrency(
+            epv
+        )
+        :
+        "N/A";
+
+
+row.append(
+    ageLabel,
+    track,
+    value
+);
 
 
             chart.appendChild(
@@ -2419,6 +2577,8 @@ function displayEPVSummary(
             "epv-summary"
         );
 
+        
+
 
     const validScenarios =
         scenarios.filter(
@@ -2439,22 +2599,41 @@ function displayEPVSummary(
         0
     ) {
 
-        summary.innerHTML = `
+        const label =
+    document.createElement(
+        "span"
+    );
 
-            <span>
-                Mortality-adjusted actuarial analysis
-            </span>
+label.textContent =
+    "Mortality-adjusted actuarial analysis";
 
-            <strong>
-                No EPV available
-            </strong>
 
-            <p>
-                No eligible monthly pension scenario
-                was available for this comparison.
-            </p>
+const value =
+    document.createElement(
+        "strong"
+    );
 
-        `;
+value.textContent =
+    "No EPV available";
+
+
+const explanation =
+    document.createElement(
+        "p"
+    );
+
+explanation.textContent =
+    (
+        "No eligible monthly pension scenario " +
+        "was available for this comparison."
+    );
+
+
+summary.append(
+    label,
+    value,
+    explanation
+);
 
         return;
 
@@ -2486,29 +2665,49 @@ function displayEPVSummary(
         );
 
 
-    summary.innerHTML = `
+    const label =
+    document.createElement(
+        "span"
+    );
 
-        <span>
-            Highest mortality-adjusted EPV
-            under these assumptions
-        </span>
+label.textContent =
+    (
+        "Highest mortality-adjusted EPV " +
+        "under these assumptions"
+    );
 
-        <strong>
-            ${formatCurrency(
-                highest.expected_present_value
-            )}
-        </strong>
 
-        <p>
-            Retirement age ${highest.retirement_age}.
-            This result depends on the selected mortality,
-            discount-rate and projection assumptions and
-            should not be interpreted as a universal
-            recommendation.
-        </p>
+const value =
+    document.createElement(
+        "strong"
+    );
 
-    `;
+value.textContent =
+    formatCurrency(
+        highest.expected_present_value
+    );
 
+
+const explanation =
+    document.createElement(
+        "p"
+    );
+
+explanation.textContent =
+    (
+        `Retirement age ${highest.retirement_age}. ` +
+        "This result depends on the selected mortality, " +
+        "discount-rate and projection assumptions and " +
+        "should not be interpreted as a universal " +
+        "recommendation."
+    );
+
+
+summary.append(
+    label,
+    value,
+    explanation
+);
 }
 
 

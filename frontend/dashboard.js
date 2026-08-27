@@ -1484,8 +1484,7 @@ function displayMissingMonths(
         );
 
 
-    container.innerHTML =
-        "";
+    container.replaceChildren();
 
 
     if (
@@ -1563,8 +1562,7 @@ function displayAmountChecks(
         );
 
 
-    body.innerHTML =
-        "";
+    body.replaceChildren();
 
 
     if (
@@ -1587,81 +1585,161 @@ function displayAmountChecks(
 
 
     checks.forEach(
-        check => {
+    check => {
 
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${check.month_name} ${check.year}
-                </td>
-
-                <td>
-                    ${formatCurrency(
-                        check.insurable_earnings
-                    )}
-                </td>
-
-                <td>
-                    ${
-                        check.recorded_first_tier
-                        !== null
-                        ?
-                        formatCurrency(
-                            check.recorded_first_tier
-                        )
-                        :
-                        "—"
-                    }
-                </td>
-
-                <td>
-                    ${
-                        check.expected_first_tier
-                        !== null
-                        ?
-                        formatCurrency(
-                            check.expected_first_tier
-                        )
-                        :
-                        "—"
-                    }
-                </td>
-
-                <td>
-                    ${
-                        check.difference
-                        !== null
-                        ?
-                        formatCurrency(
-                            check.difference
-                        )
-                        :
-                        "—"
-                    }
-                </td>
-
-                <td>
-                    ${createCheckStatus(
-                        check.status
-                    )}
-                </td>
-
-            `;
-
-
-            body.appendChild(
-                row
+        const row =
+            document.createElement(
+                "tr"
             );
 
-        }
-    );
 
+        const periodCell =
+            document.createElement(
+                "td"
+            );
+
+        periodCell.textContent =
+            `${check.month_name} ${check.year}`;
+
+
+        const earningsCell =
+            document.createElement(
+                "td"
+            );
+
+        earningsCell.textContent =
+            formatCurrency(
+                check.insurable_earnings
+            );
+
+
+        const recordedCell =
+            document.createElement(
+                "td"
+            );
+
+        recordedCell.textContent =
+            (
+                check.recorded_first_tier
+                !== null
+            )
+                ?
+                formatCurrency(
+                    check.recorded_first_tier
+                )
+                :
+                "\u2014";
+
+
+        const expectedCell =
+            document.createElement(
+                "td"
+            );
+
+        expectedCell.textContent =
+            (
+                check.expected_first_tier
+                !== null
+            )
+                ?
+                formatCurrency(
+                    check.expected_first_tier
+                )
+                :
+                "\u2014";
+
+
+        const differenceCell =
+            document.createElement(
+                "td"
+            );
+
+        differenceCell.textContent =
+            (
+                check.difference
+                !== null
+            )
+                ?
+                formatCurrency(
+                    check.difference
+                )
+                :
+                "\u2014";
+
+
+        const statusCell =
+            document.createElement(
+                "td"
+            );
+
+
+        const statusBadge =
+            document.createElement(
+                "span"
+            );
+
+
+        let statusClassName =
+            "check-status";
+
+
+        if (
+            check.status ===
+            "MATCHED"
+        ) {
+
+            statusClassName +=
+                " check-matched";
+
+        }
+        else if (
+            check.status ===
+            "AMOUNT_MISMATCH"
+        ) {
+
+            statusClassName +=
+                " check-danger";
+
+        }
+        else {
+
+            statusClassName +=
+                " check-warning";
+
+        }
+
+
+        statusBadge.className =
+            statusClassName;
+
+
+        statusBadge.textContent =
+            formatStatus(
+                check.status
+            );
+
+
+        statusCell.appendChild(
+            statusBadge
+        );
+
+
+        row.append(
+            periodCell,
+            earningsCell,
+            recordedCell,
+            expectedCell,
+            differenceCell,
+            statusCell
+        );
+
+
+        body.appendChild(
+            row
+        );
+
+    }
+);
 }
 
 
@@ -1739,8 +1817,7 @@ function displayContributionHistory(
         );
 
 
-    body.innerHTML =
-        "";
+    body.replaceChildren();
 
 
     if (
@@ -1781,62 +1858,120 @@ function displayContributionHistory(
                 );
 
 
-            row.innerHTML = `
+            const periodCell =
+    document.createElement(
+        "td"
+    );
 
-                <td>
-                    ${getMonthName(record.month)}
-                    ${record.year}
-                </td>
-
-                <td>
-                    ${formatCurrency(
-                        record.insurable_earnings
-                    )}
-                </td>
-
-                <td>
-                    ${
-                        record
-                        .recorded_first_tier_contribution
-                        !== null
-                        ?
-                        formatCurrency(
-                            record
-                            .recorded_first_tier_contribution
-                        )
-                        :
-                        "—"
-                    }
-                </td>
-
-                <td>
-
-                    <div class="table-actions">
-
-                        <button
-                            type="button"
-                            class="action-button edit-button"
-                            data-action="edit"
-                            data-id="${record.id}"
-                        >
-                            Edit
-                        </button>
+periodCell.textContent =
+    `${getMonthName(record.month)} ${record.year}`;
 
 
-                        <button
-                            type="button"
-                            class="action-button delete-button"
-                            data-action="delete"
-                            data-id="${record.id}"
-                        >
-                            Delete
-                        </button>
+const earningsCell =
+    document.createElement(
+        "td"
+    );
 
-                    </div>
+earningsCell.textContent =
+    formatCurrency(
+        record.insurable_earnings
+    );
 
-                </td>
 
-            `;
+const contributionCell =
+    document.createElement(
+        "td"
+    );
+
+contributionCell.textContent =
+    (
+        record
+        .recorded_first_tier_contribution
+        !== null
+    )
+        ?
+        formatCurrency(
+            record
+            .recorded_first_tier_contribution
+        )
+        :
+        "\u2014";
+
+
+const actionsCell =
+    document.createElement(
+        "td"
+    );
+
+
+const actions =
+    document.createElement(
+        "div"
+    );
+
+actions.className =
+    "table-actions";
+
+
+const editButton =
+    document.createElement(
+        "button"
+    );
+
+editButton.type =
+    "button";
+
+editButton.className =
+    "action-button edit-button";
+
+editButton.dataset.action =
+    "edit";
+
+editButton.dataset.id =
+    String(record.id);
+
+editButton.textContent =
+    "Edit";
+
+
+const deleteButton =
+    document.createElement(
+        "button"
+    );
+
+deleteButton.type =
+    "button";
+
+deleteButton.className =
+    "action-button delete-button";
+
+deleteButton.dataset.action =
+    "delete";
+
+deleteButton.dataset.id =
+    String(record.id);
+
+deleteButton.textContent =
+    "Delete";
+
+
+actions.append(
+    editButton,
+    deleteButton
+);
+
+
+actionsCell.appendChild(
+    actions
+);
+
+
+row.append(
+    periodCell,
+    earningsCell,
+    contributionCell,
+    actionsCell
+);
 
 
             body.appendChild(
