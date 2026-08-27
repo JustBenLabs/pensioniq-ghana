@@ -2800,3 +2800,12 @@ footer small {
     }
 
 }
+
+.retirement-factor-explanation {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}

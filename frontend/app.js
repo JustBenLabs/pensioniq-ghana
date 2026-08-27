@@ -611,6 +611,53 @@ function displayCalculationBreakdown(
 
     }
 
+    const retirementFactorExplanation =
+    document.getElementById(
+        "retirement-factor-explanation"
+    );
+
+
+const retirementAgeNumber =
+    Number(
+        retirementAge
+    );
+
+
+const retirementAgeMessages = {
+    55:
+        "Retirement at age 55 applies a 60% early-retirement factor.",
+    56:
+        "Retirement at age 56 applies a 67.5% early-retirement factor.",
+    57:
+        "Retirement at age 57 applies a 75% early-retirement factor.",
+    58:
+        "Retirement at age 58 applies an 82.5% early-retirement factor.",
+    59:
+        "Retirement at age 59 applies a 90% early-retirement factor.",
+    60:
+        "Age 60 is the full pension age, so no early-retirement reduction is applied."
+};
+
+
+if (
+    retirementAgeMessages[
+        retirementAgeNumber
+    ]
+) {
+
+    retirementFactorExplanation.textContent =
+        retirementAgeMessages[
+            retirementAgeNumber
+        ];
+
+}
+else {
+
+    retirementFactorExplanation.textContent =
+        "The retirement-age adjustment depends on the applicable retirement-benefit route.";
+
+}
+
 
     const formulaElement =
         document.getElementById(
