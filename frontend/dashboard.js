@@ -3092,6 +3092,22 @@ async function saveProfile(
         return;
 
     }
+    const maximumContributionMonths =
+    getMaximumPlausibleContributionMonths(
+        dateOfBirth
+    );
+
+if (
+    contributionMonths
+    >
+    maximumContributionMonths
+) {
+    showError(
+        "Contribution months are not plausible for your age."
+    );
+
+    return;
+}
 
 
     if (
@@ -3312,4 +3328,56 @@ function hasAtMostTwoDecimalPlaces(
         valueAsText.split(".")[1];
 
     return decimalPart.length <= 2;
+}
+function calculateAge(
+    dateOfBirth
+) {
+    const birthDate =
+        new Date(
+            `${dateOfBirth}T00:00:00`
+        );
+
+    const today =
+        new Date();
+
+    let age =
+        today.getFullYear()
+        -
+        birthDate.getFullYear();
+
+    const monthDifference =
+        today.getMonth()
+        -
+        birthDate.getMonth();
+
+    if (
+        monthDifference < 0
+        ||
+        (
+            monthDifference === 0
+            &&
+            today.getDate()
+            <
+            birthDate.getDate()
+        )
+    ) {
+        age -= 1;
+    }
+
+    return age;
+}
+
+
+function getMaximumPlausibleContributionMonths(
+    dateOfBirth
+) {
+    const age =
+        calculateAge(
+            dateOfBirth
+        );
+
+    return Math.max(
+        0,
+        (age - 15 + 1) * 12
+    );
 }
