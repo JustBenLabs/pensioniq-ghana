@@ -2657,3 +2657,146 @@ footer small {
     }
 
 }
+/* ==========================================================
+   CALCULATION TRANSPARENCY
+========================================================== */
+
+.calculation-breakdown {
+    margin-top: 28px;
+    padding: 28px;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    background: #ffffff;
+}
+
+
+.calculation-breakdown-header {
+    margin-bottom: 24px;
+}
+
+
+.calculation-breakdown-header h4 {
+    margin: 6px 0 8px;
+    font-size: 1.25rem;
+}
+
+
+.calculation-breakdown-header p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+
+.calculation-breakdown-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 14px;
+}
+
+
+.calculation-detail {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+
+.calculation-detail span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 0.85rem;
+}
+
+
+.calculation-detail strong {
+    display: block;
+    font-size: 1.05rem;
+}
+
+
+.calculation-equation {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+
+.calculation-equation-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+
+.calculation-formula {
+    padding: 16px;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+
+.calculation-answer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.calculation-answer span {
+    font-size: 0.9rem;
+}
+
+
+.calculation-answer strong {
+    font-size: 1.25rem;
+}
+
+
+.calculation-note {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.calculation-note p {
+    margin: 6px 0 0;
+    line-height: 1.6;
+    font-size: 0.88rem;
+}
+
+
+@media (
+    max-width: 700px
+) {
+
+    .calculation-breakdown-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .calculation-breakdown {
+        padding: 20px;
+    }
+
+
+    .calculation-answer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}

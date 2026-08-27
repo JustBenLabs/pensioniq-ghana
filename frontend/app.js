@@ -239,11 +239,12 @@ pensionForm.addEventListener(
 
 
             displayPensionResult(
-                data,
-                dateOfBirth,
-                retirementDate,
-                contributionMonths
-            );
+    data,
+    dateOfBirth,
+    retirementDate,
+    contributionMonths,
+    salary
+);
 
         }
 
@@ -275,7 +276,8 @@ function displayPensionResult(
     data,
     dateOfBirth,
     retirementDate,
-    contributionMonths
+    contributionMonths,
+    salary
 ) {
 
     // ------------------------------------------------------
@@ -431,7 +433,7 @@ function displayPensionResult(
 
     }
 
-
+ 
     // ------------------------------------------------------
     // Contribution progress
     // ------------------------------------------------------
@@ -439,6 +441,12 @@ function displayPensionResult(
     updateContributionProgress(
         contributionMonths
     );
+
+    displayCalculationBreakdown(
+    data,
+    salary,
+    contributionMonths
+);
 
 
     // ------------------------------------------------------
@@ -459,6 +467,233 @@ function displayPensionResult(
 
 }
 
+// ==========================================================
+// CALCULATION TRANSPARENCY
+// ==========================================================
+
+function displayCalculationBreakdown(
+    data,
+    salary,
+    contributionMonths
+) {
+
+    const annualSalary =
+        Number(salary);
+
+    const monthlySalaryBasis =
+        annualSalary / 12;
+
+
+    const pensionRight =
+        data.pension_right !== null
+        &&
+        data.pension_right !== undefined
+            ? Number(data.pension_right)
+            : null;
+
+
+    const monthlyBenefit =
+        data.monthly_benefit !== null
+        &&
+        data.monthly_benefit !== undefined
+            ? Number(data.monthly_benefit)
+            : null;
+
+
+    const retirementAge =
+        document.getElementById(
+            "retirement-age"
+        ).textContent.trim();
+
+
+    document.getElementById(
+        "calc-annual-salary"
+    ).textContent =
+        formatBreakdownCurrency(
+            annualSalary
+        );
+
+
+    document.getElementById(
+        "calc-monthly-salary"
+    ).textContent =
+        formatBreakdownCurrency(
+            monthlySalaryBasis
+        );
+
+
+    document.getElementById(
+        "calc-contribution-months"
+    ).textContent =
+        Number(
+            contributionMonths
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "calc-retirement-age"
+    ).textContent =
+        retirementAge;
+
+
+    if (
+        pensionRight !== null
+        &&
+        Number.isFinite(pensionRight)
+    ) {
+
+        document.getElementById(
+            "calc-pension-right"
+        ).textContent =
+            `${(
+                pensionRight * 100
+            ).toFixed(3)}%`;
+
+    }
+    else {
+
+        document.getElementById(
+            "calc-pension-right"
+        ).textContent =
+            "Not Applicable";
+
+    }
+
+
+    const pensionBeforeAgeFactor =
+        monthlySalaryBasis
+        *
+        (
+            pensionRight ?? 0
+        );
+
+
+    let retirementFactor =
+        null;
+
+
+    if (
+        monthlyBenefit !== null
+        &&
+        Number.isFinite(monthlyBenefit)
+        &&
+        pensionBeforeAgeFactor > 0
+    ) {
+
+        retirementFactor =
+            monthlyBenefit
+            /
+            pensionBeforeAgeFactor;
+
+    }
+
+
+    if (
+        retirementFactor !== null
+        &&
+        Number.isFinite(retirementFactor)
+    ) {
+
+        document.getElementById(
+            "calc-retirement-factor"
+        ).textContent =
+            `${(
+                retirementFactor * 100
+            ).toFixed(1)}%`;
+
+    }
+    else {
+
+        document.getElementById(
+            "calc-retirement-factor"
+        ).textContent =
+            "Not Applicable";
+
+    }
+
+
+    const formulaElement =
+        document.getElementById(
+            "calc-formula"
+        );
+
+
+    if (
+        pensionRight !== null
+        &&
+        retirementFactor !== null
+        &&
+        monthlyBenefit !== null
+    ) {
+
+        formulaElement.textContent =
+            `${formatBreakdownCurrency(
+                monthlySalaryBasis
+            )} \u00D7 `
+            +
+            `${(
+                pensionRight * 100
+            ).toFixed(3)}% \u00D7 `
+            +
+            `${(
+                retirementFactor * 100
+            ).toFixed(1)}%`;
+
+    }
+    else {
+
+        formulaElement.textContent =
+            "Monthly pension calculation "
+            +
+            "is not applicable for this result.";
+
+    }
+
+
+    document.getElementById(
+        "calc-monthly-pension"
+    ).textContent =
+        monthlyBenefit !== null
+        &&
+        Number.isFinite(monthlyBenefit)
+            ?
+            formatBreakdownCurrency(
+                monthlyBenefit
+            )
+            :
+            "Not Applicable";
+}
+
+
+function formatBreakdownCurrency(
+    value
+) {
+
+    const numericValue =
+        Number(value);
+
+
+    if (
+        !Number.isFinite(numericValue)
+    ) {
+
+        return "GH\u00A20.00";
+
+    }
+
+
+    return (
+        "GH\u00A2"
+        +
+        numericValue.toLocaleString(
+            "en-GH",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        )
+    );
+}
 
 // ==========================================================
 // CONTRIBUTION PROGRESS
