@@ -163,6 +163,17 @@ registerForm.addEventListener(
             return;
 
         }
+        if (
+    !hasAtMostTwoDecimalPlaces(
+        salary
+    )
+) {
+    showError(
+        "Salary cannot have more than 2 decimal places."
+    );
+
+    return;
+}
 
 
         if (
@@ -430,4 +441,23 @@ function setLoading(
         :
         "Create Account";
 
+}
+function hasAtMostTwoDecimalPlaces(
+    value
+) {
+    if (!Number.isFinite(value)) {
+        return false;
+    }
+
+    const valueAsText =
+        String(value);
+
+    if (!valueAsText.includes(".")) {
+        return true;
+    }
+
+    const decimalPart =
+        valueAsText.split(".")[1];
+
+    return decimalPart.length <= 2;
 }

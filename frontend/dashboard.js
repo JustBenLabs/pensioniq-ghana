@@ -1974,6 +1974,30 @@ async function saveContribution(
         return;
 
     }
+    const today =
+    new Date();
+
+const currentYear =
+    today.getFullYear();
+
+const currentMonth =
+    today.getMonth() + 1;
+
+if (
+    year > currentYear
+    ||
+    (
+        year === currentYear
+        &&
+        month > currentMonth
+    )
+) {
+    showError(
+        "Contribution period cannot be in the future."
+    );
+
+    return;
+}
 
 
     if (
@@ -1989,6 +2013,17 @@ async function saveContribution(
         return;
 
     }
+    if (
+    !hasAtMostTwoDecimalPlaces(
+        earnings
+    )
+) {
+    showError(
+        "Insurable earnings cannot have more than 2 decimal places."
+    );
+
+    return;
+}
 
 
     if (
@@ -2010,6 +2045,19 @@ async function saveContribution(
         return;
 
     }
+    if (
+    recordedContribution !== null
+    &&
+    !hasAtMostTwoDecimalPlaces(
+        recordedContribution
+    )
+) {
+    showError(
+        "Recorded First-Tier contribution cannot have more than 2 decimal places."
+    );
+
+    return;
+}
 
 
     const isEditing =
@@ -3061,6 +3109,17 @@ async function saveProfile(
         return;
 
     }
+    if (
+    !hasAtMostTwoDecimalPlaces(
+        salary
+    )
+) {
+    showError(
+        "Salary cannot have more than 2 decimal places."
+    );
+
+    return;
+}
 
 
     setProfileLoading(
@@ -3234,3 +3293,23 @@ function hideProfileSuccess() {
 // ==========================================================
 
 initialiseDashboard();
+
+function hasAtMostTwoDecimalPlaces(
+    value
+) {
+    if (!Number.isFinite(value)) {
+        return false;
+    }
+
+    const valueAsText =
+        String(value);
+
+    if (!valueAsText.includes(".")) {
+        return true;
+    }
+
+    const decimalPart =
+        valueAsText.split(".")[1];
+
+    return decimalPart.length <= 2;
+}
