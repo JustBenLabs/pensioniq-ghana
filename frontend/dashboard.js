@@ -827,6 +827,11 @@ function displayDashboard(
     );
 
 
+    displayRetirementReadiness(
+        data.retirement_readiness
+    );
+
+
     displayContributionSummary(
         data.contribution_summary
     );
@@ -835,6 +840,691 @@ function displayDashboard(
     displayContributionHealth(
         data.contribution_health
     );
+
+}
+
+// ==========================================================
+// RETIREMENT READINESS
+// ==========================================================
+
+
+function displayRetirementReadiness(
+    readiness
+) {
+
+    if (!readiness) {
+        return;
+    }
+
+
+    // ------------------------------------------------------
+    // DOM ELEMENTS
+    // ------------------------------------------------------
+
+    const scoreElement =
+        document.getElementById(
+            "readiness-score"
+        );
+
+    const ratingElement =
+        document.getElementById(
+            "readiness-rating"
+        );
+
+    const messageElement =
+        document.getElementById(
+            "readiness-score-message"
+        );
+
+    const progressBar =
+        document.getElementById(
+            "readiness-progress-bar"
+        );
+
+
+    const eligibilityScore =
+        document.getElementById(
+            "readiness-eligibility-score"
+        );
+
+    const pensionScore =
+        document.getElementById(
+            "readiness-pension-score"
+        );
+
+    const consistencyScore =
+        document.getElementById(
+            "readiness-consistency-score"
+        );
+
+
+    const minimumStatus =
+        document.getElementById(
+            "readiness-minimum-status"
+        );
+
+    const minimumDetail =
+        document.getElementById(
+            "readiness-minimum-detail"
+        );
+
+
+    const maximumStatus =
+        document.getElementById(
+            "readiness-maximum-status"
+        );
+
+    const maximumDetail =
+        document.getElementById(
+            "readiness-maximum-detail"
+        );
+
+
+    const continuityElement =
+        document.getElementById(
+            "readiness-continuity"
+        );
+
+    const continuityDetail =
+        document.getElementById(
+            "readiness-continuity-detail"
+        );
+
+
+    const dataQualityElement =
+        document.getElementById(
+            "readiness-data-quality"
+        );
+
+    const dataQualityDetail =
+        document.getElementById(
+            "readiness-data-quality-detail"
+        );
+
+
+    const recommendationList =
+        document.getElementById(
+            "readiness-recommendation-list"
+        );
+
+    const disclaimerElement =
+        document.getElementById(
+            "readiness-disclaimer"
+        );
+
+
+    // ------------------------------------------------------
+    // BASIC VALUES
+    // ------------------------------------------------------
+
+    const score =
+        readiness.score !== null
+            ?
+            Number(
+                readiness.score
+            )
+            :
+            null;
+
+
+    scoreElement.textContent =
+        score !== null
+            ?
+            score.toFixed(2)
+            :
+            "Incomplete";
+
+
+    ratingElement.textContent =
+        readiness.rating
+        ||
+        "Incomplete";
+
+
+    // ------------------------------------------------------
+    // STATUS BADGE
+    // ------------------------------------------------------
+
+    ratingElement.classList.remove(
+        "status-success",
+        "status-warning",
+        "status-danger",
+        "readiness-status-fair"
+    );
+
+
+    switch (
+        readiness.rating
+    ) {
+
+        case "Strong":
+
+        case "Good":
+
+            ratingElement.classList.add(
+                "status-success"
+            );
+
+            break;
+
+
+        case "Fair":
+
+            ratingElement.classList.add(
+                "readiness-status-fair"
+            );
+
+            break;
+
+
+        case "Building":
+
+        case "Incomplete":
+
+            ratingElement.classList.add(
+                "status-warning"
+            );
+
+            break;
+
+
+        case "Needs Attention":
+
+            ratingElement.classList.add(
+                "status-danger"
+            );
+
+            break;
+
+    }
+
+
+    // ------------------------------------------------------
+    // MAIN MESSAGE
+    // ------------------------------------------------------
+
+    if (
+        readiness.provisional
+    ) {
+
+        messageElement.textContent =
+            (
+                "Your readiness score is incomplete "
+                +
+                "because PensionIQ does not yet have "
+                +
+                "enough aligned contribution-history "
+                +
+                "data to assess consistency."
+            );
+
+    }
+
+    else if (
+        readiness.rating
+        ===
+        "Strong"
+    ) {
+
+        messageElement.textContent =
+            (
+                "Your recorded retirement position "
+                +
+                "is strong under the PensionIQ "
+                +
+                "readiness framework."
+            );
+
+    }
+
+    else if (
+        readiness.rating
+        ===
+        "Good"
+    ) {
+
+        messageElement.textContent =
+            (
+                "Your retirement position is progressing "
+                +
+                "well. Continue strengthening your "
+                +
+                "contribution record."
+            );
+
+    }
+
+    else if (
+        readiness.rating
+        ===
+        "Fair"
+    ) {
+
+        messageElement.textContent =
+            (
+                "You are making meaningful retirement "
+                +
+                "progress, with room to strengthen "
+                +
+                "your position."
+            );
+
+    }
+
+    else if (
+        readiness.rating
+        ===
+        "Building"
+    ) {
+
+        messageElement.textContent =
+            (
+                "Your retirement position is still "
+                +
+                "being built. Focus on contribution "
+                +
+                "progress and consistency."
+            );
+
+    }
+
+    else {
+
+        messageElement.textContent =
+            (
+                "Your retirement position currently "
+                +
+                "needs attention. Review the guidance "
+                +
+                "below for priority actions."
+            );
+
+    }
+
+
+    // ------------------------------------------------------
+    // SCORE PROGRESS BAR
+    // ------------------------------------------------------
+
+    const progressPercent =
+        score === null
+            ?
+            0
+            :
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    score
+                )
+            );
+
+
+    progressBar.style.width =
+        `${progressPercent}%`;
+
+
+    // ------------------------------------------------------
+    // SCORE COMPONENTS
+    // ------------------------------------------------------
+
+    eligibilityScore.textContent =
+        (
+            readiness.components
+            ?.eligibility
+            ?.score
+            ??
+            "0.00"
+        )
+        +
+        " / 40";
+
+
+    pensionScore.textContent =
+        (
+            readiness.components
+            ?.pension_right
+            ?.score
+            ??
+            "0.00"
+        )
+        +
+        " / 35";
+
+
+    const consistencyValue =
+        readiness.components
+        ?.contribution_consistency
+        ?.score;
+
+
+    consistencyScore.textContent =
+        consistencyValue !== null
+        &&
+        consistencyValue !== undefined
+            ?
+            `${consistencyValue} / 25`
+            :
+            "Not assessed";
+
+
+    // ------------------------------------------------------
+    // MINIMUM THRESHOLD
+    // ------------------------------------------------------
+
+    if (
+        readiness.months_to_minimum
+        ===
+        0
+    ) {
+
+        minimumStatus.textContent =
+            "Reached";
+
+        minimumDetail.textContent =
+            (
+                "The minimum 180-month contribution "
+                +
+                "threshold has been reached."
+            );
+
+    }
+
+    else {
+
+        minimumStatus.textContent =
+            (
+                `${readiness.months_to_minimum} `
+                +
+                "months remaining"
+            );
+
+        minimumDetail.textContent =
+            (
+                "Additional qualifying contributions "
+                +
+                "are needed to reach the 180-month "
+                +
+                "minimum threshold."
+            );
+
+    }
+
+
+    // ------------------------------------------------------
+    // MAXIMUM PENSION-RIGHT LEVEL
+    // ------------------------------------------------------
+
+    if (
+        readiness.months_to_maximum
+        ===
+        0
+    ) {
+
+        maximumStatus.textContent =
+            "Reached";
+
+        maximumDetail.textContent =
+            (
+                "The 420-month maximum pension-right "
+                +
+                "level has been reached."
+            );
+
+    }
+
+    else {
+
+        maximumStatus.textContent =
+            (
+                `${readiness.months_to_maximum} `
+                +
+                "months remaining"
+            );
+
+        maximumDetail.textContent =
+            (
+                "Qualifying contributions can continue "
+                +
+                "increasing pension-right progress "
+                +
+                "until this level is reached."
+            );
+
+    }
+
+
+    // ------------------------------------------------------
+    // CONTINUITY
+    // ------------------------------------------------------
+
+    const dataQuality =
+        readiness.data_quality
+        ||
+        {};
+
+
+    const continuityPercent =
+        dataQuality
+        .continuity_ratio_percent;
+
+
+    continuityElement.textContent =
+        continuityPercent !== null
+        &&
+        continuityPercent !== undefined
+            ?
+            `${continuityPercent}%`
+            :
+            "Not available";
+
+
+    if (
+        dataQuality
+        .continuity_used_in_score
+    ) {
+
+        continuityDetail.textContent =
+            (
+                "This continuity result is included "
+                +
+                "in your readiness score."
+            );
+
+    }
+
+    else {
+
+        continuityDetail.textContent =
+            (
+                "This value is not currently being "
+                +
+                "used in your readiness score."
+            );
+
+    }
+
+
+    // ------------------------------------------------------
+    // DATA QUALITY
+    // ------------------------------------------------------
+
+    const alignmentStatus =
+        dataQuality
+        .record_alignment_status;
+
+
+    if (
+        alignmentStatus
+        ===
+        "ALIGNED"
+    ) {
+
+        dataQualityElement.textContent =
+            "Aligned";
+
+        dataQualityDetail.textContent =
+            (
+                "Your detailed contribution records "
+                +
+                "align with your stored contribution "
+                +
+                "month total."
+            );
+
+    }
+
+    else if (
+        alignmentStatus
+        ===
+        "NO_DETAILED_HISTORY"
+    ) {
+
+        dataQualityElement.textContent =
+            "More data needed";
+
+        dataQualityDetail.textContent =
+            (
+                "Add your detailed monthly contribution "
+                +
+                "history to complete the consistency "
+                +
+                "assessment."
+            );
+
+    }
+
+    else {
+
+        dataQualityElement.textContent =
+            "Review needed";
+
+        dataQualityDetail.textContent =
+            (
+                "Your detailed records and stored "
+                +
+                "contribution-month total do not "
+                +
+                "currently align."
+            );
+
+    }
+
+
+    // ------------------------------------------------------
+    // PERSONALIZED RECOMMENDATIONS
+    // ------------------------------------------------------
+
+    recommendationList.replaceChildren();
+
+
+    const recommendations =
+        Array.isArray(
+            readiness.recommendations
+        )
+            ?
+            readiness.recommendations
+            :
+            [];
+
+
+    recommendations.forEach(
+        (
+            recommendation
+        ) => {
+
+            const item =
+                document.createElement(
+                    "li"
+                );
+
+
+            const marker =
+                document.createElement(
+                    "span"
+                );
+
+            marker.className =
+                "readiness-recommendation-marker";
+
+            marker.textContent =
+                "✓";
+
+
+            const text =
+                document.createElement(
+                    "p"
+                );
+
+            text.textContent =
+                recommendation;
+
+
+            item.append(
+                marker,
+                text
+            );
+
+
+            recommendationList.append(
+                item
+            );
+
+        }
+    );
+
+
+    if (
+        recommendations.length
+        ===
+        0
+    ) {
+
+        const item =
+            document.createElement(
+                "li"
+            );
+
+
+        const text =
+            document.createElement(
+                "p"
+            );
+
+        text.textContent =
+            (
+                "No additional retirement guidance "
+                +
+                "is available at this time."
+            );
+
+
+        item.append(
+            text
+        );
+
+
+        recommendationList.append(
+            item
+        );
+
+    }
+
+
+    // ------------------------------------------------------
+    // DISCLAIMER
+    // ------------------------------------------------------
+
+    disclaimerElement.textContent =
+        readiness.disclaimer
+        ||
+        (
+            "This is a PensionIQ retirement-planning "
+            +
+            "indicator and is not an official SSNIT "
+            +
+            "benefit determination."
+        );
 
 }
 

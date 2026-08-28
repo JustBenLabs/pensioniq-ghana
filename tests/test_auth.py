@@ -2825,3 +2825,361 @@ def test_access_token_missing_required_claim_is_rejected(
 
 
     assert response.status_code == 401               
+
+# ============================================================
+# RETIREMENT READINESS — DASHBOARD API
+# ============================================================
+
+
+def test_dashboard_readiness_without_detailed_history(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    response = client.get(
+        f"/members/{member_id}/dashboard",
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    readiness = data[
+        "retirement_readiness"
+    ]
+
+    assert readiness["score"] is None
+
+    assert (
+        readiness["rating"]
+        ==
+        "Incomplete"
+    )
+
+    assert (
+        readiness["provisional"]
+        is True
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "record_alignment_status"
+        ]
+        ==
+        "NO_DETAILED_HISTORY"
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "continuity_used_in_score"
+        ]
+        is False
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "continuity_ratio_percent"
+        ]
+        is None
+    )
+
+
+def test_dashboard_readiness_rejects_partial_history_for_score(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    # --------------------------------------------------------
+    # Member has 240 stored contribution months,
+    # but only one detailed contribution record.
+    # --------------------------------------------------------
+
+    contribution_response = client.post(
+        f"/members/{member_id}/contributions",
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "year": 2026,
+            "month": 1,
+            "insurable_earnings":
+                "5000.00",
+            "recorded_first_tier_contribution":
+                "675.00",
+        },
+    )
+
+    assert (
+        contribution_response.status_code
+        ==
+        200
+    )
+
+    response = client.get(
+        f"/members/{member_id}/dashboard",
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    readiness = data[
+        "retirement_readiness"
+    ]
+
+    # One isolated record gives 100% continuity
+    # within the observed detailed period,
+    # but it must NOT be treated as representative
+    # of the member's full 240-month history.
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "record_alignment_status"
+        ]
+        ==
+        "TOTAL_AND_HISTORY_DIFFER"
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "continuity_ratio_percent"
+        ]
+        ==
+        "100.00"
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "continuity_used_in_score"
+        ]
+        is False
+    )
+
+    assert readiness["score"] is None
+
+    assert (
+        readiness["rating"]
+        ==
+        "Incomplete"
+    )
+
+    assert (
+        readiness["provisional"]
+        is True
+    )
+
+
+def test_dashboard_readiness_uses_aligned_history(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+    # --------------------------------------------------------
+    # Change the member's stored contribution total to
+    # 3 months so it can be matched exactly by 3 detailed
+    # contribution records.
+    # --------------------------------------------------------
+
+    profile_response = client.put(
+        f"/members/{member_id}",
+        headers=authorization_headers(
+            token
+        ),
+        json={
+            "contribution_months":
+                3,
+        },
+    )
+
+    assert (
+        profile_response.status_code
+        ==
+        200
+    )
+
+    # --------------------------------------------------------
+    # Add January, February and March 2026.
+    # These three consecutive records produce
+    # 100% continuity.
+    # --------------------------------------------------------
+
+    for month in (
+        1,
+        2,
+        3,
+    ):
+
+        contribution_response = (
+            client.post(
+                (
+                    f"/members/"
+                    f"{member_id}/"
+                    "contributions"
+                ),
+                headers=(
+                    authorization_headers(
+                        token
+                    )
+                ),
+                json={
+                    "year":
+                        2026,
+
+                    "month":
+                        month,
+
+                    "insurable_earnings":
+                        "5000.00",
+
+                    "recorded_first_tier_contribution":
+                        "675.00",
+                },
+            )
+        )
+
+        assert (
+            contribution_response
+            .status_code
+            ==
+            200
+        )
+
+    response = client.get(
+        f"/members/{member_id}/dashboard",
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    readiness = data[
+        "retirement_readiness"
+    ]
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "record_alignment_status"
+        ]
+        ==
+        "ALIGNED"
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "continuity_ratio_percent"
+        ]
+        ==
+        "100.00"
+    )
+
+    assert (
+        readiness[
+            "data_quality"
+        ][
+            "continuity_used_in_score"
+        ]
+        is True
+    )
+
+    assert (
+        readiness["score"]
+        ==
+        "25.67"
+    )
+
+    assert (
+        readiness["rating"]
+        ==
+        "Needs Attention"
+    )
+
+    assert (
+        readiness["provisional"]
+        is False
+    )
+
+    assert (
+        readiness[
+            "components"
+        ][
+            "eligibility"
+        ][
+            "score"
+        ]
+        ==
+        "0.67"
+    )
+
+    assert (
+        readiness[
+            "components"
+        ][
+            "pension_right"
+        ][
+            "score"
+        ]
+        ==
+        "0.00"
+    )
+
+    assert (
+        readiness[
+            "components"
+        ][
+            "contribution_consistency"
+        ][
+            "score"
+        ]
+        ==
+        "25.00"
+    )
+
+    assert (
+        len(
+            readiness[
+                "recommendations"
+            ]
+        )
+        >
+        0
+    )    

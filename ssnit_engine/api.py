@@ -45,6 +45,10 @@ from ssnit_engine.contribution_health import (
     analyse_contribution_history,
 )
 
+from ssnit_engine.readiness import (
+    calculate_retirement_readiness,
+)
+
 from ssnit_engine.database.connection import (
     get_db,
 )
@@ -73,6 +77,7 @@ from ssnit_engine.rate_limit import (
     register_rate_limit,
     reset_password_rate_limit,
 )
+
 
 APP_ENV = os.getenv(
     "APP_ENV",
@@ -3861,6 +3866,7 @@ def get_member_dashboard(
     )
 
 
+
     contribution_years = (
         Decimal(
             contribution_months
@@ -3967,6 +3973,63 @@ def get_member_dashboard(
             "TOTAL_AND_HISTORY_DIFFER"
         )
 
+        # ============================================================
+        # RETIREMENT READINESS DATA QUALITY
+        # ============================================================
+
+
+    continuity_ratio_percent = (
+        contribution_health[
+            "continuity_ratio_percent"
+        ]
+    )
+
+
+    # Contribution continuity is included in the readiness
+    # score only when the detailed contribution history
+    # aligns with the member's stored contribution-month total.
+    #
+    # This prevents a short partial history from receiving
+    # an artificially high consistency score.
+
+
+    if (
+        record_alignment_status
+        ==
+        "ALIGNED"
+        and
+        continuity_ratio_percent
+        is not None
+    ):
+
+        continuity_ratio = (
+            Decimal(
+                continuity_ratio_percent
+            )
+            /
+            Decimal("100")
+        )
+
+        continuity_used_in_readiness = True
+
+    else:
+
+        continuity_ratio = None
+
+        continuity_used_in_readiness = False
+
+
+    retirement_readiness = (
+        calculate_retirement_readiness(
+            contribution_months=(
+                contribution_months
+            ),
+            continuity_ratio=(
+                continuity_ratio
+            ),
+        )
+    )
+
 
     return {
 
@@ -4062,6 +4125,142 @@ def get_member_dashboard(
             "maximum_pension_right_months":
                 maximum_pension_right_months,
         },
+
+        "retirement_readiness": {
+
+    "indicator_name":
+        (
+            "PensionIQ Retirement "
+            "Readiness Indicator"
+        ),
+
+    "score":
+        (
+            str(
+                retirement_readiness
+                .total_score
+            )
+            if (
+                retirement_readiness
+                .total_score
+                is not None
+            )
+            else None
+        ),
+
+    "maximum_score":
+        "100.00",
+
+    "rating":
+        retirement_readiness.rating,
+
+    "provisional":
+        retirement_readiness.provisional,
+
+    "data_quality": {
+
+    "record_alignment_status":
+        record_alignment_status,
+
+    "continuity_used_in_score":
+        continuity_used_in_readiness,
+
+    "continuity_ratio_percent":
+        continuity_ratio_percent,
+
+},    
+
+    "components": {
+
+        "eligibility": {
+
+            "score":
+                str(
+                    retirement_readiness
+                    .eligibility_score
+                ),
+
+            "maximum":
+                "40.00",
+        },
+
+        "pension_right": {
+
+            "score":
+                str(
+                    retirement_readiness
+                    .pension_right_score
+                ),
+
+            "maximum":
+                "35.00",
+        },
+
+        "contribution_consistency": {
+
+            "score":
+                (
+                    str(
+                        retirement_readiness
+                        .consistency_score
+                    )
+                    if (
+                        retirement_readiness
+                        .consistency_score
+                        is not None
+                    )
+                    else None
+                ),
+
+            "maximum":
+                "25.00",
+        },
+    },
+
+    "pension_right":
+        (
+            str(
+                retirement_readiness
+                .pension_right
+            )
+            if (
+                retirement_readiness
+                .pension_right
+                is not None
+            )
+            else None
+        ),
+
+    "months_to_minimum":
+        (
+            retirement_readiness
+            .months_to_minimum
+        ),
+
+    "months_to_maximum":
+        (
+            retirement_readiness
+            .months_to_maximum
+        ),
+
+    "continuity_ratio_percent":
+        continuity_ratio_percent,
+
+    "recommendations":
+        list(
+            retirement_readiness
+            .recommendations
+        ),
+
+    "disclaimer":
+        (
+            "This is a PensionIQ "
+            "retirement-planning indicator. "
+            "It is not an official SSNIT "
+            "score, entitlement decision, "
+            "or benefit determination."
+        ),
+},
 
 
         "contribution_summary": {
