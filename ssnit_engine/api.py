@@ -10,7 +10,10 @@ from datetime import (
     datetime,
     timedelta,
 )
-from decimal import Decimal
+from decimal import (
+    Decimal,
+    ROUND_HALF_UP,
+)
 from enum import Enum
 from pathlib import Path
 
@@ -47,6 +50,10 @@ from ssnit_engine.contribution_health import (
 
 from ssnit_engine.readiness import (
     calculate_retirement_readiness,
+)
+
+from ssnit_engine.scenario import (
+    calculate_retirement_scenario,
 )
 
 from ssnit_engine.database.connection import (
@@ -261,6 +268,13 @@ class RetirementComparisonRequest(BaseModel):
 
     qualifying_hazardous_employment: bool = False
 
+class RetirementScenarioRequest(BaseModel):
+
+    additional_contribution_months: int
+
+    projected_annual_salary: Decimal
+
+    retirement_age: int
 
 class RetirementEPVRequest(BaseModel):
 
@@ -4095,15 +4109,12 @@ def get_member_dashboard(
             "pension_right_percent":
                 (
                     str(
-                        pension_right_percent
-                        .quantize(
-                            Decimal("0.001")
+                        pension_right_percent.quantize(
+                            Decimal("0.01"),
+                            rounding=ROUND_HALF_UP,
                         )
                     )
-                    if (
-                        pension_right_percent
-                        is not None
-                    )
+                    if pension_right_percent is not None
                     else None
                 ),
 
@@ -4336,4 +4347,657 @@ def get_member_dashboard(
                     "actuarial engine."
                 ),
         },
+    }
+
+# ============================================================
+# MEMBER — WHAT-IF RETIREMENT SCENARIO
+# ============================================================
+
+
+@app.post(
+    "/members/{member_id}/retirement-scenario"
+)
+def member_retirement_scenario(
+
+    member_id: int,
+
+    request: RetirementScenarioRequest,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    # ========================================================
+    # AUTHORIZATION
+    # ========================================================
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    # ========================================================
+    # MEMBER
+    # ========================================================
+
+    member = db.get(
+        Member,
+        member_id,
+    )
+
+
+    if member is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Member not found.",
+        )
+
+
+    # ========================================================
+    # CONTRIBUTION HISTORY
+    # ========================================================
+
+    records = db.scalars(
+        select(
+            ContributionRecord
+        )
+        .where(
+            ContributionRecord.member_id
+            ==
+            member_id
+        )
+        .order_by(
+            ContributionRecord.year,
+            ContributionRecord.month,
+        )
+    ).all()
+
+
+    contribution_health = (
+        analyse_contribution_history(
+            records
+        )
+    )
+
+
+    # Each stored contribution record represents
+    # one unique contribution month.
+
+    recorded_history_months = (
+        len(records)
+    )
+
+
+    stored_contribution_months = (
+        member.contribution_months
+    )
+
+
+    # ========================================================
+    # RECORD ALIGNMENT
+    # ========================================================
+
+    if recorded_history_months == 0:
+
+        record_alignment_status = (
+            "NO_DETAILED_HISTORY"
+        )
+
+    elif (
+        recorded_history_months
+        ==
+        stored_contribution_months
+    ):
+
+        record_alignment_status = (
+            "ALIGNED"
+        )
+
+    else:
+
+        record_alignment_status = (
+            "TOTAL_AND_HISTORY_DIFFER"
+        )
+
+
+    # ========================================================
+    # TRUSTED CONTINUITY
+    # ========================================================
+
+    continuity_ratio_percent = (
+        contribution_health[
+            "continuity_ratio_percent"
+        ]
+    )
+
+
+    if (
+        record_alignment_status
+        ==
+        "ALIGNED"
+        and
+        continuity_ratio_percent
+        is not None
+    ):
+
+        continuity_ratio = (
+            Decimal(
+                str(
+                    continuity_ratio_percent
+                )
+            )
+            /
+            Decimal("100")
+        )
+
+        continuity_used_in_scenario = True
+
+    else:
+
+        continuity_ratio = None
+
+        continuity_used_in_scenario = False
+
+
+    # ========================================================
+    # CURRENT MEMBER SALARY
+    # ========================================================
+
+    current_annual_salary = (
+        Decimal(
+            str(
+                member
+                .best_three_year_average_annual_salary
+            )
+        )
+    )
+
+
+    # ========================================================
+    # CALCULATE SCENARIO
+    # ========================================================
+
+    try:
+
+        result = (
+            calculate_retirement_scenario(
+
+                date_of_birth=(
+                    member.date_of_birth
+                ),
+
+                current_contribution_months=(
+                    stored_contribution_months
+                ),
+
+                current_annual_salary=(
+                    current_annual_salary
+                ),
+
+                additional_contribution_months=(
+                    request
+                    .additional_contribution_months
+                ),
+
+                projected_annual_salary=(
+                    request
+                    .projected_annual_salary
+                ),
+
+                retirement_age=(
+                    request.retirement_age
+                ),
+
+                continuity_ratio=(
+                    continuity_ratio
+                ),
+            )
+        )
+
+    except ValueError as exc:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+
+    # ========================================================
+    # RESPONSE
+    # ========================================================
+
+    return {
+
+        "member_id":
+            member.id,
+
+
+        # ----------------------------------------------------
+        # INPUT ASSUMPTIONS
+        # ----------------------------------------------------
+
+        "assumptions": {
+
+            "additional_contribution_months":
+                result
+                .additional_contribution_months,
+
+            "projected_annual_salary":
+                str(
+                    request
+                    .projected_annual_salary
+                ),
+
+            "retirement_age":
+                request.retirement_age,
+
+            "retirement_date":
+                (
+                    result
+                    .scenario
+                    .retirement_date
+                    .isoformat()
+                ),
+
+            "available_contribution_months":
+                (
+                    result
+                    .available_contribution_months
+                ),
+
+            "continuity_assumption":
+                result.continuity_assumption,
+        },
+
+
+        # ----------------------------------------------------
+        # BASELINE
+        # ----------------------------------------------------
+
+        "baseline": {
+
+            "contribution_months":
+                (
+                    result
+                    .baseline
+                    .contribution_months
+                ),
+
+            "annual_salary":
+                str(
+                    result
+                    .baseline
+                    .annual_salary
+                ),
+
+            "retirement_age":
+                (
+                    result
+                    .baseline
+                    .retirement_age
+                ),
+
+            "retirement_date":
+                (
+                    result
+                    .baseline
+                    .retirement_date
+                    .isoformat()
+                ),
+
+            "pension_right":
+                (
+                    str(
+                        result
+                        .baseline
+                        .pension_right
+                    )
+                    if (
+                        result
+                        .baseline
+                        .pension_right
+                        is not None
+                    )
+                    else None
+                ),
+
+            "pension_right_percent":
+                (
+                    str(
+                        (
+                            result
+                            .baseline
+                            .pension_right
+                            *
+                            Decimal("100")
+                        )
+                        .quantize(
+                            Decimal("0.01"),
+                            rounding=ROUND_HALF_UP
+                        )
+                    )
+                    if (
+                        result
+                        .baseline
+                        .pension_right
+                        is not None
+                    )
+                    else None
+                ),
+
+            "retirement_age_factor":
+                (
+                    str(
+                        result
+                        .baseline
+                        .retirement_age_factor
+                    )
+                    if (
+                        result
+                        .baseline
+                        .retirement_age_factor
+                        is not None
+                    )
+                    else None
+                ),
+
+            "monthly_pension":
+                (
+                    str(
+                        result
+                        .baseline
+                        .monthly_pension
+                    )
+                    if (
+                        result
+                        .baseline
+                        .monthly_pension
+                        is not None
+                    )
+                    else None
+                ),
+
+            "readiness_score":
+                (
+                    str(
+                        result
+                        .baseline
+                        .readiness_score
+                    )
+                    if (
+                        result
+                        .baseline
+                        .readiness_score
+                        is not None
+                    )
+                    else None
+                ),
+
+            "readiness_rating":
+                (
+                    result
+                    .baseline
+                    .readiness_rating
+                ),
+
+            "readiness_provisional":
+                (
+                    result
+                    .baseline
+                    .readiness_provisional
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # SCENARIO
+        # ----------------------------------------------------
+
+        "scenario": {
+
+            "contribution_months":
+                (
+                    result
+                    .scenario
+                    .contribution_months
+                ),
+
+            "annual_salary":
+                str(
+                    result
+                    .scenario
+                    .annual_salary
+                ),
+
+            "retirement_age":
+                (
+                    result
+                    .scenario
+                    .retirement_age
+                ),
+
+            "retirement_date":
+                (
+                    result
+                    .scenario
+                    .retirement_date
+                    .isoformat()
+                ),
+
+            "pension_right":
+                (
+                    str(
+                        result
+                        .scenario
+                        .pension_right
+                    )
+                    if (
+                        result
+                        .scenario
+                        .pension_right
+                        is not None
+                    )
+                    else None
+                ),
+
+            "pension_right_percent":
+                (
+                    str(
+                        (
+                            result
+                            .scenario
+                            .pension_right
+                            *
+                            Decimal("100")
+                        )
+                        .quantize(
+    Decimal("0.01"),
+    rounding=ROUND_HALF_UP,
+)
+                    )
+                    if (
+                        result
+                        .scenario
+                        .pension_right
+                        is not None
+                    )
+                    else None
+                ),
+
+            "retirement_age_factor":
+                (
+                    str(
+                        result
+                        .scenario
+                        .retirement_age_factor
+                    )
+                    if (
+                        result
+                        .scenario
+                        .retirement_age_factor
+                        is not None
+                    )
+                    else None
+                ),
+
+            "monthly_pension":
+                (
+                    str(
+                        result
+                        .scenario
+                        .monthly_pension
+                    )
+                    if (
+                        result
+                        .scenario
+                        .monthly_pension
+                        is not None
+                    )
+                    else None
+                ),
+
+            "readiness_score":
+                (
+                    str(
+                        result
+                        .scenario
+                        .readiness_score
+                    )
+                    if (
+                        result
+                        .scenario
+                        .readiness_score
+                        is not None
+                    )
+                    else None
+                ),
+
+            "readiness_rating":
+                (
+                    result
+                    .scenario
+                    .readiness_rating
+                ),
+
+            "readiness_provisional":
+                (
+                    result
+                    .scenario
+                    .readiness_provisional
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # IMPACT
+        # ----------------------------------------------------
+
+        "impact": {
+
+            "pension_right_change_percentage_points":
+                (
+                    str(
+                        result
+                        .pension_right_change_percentage_points
+                    )
+                    if (
+                        result
+                        .pension_right_change_percentage_points
+                        is not None
+                    )
+                    else None
+                ),
+
+            "monthly_pension_change":
+                (
+                    str(
+                        result
+                        .monthly_pension_change
+                    )
+                    if (
+                        result
+                        .monthly_pension_change
+                        is not None
+                    )
+                    else None
+                ),
+
+            "monthly_pension_change_percent":
+                (
+                    str(
+                        result
+                        .monthly_pension_change_percent
+                    )
+                    if (
+                        result
+                        .monthly_pension_change_percent
+                        is not None
+                    )
+                    else None
+                ),
+
+            "readiness_score_change":
+                (
+                    str(
+                        result
+                        .readiness_score_change
+                    )
+                    if (
+                        result
+                        .readiness_score_change
+                        is not None
+                    )
+                    else None
+                ),
+
+            "became_monthly_pension_eligible":
+                (
+                    result
+                    .became_monthly_pension_eligible
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # DATA QUALITY
+        # ----------------------------------------------------
+
+        "data_quality": {
+
+            "stored_contribution_months":
+                stored_contribution_months,
+
+            "detailed_records_stored":
+                recorded_history_months,
+
+            "record_alignment_status":
+                record_alignment_status,
+
+            "continuity_ratio_percent":
+                continuity_ratio_percent,
+
+            "continuity_used_in_scenario":
+                continuity_used_in_scenario,
+        },
+
+
+        # ----------------------------------------------------
+        # DISCLAIMER
+        # ----------------------------------------------------
+
+        "disclaimer": (
+            "This is a PensionIQ retirement-planning "
+            "simulation based on the member's stored "
+            "profile, selected assumptions, and available "
+            "contribution data. It is not an official "
+            "SSNIT benefit determination, entitlement "
+            "decision, or guarantee of future pension."
+        ),
     }

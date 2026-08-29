@@ -3182,4 +3182,850 @@ def test_dashboard_readiness_uses_aligned_history(
         )
         >
         0
-    )    
+    )
+
+# ============================================================
+# RETIREMENT WHAT-IF SCENARIO API
+# ============================================================
+
+
+def test_retirement_scenario_authenticated_member(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-scenario"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "additional_contribution_months":
+                60,
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    # --------------------------------------------------------
+    # Member
+    # --------------------------------------------------------
+
+    assert (
+        data["member_id"]
+        ==
+        member_id
+    )
+
+
+    # --------------------------------------------------------
+    # Baseline comes from stored profile
+    # --------------------------------------------------------
+
+    assert (
+        data["baseline"][
+            "contribution_months"
+        ]
+        ==
+        240
+    )
+
+
+    assert (
+        data["baseline"][
+            "annual_salary"
+        ]
+        ==
+        "72000.00"
+    )
+
+
+    assert (
+        data["baseline"][
+            "pension_right_percent"
+        ]
+        ==
+        "43.13"
+    )
+
+
+    assert (
+        data["baseline"][
+            "monthly_pension"
+        ]
+        ==
+        "2587.50"
+    )
+
+
+    # --------------------------------------------------------
+    # Scenario
+    # --------------------------------------------------------
+
+    assert (
+        data["scenario"][
+            "contribution_months"
+        ]
+        ==
+        300
+    )
+
+
+    assert (
+        data["scenario"][
+            "annual_salary"
+        ]
+        ==
+        "90000.00"
+    )
+
+
+    assert (
+        data["scenario"][
+            "pension_right_percent"
+        ]
+        ==
+        "48.75"
+    )
+
+
+    assert (
+        data["scenario"][
+            "monthly_pension"
+        ]
+        ==
+        "3656.25"
+    )
+
+
+    # --------------------------------------------------------
+    # Impact
+    # --------------------------------------------------------
+
+    assert (
+        data["impact"][
+            "monthly_pension_change"
+        ]
+        ==
+        "1068.75"
+    )
+
+
+    assert (
+        data["impact"][
+            "monthly_pension_change_percent"
+        ]
+        ==
+        "41.30"
+    )
+
+
+    assert (
+        data["impact"][
+            "pension_right_change_percentage_points"
+        ]
+        ==
+        "5.63"
+    )
+
+
+    # --------------------------------------------------------
+    # No detailed history exists yet.
+    # Readiness must therefore remain incomplete.
+    # --------------------------------------------------------
+
+    assert (
+        data["data_quality"][
+            "record_alignment_status"
+        ]
+        ==
+        "NO_DETAILED_HISTORY"
+    )
+
+
+    assert (
+        data["data_quality"][
+            "continuity_used_in_scenario"
+        ]
+        is False
+    )
+
+
+    assert (
+        data["baseline"][
+            "readiness_score"
+        ]
+        is None
+    )
+
+
+    assert (
+        data["scenario"][
+            "readiness_score"
+        ]
+        is None
+    )
+
+
+# ============================================================
+# AUTHENTICATION REQUIRED
+# ============================================================
+
+
+def test_retirement_scenario_requires_authentication(
+    client,
+):
+
+    register_response = (
+        register_user(
+            client
+        )
+    )
+
+
+    assert (
+        register_response.status_code
+        ==
+        200
+    )
+
+
+    member_id = (
+        register_response
+        .json()[
+            "user"
+        ][
+            "member_id"
+        ]
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-scenario"
+        ),
+
+        json={
+
+            "additional_contribution_months":
+                60,
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        401
+    )
+
+
+# ============================================================
+# MEMBER OWNERSHIP
+# ============================================================
+
+
+def test_retirement_scenario_rejects_other_member(
+    client,
+):
+
+    # --------------------------------------------------------
+    # First account
+    # --------------------------------------------------------
+
+    first_token, first_member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    assert first_token
+
+
+    # --------------------------------------------------------
+    # Second account
+    # --------------------------------------------------------
+
+    second_email = (
+        "second-member@example.com"
+    )
+
+
+    register_response = (
+        register_user(
+            client,
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        register_response.status_code
+        ==
+        200
+    )
+
+
+    login_response = (
+        login_user(
+            client,
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        login_response.status_code
+        ==
+        200
+    )
+
+
+    second_token = (
+        login_response
+        .json()[
+            "access_token"
+        ]
+    )
+
+
+    # --------------------------------------------------------
+    # Second user attempts to access first member
+    # --------------------------------------------------------
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{first_member_id}/"
+            "retirement-scenario"
+        ),
+
+        headers=authorization_headers(
+            second_token
+        ),
+
+        json={
+
+            "additional_contribution_months":
+                60,
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        403
+    )
+
+
+# ============================================================
+# PARTIAL CONTRIBUTION HISTORY MUST NOT AFFECT READINESS
+# ============================================================
+
+
+def test_retirement_scenario_rejects_partial_history_continuity(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # Member profile contains 240 contribution months,
+    # but only one detailed record will be stored.
+    # --------------------------------------------------------
+
+    contribution_response = (
+        client.post(
+
+            (
+                f"/members/"
+                f"{member_id}/"
+                "contributions"
+            ),
+
+            headers=authorization_headers(
+                token
+            ),
+
+            json={
+
+                "year":
+                    2026,
+
+                "month":
+                    1,
+
+                "insurable_earnings":
+                    "5000.00",
+
+                "recorded_first_tier_contribution":
+                    "675.00",
+            },
+        )
+    )
+
+
+    assert (
+        contribution_response.status_code
+        ==
+        200
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-scenario"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "additional_contribution_months":
+                60,
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    # --------------------------------------------------------
+    # The single observed record has perfect continuity
+    # within its tiny observed period.
+    # --------------------------------------------------------
+
+    assert (
+        data["data_quality"][
+            "continuity_ratio_percent"
+        ]
+        ==
+        "100.00"
+    )
+
+
+    # --------------------------------------------------------
+    # But it does not represent the member's full
+    # 240-month contribution history.
+    # --------------------------------------------------------
+
+    assert (
+        data["data_quality"][
+            "record_alignment_status"
+        ]
+        ==
+        "TOTAL_AND_HISTORY_DIFFER"
+    )
+
+
+    assert (
+        data["data_quality"][
+            "continuity_used_in_scenario"
+        ]
+        is False
+    )
+
+
+    # --------------------------------------------------------
+    # Therefore the readiness score remains incomplete.
+    # --------------------------------------------------------
+
+    assert (
+        data["baseline"][
+            "readiness_score"
+        ]
+        is None
+    )
+
+
+    assert (
+        data["scenario"][
+            "readiness_score"
+        ]
+        is None
+    )
+
+
+    assert (
+        data["baseline"][
+            "readiness_provisional"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["scenario"][
+            "readiness_provisional"
+        ]
+        is True
+    )
+
+
+# ============================================================
+# ALIGNED CONTRIBUTION HISTORY
+# ============================================================
+
+
+def test_retirement_scenario_uses_aligned_history(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # Reduce stored total to 3 contribution months.
+    # --------------------------------------------------------
+
+    profile_response = (
+        client.put(
+
+            f"/members/{member_id}",
+
+            headers=authorization_headers(
+                token
+            ),
+
+            json={
+                "contribution_months":
+                    3,
+            },
+        )
+    )
+
+
+    assert (
+        profile_response.status_code
+        ==
+        200
+    )
+
+
+    # --------------------------------------------------------
+    # Add exactly 3 consecutive detailed records.
+    # --------------------------------------------------------
+
+    for month in (
+        1,
+        2,
+        3,
+    ):
+
+        contribution_response = (
+            client.post(
+
+                (
+                    f"/members/"
+                    f"{member_id}/"
+                    "contributions"
+                ),
+
+                headers=authorization_headers(
+                    token
+                ),
+
+                json={
+
+                    "year":
+                        2026,
+
+                    "month":
+                        month,
+
+                    "insurable_earnings":
+                        "5000.00",
+
+                    "recorded_first_tier_contribution":
+                        "675.00",
+                },
+            )
+        )
+
+
+        assert (
+            contribution_response.status_code
+            ==
+            200
+        )
+
+
+    # --------------------------------------------------------
+    # Simulate enough future contributions to cross
+    # the 180-month monthly-pension threshold.
+    #
+    # Current = 3
+    # Additional = 180
+    # Scenario = 183
+    # --------------------------------------------------------
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-scenario"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "additional_contribution_months":
+                180,
+
+            "projected_annual_salary":
+                "72000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    # --------------------------------------------------------
+    # Data quality
+    # --------------------------------------------------------
+
+    assert (
+        data["data_quality"][
+            "record_alignment_status"
+        ]
+        ==
+        "ALIGNED"
+    )
+
+
+    assert (
+        data["data_quality"][
+            "continuity_ratio_percent"
+        ]
+        ==
+        "100.00"
+    )
+
+
+    assert (
+        data["data_quality"][
+            "continuity_used_in_scenario"
+        ]
+        is True
+    )
+
+
+    # --------------------------------------------------------
+    # Baseline readiness now has trusted continuity.
+    # --------------------------------------------------------
+
+    assert (
+        data["baseline"][
+            "readiness_score"
+        ]
+        ==
+        "25.67"
+    )
+
+
+    assert (
+        data["baseline"][
+            "readiness_provisional"
+        ]
+        is False
+    )
+
+
+    # --------------------------------------------------------
+    # Scenario crosses pension threshold.
+    # --------------------------------------------------------
+
+    assert (
+        data["scenario"][
+            "contribution_months"
+        ]
+        ==
+        183
+    )
+
+
+    assert (
+        data["scenario"][
+            "pension_right"
+        ]
+        ==
+        "0.3778125"
+    )
+
+
+    assert (
+        data["scenario"][
+            "pension_right_percent"
+        ]
+        ==
+        "37.78"
+    )
+
+
+    assert (
+        data["scenario"][
+            "monthly_pension"
+        ]
+        ==
+        "2266.88"
+    )
+
+
+    assert (
+        data["impact"][
+            "became_monthly_pension_eligible"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["scenario"][
+            "readiness_score"
+        ]
+        is not None
+    )
+
+
+    assert (
+        data["scenario"][
+            "readiness_provisional"
+        ]
+        is False
+    )
+
+
+# ============================================================
+# IMPOSSIBLE FUTURE CONTRIBUTION MONTHS
+# ============================================================
+
+
+def test_retirement_scenario_rejects_impossible_future_months(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-scenario"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "additional_contribution_months":
+                999,
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        400
+    )
+
+
+    data = response.json()
+
+
+    assert (
+        "cannot exceed"
+        in
+        data["detail"].lower()
+    )        

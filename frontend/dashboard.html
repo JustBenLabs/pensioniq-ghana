@@ -548,6 +548,596 @@
     </div>
 
 </section>
+<!-- =================================================
+     WHAT-IF RETIREMENT PLANNER
+================================================== -->
+
+<section
+    class="dashboard-card scenario-card"
+    id="retirement-scenario-card"
+>
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                Retirement Planning
+            </span>
+
+            <h3>
+                What-If Retirement Planner
+            </h3>
+
+            <p class="card-description">
+                Explore how additional contribution months,
+                a projected salary and a different retirement
+                age could affect your estimated pension position.
+            </p>
+
+        </div>
+
+        <span class="scenario-badge">
+            Simulation
+        </span>
+
+    </div>
+
+
+    <!-- =============================================
+         CURRENT PROFILE SUMMARY
+    ============================================== -->
+
+    <div class="scenario-current-summary">
+
+        <div>
+
+            <span>
+                Current contribution months
+            </span>
+
+            <strong id="scenario-current-months">
+                -
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Current annual salary basis
+            </span>
+
+            <strong id="scenario-current-salary">
+                -
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =============================================
+         SCENARIO FORM
+    ============================================== -->
+
+    <form
+        id="retirement-scenario-form"
+        class="scenario-form"
+    >
+
+        <div class="scenario-input-grid">
+
+            <div class="form-group">
+
+                <label
+                    for="scenario-additional-months"
+                >
+                    Additional Contribution Months
+                </label>
+
+                <input
+                    type="number"
+                    id="scenario-additional-months"
+                    min="0"
+                    step="1"
+                    value="0"
+                    required
+                >
+
+                <small>
+                    Number of additional monthly contributions
+                    you want to simulate before retirement.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label
+                    for="scenario-projected-salary"
+                >
+                    Projected Best 3-Year Average Annual Salary
+                </label>
+
+                <div class="money-field">
+
+                    <span>
+                        GH¢
+                    </span>
+
+                    <input
+    type="number"
+    id="scenario-projected-salary"
+    min="0"
+    step="0.01"
+    placeholder="e.g. 120000"
+    required
+>
+
+                </div>
+
+                <small>
+                    Your assumed best-three-year average annual
+                    pensionable salary for the scenario.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label
+                    for="scenario-retirement-age"
+                >
+                    Retirement Age
+                </label>
+
+                <select
+                    id="scenario-retirement-age"
+                    required
+                >
+
+                    <option value="55">
+                        55
+                    </option>
+
+                    <option value="56">
+                        56
+                    </option>
+
+                    <option value="57">
+                        57
+                    </option>
+
+                    <option value="58">
+                        58
+                    </option>
+
+                    <option value="59">
+                        59
+                    </option>
+
+                    <option
+                        value="60"
+                        selected
+                    >
+                        60
+                    </option>
+
+                </select>
+
+                <small>
+                    Ordinary retirement scenarios between
+                    ages 55 and 60.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="scenario-form-error"
+            class="scenario-error hidden"
+        ></div>
+
+
+        <div class="scenario-form-actions">
+
+            <button
+                type="submit"
+                id="scenario-submit-button"
+                class="primary-button"
+            >
+                Run What-If Scenario
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- =============================================
+         RESULTS
+    ============================================== -->
+
+    <div
+        id="scenario-results"
+        class="scenario-results hidden"
+    >
+
+        <div class="scenario-results-heading">
+
+            <div>
+
+                <span class="section-label">
+                    Scenario Results
+                </span>
+
+                <h4>
+                    Baseline vs What-If Scenario
+                </h4>
+
+            </div>
+
+            <span
+                id="scenario-retirement-date"
+                class="scenario-date"
+            >
+                -
+            </span>
+
+        </div>
+
+
+        <!-- =========================================
+             BASELINE / SCENARIO COMPARISON
+        ========================================== -->
+
+        <div class="scenario-comparison-grid">
+
+            <article
+                class="scenario-position-card baseline-position"
+            >
+
+                <div class="scenario-position-heading">
+
+                    <span>
+                        BASELINE
+                    </span>
+
+                    <strong>
+                       Baseline at Retirement
+                    </strong>
+
+                </div>
+
+
+                <dl class="scenario-position-list">
+
+                    <div>
+
+                        <dt>
+                            Contribution months
+                        </dt>
+
+                        <dd id="scenario-baseline-months">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Pension right
+                        </dt>
+
+                        <dd id="scenario-baseline-right">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Retirement factor
+                        </dt>
+
+                        <dd id="scenario-baseline-factor">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Estimated monthly pension
+                        </dt>
+
+                        <dd id="scenario-baseline-pension">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Readiness
+                        </dt>
+
+                        <dd id="scenario-baseline-readiness">
+                            -
+                        </dd>
+
+                    </div>
+
+                </dl>
+
+            </article>
+
+
+            <article
+                class="scenario-position-card projected-position"
+            >
+
+                <div class="scenario-position-heading">
+
+                    <span>
+                        WHAT-IF
+                    </span>
+
+                    <strong>
+                        What-If at Retirement
+                    </strong>
+
+                </div>
+
+
+                <dl class="scenario-position-list">
+
+                    <div>
+
+                        <dt>
+                            Contribution months
+                        </dt>
+
+                        <dd id="scenario-projected-months">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Pension right
+                        </dt>
+
+                        <dd id="scenario-projected-right">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Retirement factor
+                        </dt>
+
+                        <dd id="scenario-projected-factor">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Estimated monthly pension
+                        </dt>
+
+                        <dd id="scenario-projected-pension">
+                            -
+                        </dd>
+
+                    </div>
+
+
+                    <div>
+
+                        <dt>
+                            Readiness
+                        </dt>
+
+                        <dd id="scenario-projected-readiness">
+                            -
+                        </dd>
+
+                    </div>
+
+                </dl>
+
+            </article>
+
+        </div>
+
+
+        <!-- =========================================
+             IMPACT
+        ========================================== -->
+
+        <div class="scenario-impact-section">
+
+            <div class="scenario-impact-heading">
+
+                <span>
+                    POTENTIAL CHANGE
+                </span>
+
+                <h4>
+                    What this scenario could change
+                </h4>
+
+            </div>
+
+
+            <div class="scenario-impact-grid">
+
+                <div class="scenario-impact-item">
+
+                    <span>
+                        Contribution Months
+                    </span>
+
+                    <strong
+                        id="scenario-impact-months"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="scenario-impact-item">
+
+                    <span>
+                        Pension Right
+                    </span>
+
+                    <strong
+                        id="scenario-impact-right"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="scenario-impact-item">
+
+                    <span>
+                        Monthly Pension
+                    </span>
+
+                    <strong
+                        id="scenario-impact-pension"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="scenario-impact-item">
+
+                    <span>
+                        Monthly Pension %
+                    </span>
+
+                    <strong
+                        id="scenario-impact-pension-percent"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="scenario-impact-item">
+
+                    <span>
+                        Readiness Score
+                    </span>
+
+                    <strong
+                        id="scenario-impact-readiness"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="scenario-impact-item">
+
+                    <span>
+                        Eligibility Transition
+                    </span>
+
+                    <strong
+                        id="scenario-impact-eligibility"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             DATA QUALITY
+        ========================================== -->
+
+        <div class="scenario-data-quality">
+
+            <div class="scenario-data-quality-icon">
+                i
+            </div>
+
+            <div>
+
+                <strong>
+                    Contribution data quality
+                </strong>
+
+                <p
+                    id="scenario-data-quality-message"
+                >
+                    -
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             DISCLAIMER
+        ========================================== -->
+
+        <div class="scenario-disclaimer">
+
+            <strong>
+                Planning note
+            </strong>
+
+            <p id="scenario-disclaimer">
+                -
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
 
 
 

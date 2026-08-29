@@ -831,6 +831,10 @@ function displayDashboard(
         data.retirement_readiness
     );
 
+    prepareRetirementScenario(
+    data.member
+);
+
 
     displayContributionSummary(
         data.contribution_summary
@@ -4291,4 +4295,1366 @@ function getMaximumPlausibleContributionMonths(
         0,
         (age - 15 + 1) * 12
     );
+}
+
+// ==========================================================
+// WHAT-IF RETIREMENT PLANNER
+// ==========================================================
+
+
+function prepareRetirementScenario(
+    member
+) {
+
+    if (!member) {
+        return;
+    }
+
+
+    const monthsElement =
+        document.getElementById(
+            "scenario-current-months"
+        );
+
+
+    const salaryElement =
+        document.getElementById(
+            "scenario-current-salary"
+        );
+
+
+    const salaryInput =
+        document.getElementById(
+            "scenario-projected-salary"
+        );
+
+
+    if (monthsElement) {
+
+        monthsElement.textContent =
+            Number(
+                member.contribution_months
+                ||
+                0
+            )
+            .toLocaleString();
+
+    }
+
+
+    if (salaryElement) {
+
+        salaryElement.textContent =
+            formatScenarioCurrency(
+                member
+                .best_three_year_average_annual_salary
+            );
+
+    }
+
+
+    if (
+        salaryInput
+        &&
+        document.activeElement
+        !==
+        salaryInput
+    ) {
+
+        salaryInput.value =
+            Number(
+                member
+                .best_three_year_average_annual_salary
+                ||
+                0
+            )
+            .toFixed(
+                2
+            );
+
+    }
+
+}
+
+
+// ==========================================================
+// RUN SCENARIO
+// ==========================================================
+
+
+async function runRetirementScenario(
+    event
+) {
+
+    event.preventDefault();
+
+
+    hideScenarioError();
+
+
+    if (!currentMemberId) {
+
+        showScenarioError(
+            "No authenticated member profile is available."
+        );
+
+        return;
+
+    }
+
+
+    const monthsInput =
+        document.getElementById(
+            "scenario-additional-months"
+        );
+
+
+    const salaryInput =
+        document.getElementById(
+            "scenario-projected-salary"
+        );
+
+
+    const ageInput =
+        document.getElementById(
+            "scenario-retirement-age"
+        );
+
+
+    const additionalMonths =
+        Number(
+            monthsInput.value
+        );
+
+
+    const projectedSalary =
+        Number(
+            salaryInput.value
+        );
+
+
+    const retirementAge =
+        Number(
+            ageInput.value
+        );
+
+
+    // ------------------------------------------------------
+    // FRONTEND VALIDATION
+    // ------------------------------------------------------
+
+
+    if (
+        !Number.isInteger(
+            additionalMonths
+        )
+        ||
+        additionalMonths < 0
+    ) {
+
+        showScenarioError(
+            "Additional contribution months must be a whole number of zero or greater."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isFinite(
+            projectedSalary
+        )
+        ||
+        projectedSalary < 0
+    ) {
+
+        showScenarioError(
+            "Projected annual salary must be zero or greater."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isInteger(
+            retirementAge
+        )
+        ||
+        retirementAge < 55
+        ||
+        retirementAge > 60
+    ) {
+
+        showScenarioError(
+            "Retirement age must be between 55 and 60."
+        );
+
+        return;
+
+    }
+
+
+    setScenarioLoading(
+        true
+    );
+
+
+    try {
+
+        const response =
+            await authenticatedFetch(
+
+                (
+                    `${API_BASE_URL}/members/`
+                    +
+                    `${currentMemberId}/`
+                    +
+                    "retirement-scenario"
+                ),
+
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+
+                                additional_contribution_months:
+                                    additionalMonths,
+
+                                projected_annual_salary:
+                                    projectedSalary
+                                        .toFixed(
+                                            2
+                                        ),
+
+                                retirement_age:
+                                    retirementAge
+
+                            }
+                        )
+
+                }
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+
+                getApiErrorMessage(
+                    data,
+                    "Unable to calculate the retirement scenario."
+                )
+
+            );
+
+        }
+
+
+        displayRetirementScenario(
+            data
+        );
+
+    }
+
+    catch (error) {
+
+        showScenarioError(
+            error.message
+        );
+
+    }
+
+    finally {
+
+        setScenarioLoading(
+            false
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// DISPLAY SCENARIO
+// ==========================================================
+
+
+function displayRetirementScenario(
+    data
+) {
+
+    if (
+        !data
+        ||
+        !data.baseline
+        ||
+        !data.scenario
+    ) {
+
+        showScenarioError(
+            "The retirement scenario response is incomplete."
+        );
+
+        return;
+
+    }
+
+
+    const baseline =
+        data.baseline;
+
+
+    const scenario =
+        data.scenario;
+
+
+    const impact =
+        data.impact
+        ||
+        {};
+
+
+    const dataQuality =
+        data.data_quality
+        ||
+        {};
+
+
+    // ------------------------------------------------------
+    // DATE
+    // ------------------------------------------------------
+
+
+    setScenarioText(
+        "scenario-retirement-date",
+        formatScenarioDate(
+            scenario.retirement_date
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // BASELINE
+    // ------------------------------------------------------
+
+
+    setScenarioText(
+        "scenario-baseline-months",
+        formatScenarioMonths(
+            baseline.contribution_months
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-baseline-right",
+        formatScenarioPensionRight(
+            baseline.pension_right_percent
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-baseline-factor",
+        formatScenarioFactor(
+            baseline.retirement_age_factor
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-baseline-pension",
+        formatScenarioPension(
+            baseline.monthly_pension
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-baseline-readiness",
+        formatScenarioReadiness(
+            baseline.readiness_score,
+            baseline.readiness_rating
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // SCENARIO
+    // ------------------------------------------------------
+
+
+    setScenarioText(
+        "scenario-projected-months",
+        formatScenarioMonths(
+            scenario.contribution_months
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-projected-right",
+        formatScenarioPensionRight(
+            scenario.pension_right_percent
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-projected-factor",
+        formatScenarioFactor(
+            scenario.retirement_age_factor
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-projected-pension",
+        formatScenarioPension(
+            scenario.monthly_pension
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-projected-readiness",
+        formatScenarioReadiness(
+            scenario.readiness_score,
+            scenario.readiness_rating
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // IMPACT
+    // ------------------------------------------------------
+
+
+    setScenarioText(
+        "scenario-impact-months",
+        (
+            "+"
+            +
+            Number(
+                data
+                .assumptions
+                .additional_contribution_months
+                ||
+                0
+            )
+            .toLocaleString()
+            +
+            " months"
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-impact-right",
+        formatScenarioPointChange(
+            impact
+            .pension_right_change_percentage_points
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-impact-pension",
+        formatScenarioCurrencyChange(
+            impact.monthly_pension_change
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-impact-pension-percent",
+        formatScenarioPercentChange(
+            impact
+            .monthly_pension_change_percent
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-impact-readiness",
+        formatScenarioReadinessChange(
+            impact
+            .readiness_score_change
+        )
+    );
+
+
+    setScenarioText(
+        "scenario-impact-eligibility",
+        (
+            impact
+            .became_monthly_pension_eligible
+            ?
+            "Reached monthly-pension threshold"
+            :
+            "No new eligibility transition"
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // DATA QUALITY
+    // ------------------------------------------------------
+
+
+    displayScenarioDataQuality(
+        dataQuality
+    );
+
+
+    // ------------------------------------------------------
+    // DISCLAIMER
+    // ------------------------------------------------------
+
+
+    setScenarioText(
+        "scenario-disclaimer",
+        (
+            data.disclaimer
+            ||
+            "This is a PensionIQ planning simulation and not an official SSNIT determination."
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // SHOW RESULTS
+    // ------------------------------------------------------
+
+
+    const results =
+        document.getElementById(
+            "scenario-results"
+        );
+
+
+    if (results) {
+
+        results.classList.remove(
+            "hidden"
+        );
+
+
+        results.scrollIntoView(
+            {
+                behavior:
+                    "smooth",
+
+                block:
+                    "nearest"
+            }
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// DATA QUALITY MESSAGE
+// ==========================================================
+
+
+function displayScenarioDataQuality(
+    dataQuality
+) {
+
+    let message;
+
+
+    if (
+        dataQuality
+        .continuity_used_in_scenario
+        ===
+        true
+    ) {
+
+        message =
+            (
+                "Your detailed contribution history aligns "
+                +
+                "with your stored contribution-month total. "
+                +
+                "The assessed contribution continuity was "
+                +
+                "therefore included in the readiness comparison."
+            );
+
+    }
+
+    else if (
+        dataQuality
+        .record_alignment_status
+        ===
+        "NO_DETAILED_HISTORY"
+    ) {
+
+        message =
+            (
+                "No detailed contribution history is currently "
+                +
+                "available. Contribution consistency was not "
+                +
+                "used, so the readiness score in this scenario "
+                +
+                "remains incomplete."
+            );
+
+    }
+
+    else if (
+        dataQuality
+        .record_alignment_status
+        ===
+        "TOTAL_AND_HISTORY_DIFFER"
+    ) {
+
+        message =
+            (
+                "Your stored contribution-month total does not "
+                +
+                "match the detailed contribution records currently "
+                +
+                "available. Contribution consistency was therefore "
+                +
+                "excluded to avoid overstating retirement readiness."
+            );
+
+    }
+
+    else {
+
+        message =
+            (
+                "Contribution consistency could not be reliably "
+                +
+                "assessed for this scenario."
+            );
+
+    }
+
+
+    setScenarioText(
+        "scenario-data-quality-message",
+        message
+    );
+
+}
+
+
+// ==========================================================
+// SCENARIO FORM ERROR
+// ==========================================================
+
+
+function showScenarioError(
+    message
+) {
+
+    const errorElement =
+        document.getElementById(
+            "scenario-form-error"
+        );
+
+
+    if (!errorElement) {
+        return;
+    }
+
+
+    errorElement.textContent =
+        message;
+
+
+    errorElement.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+function hideScenarioError() {
+
+    const errorElement =
+        document.getElementById(
+            "scenario-form-error"
+        );
+
+
+    if (!errorElement) {
+        return;
+    }
+
+
+    errorElement.textContent =
+        "";
+
+
+    errorElement.classList.add(
+        "hidden"
+    );
+
+}
+
+
+// ==========================================================
+// LOADING STATE
+// ==========================================================
+
+
+function setScenarioLoading(
+    isLoading
+) {
+
+    const button =
+        document.getElementById(
+            "scenario-submit-button"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.disabled =
+        isLoading;
+
+
+    button.textContent =
+        (
+            isLoading
+            ?
+            "Running Scenario..."
+            :
+            "Run What-If Scenario"
+        );
+
+}
+
+
+// ==========================================================
+// SAFE TEXT OUTPUT
+// ==========================================================
+
+
+function setScenarioText(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        value;
+
+}
+
+
+// ==========================================================
+// FORMATTERS
+// ==========================================================
+
+
+function formatScenarioCurrency(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+        ||
+        value === ""
+    ) {
+
+        return "Unavailable";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Unavailable";
+
+    }
+
+
+    return (
+        "GH¢"
+        +
+        number.toLocaleString(
+            "en-GH",
+            {
+                minimumFractionDigits:
+                    2,
+
+                maximumFractionDigits:
+                    2
+            }
+        )
+    );
+
+}
+
+
+function formatScenarioPension(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not yet eligible";
+
+    }
+
+
+    return (
+        formatScenarioCurrency(
+            value
+        )
+        +
+        " / month"
+    );
+
+}
+
+
+function formatScenarioPensionRight(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not yet eligible";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Unavailable";
+
+    }
+
+
+    return (
+        number.toFixed(
+            2
+        )
+        +
+        "%"
+    );
+
+}
+
+
+function formatScenarioFactor(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not applicable";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Unavailable";
+
+    }
+
+
+    return (
+        (
+            number
+            *
+            100
+        )
+        .toFixed(
+            1
+        )
+        +
+        "%"
+    );
+
+}
+
+
+function formatScenarioReadiness(
+    score,
+    rating
+) {
+
+    if (
+        score === null
+        ||
+        score === undefined
+    ) {
+
+        return (
+            rating
+            ||
+            "Incomplete"
+        );
+
+    }
+
+
+    const number =
+        Number(
+            score
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return (
+            rating
+            ||
+            "Unavailable"
+        );
+
+    }
+
+
+    return (
+        number.toFixed(
+            2
+        )
+        +
+        " / 100 — "
+        +
+        (
+            rating
+            ||
+            "Unrated"
+        )
+    );
+
+}
+
+
+function formatScenarioMonths(
+    value
+) {
+
+    const number =
+        Number(
+            value
+            ||
+            0
+        );
+
+
+    return (
+        number.toLocaleString()
+        +
+        " months"
+    );
+
+}
+
+
+function formatScenarioPointChange(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not comparable";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Not comparable";
+
+    }
+
+
+    return (
+        formatScenarioSignedNumber(
+            number
+        )
+        +
+        " percentage points"
+    );
+
+}
+
+
+function formatScenarioCurrencyChange(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not comparable";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Not comparable";
+
+    }
+
+
+    const absoluteValue =
+        Math.abs(
+            number
+        );
+
+
+    if (number > 0) {
+
+        return (
+            "Increase of "
+            +
+            formatScenarioCurrency(
+                absoluteValue
+            )
+        );
+
+    }
+
+
+    if (number < 0) {
+
+        return (
+            "Decrease of "
+            +
+            formatScenarioCurrency(
+                absoluteValue
+            )
+        );
+
+    }
+
+
+    return "No change";
+
+}
+
+function formatScenarioPercentChange(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not comparable";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Not comparable";
+
+    }
+
+
+    const absoluteValue =
+        Math.abs(
+            number
+        );
+
+
+    if (number > 0) {
+
+        return (
+            "Increase of "
+            +
+            absoluteValue.toFixed(
+                2
+            )
+            +
+            "%"
+        );
+
+    }
+
+
+    if (number < 0) {
+
+        return (
+            "Decrease of "
+            +
+            absoluteValue.toFixed(
+                2
+            )
+            +
+            "%"
+        );
+
+    }
+
+
+    return "No change";
+
+}
+
+
+function formatScenarioReadinessChange(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Incomplete";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Incomplete";
+
+    }
+
+
+    return (
+        formatScenarioSignedNumber(
+            number
+        )
+        +
+        " points"
+    );
+
+}
+
+
+function formatScenarioSignedNumber(
+    value
+) {
+
+    const prefix =
+        (
+            value > 0
+            ?
+            "+"
+            :
+            ""
+        );
+
+
+    return (
+        prefix
+        +
+        value.toFixed(
+            2
+        )
+    );
+
+}
+
+
+function formatScenarioDate(
+    value
+) {
+
+    if (!value) {
+
+        return "Retirement date unavailable";
+
+    }
+
+
+    const dateValue =
+        new Date(
+            `${value}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            dateValue.getTime()
+        )
+    ) {
+
+        return value;
+
+    }
+
+
+    return (
+        "Retirement: "
+        +
+        dateValue.toLocaleDateString(
+            "en-GH",
+            {
+                year:
+                    "numeric",
+
+                month:
+                    "short",
+
+                day:
+                    "numeric"
+            }
+        )
+    );
+
+}
+
+
+// ==========================================================
+// FORM EVENT
+// ==========================================================
+
+
+const retirementScenarioForm =
+    document.getElementById(
+        "retirement-scenario-form"
+    );
+
+
+if (retirementScenarioForm) {
+
+    retirementScenarioForm.addEventListener(
+        "submit",
+        runRetirementScenario
+    );
+
 }

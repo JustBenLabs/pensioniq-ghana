@@ -3165,3 +3165,670 @@ tbody tr:hover {
     }
 
 }
+
+/* ==========================================================
+   WHAT-IF RETIREMENT PLANNER
+========================================================== */
+
+
+.scenario-card {
+    overflow: hidden;
+}
+
+
+.scenario-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 28px;
+
+    padding:
+        5px
+        11px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(
+            15,
+            118,
+            110,
+            0.10
+        );
+
+    color: var(--primary);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.06em;
+
+    text-transform: uppercase;
+}
+
+
+/* ==========================================================
+   CURRENT SUMMARY
+========================================================== */
+
+
+.scenario-current-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 14px;
+
+    margin-top: 22px;
+}
+
+
+.scenario-current-summary div {
+    padding: 16px 18px;
+
+    border:
+        1px solid
+        #e8edf2;
+
+    border-radius: 13px;
+
+    background: #f8fafb;
+}
+
+
+.scenario-current-summary span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.03em;
+
+    text-transform: uppercase;
+}
+
+
+.scenario-current-summary strong {
+    color: var(--navy);
+
+    font-size: 18px;
+}
+
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+
+.scenario-form {
+    margin-top: 22px;
+
+    padding: 22px;
+
+    border:
+        1px solid
+        #e7ecef;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #fbfcfd,
+            #f7f9fa
+        );
+}
+
+
+.scenario-input-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+}
+
+
+.scenario-form select {
+    width: 100%;
+
+    min-height: 44px;
+
+    padding:
+        0
+        12px;
+
+    border:
+        1px solid
+        #ccd6dd;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: var(--navy);
+
+    font: inherit;
+}
+
+
+.scenario-form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 20px;
+}
+
+
+.scenario-error {
+    margin-top: 16px;
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    background: #fff3f3;
+
+    color: #a53232;
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+
+/* ==========================================================
+   RESULTS
+========================================================== */
+
+
+.scenario-results {
+    margin-top: 25px;
+
+    padding-top: 24px;
+
+    border-top:
+        1px solid
+        #e9edf1;
+}
+
+
+.scenario-results-heading {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+
+.scenario-results-heading h4 {
+    margin:
+        4px
+        0
+        0;
+
+    color: var(--navy);
+
+    font-size: 19px;
+}
+
+
+.scenario-date {
+    padding:
+        7px
+        11px;
+
+    border-radius: 9px;
+
+    background: #f3f6f8;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   BASELINE VS SCENARIO
+========================================================== */
+
+
+.scenario-comparison-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 16px;
+}
+
+
+.scenario-position-card {
+    padding: 20px;
+
+    border-radius: 16px;
+}
+
+
+.baseline-position {
+    border:
+        1px solid
+        #dfe6eb;
+
+    background: #fafbfc;
+}
+
+
+.projected-position {
+    border:
+        1px solid
+        rgba(
+            15,
+            118,
+            110,
+            0.20
+        );
+
+    background:
+        rgba(
+            15,
+            118,
+            110,
+            0.045
+        );
+}
+
+
+.scenario-position-heading {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    margin-bottom: 15px;
+}
+
+
+.scenario-position-heading span {
+    color: var(--primary);
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: 0.09em;
+}
+
+
+.scenario-position-heading strong {
+    color: var(--navy);
+
+    font-size: 16px;
+}
+
+
+.scenario-position-list {
+    display: grid;
+
+    gap: 0;
+
+    margin: 0;
+}
+
+
+.scenario-position-list div {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding:
+        11px
+        0;
+
+    border-bottom:
+        1px solid
+        #e9edef;
+}
+
+
+.scenario-position-list div:last-child {
+    border-bottom: none;
+}
+
+
+.scenario-position-list dt {
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.scenario-position-list dd {
+    margin: 0;
+
+    color: var(--navy);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    text-align: right;
+}
+
+
+/* ==========================================================
+   IMPACT
+========================================================== */
+
+
+.scenario-impact-section {
+    margin-top: 22px;
+
+    padding: 20px;
+
+    border-radius: 16px;
+
+    background: var(--navy);
+}
+
+
+.scenario-impact-heading span {
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.60
+        );
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.09em;
+}
+
+
+.scenario-impact-heading h4 {
+    margin:
+        4px
+        0
+        17px;
+
+    color: #ffffff;
+
+    font-size: 17px;
+}
+
+
+.scenario-impact-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.scenario-impact-item {
+    padding: 14px;
+
+    border-radius: 11px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.08
+        );
+}
+
+
+.scenario-impact-item span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.65
+        );
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+.scenario-impact-item strong {
+    color: #ffffff;
+
+    font-size: 13px;
+}
+
+
+/* ==========================================================
+   DATA QUALITY
+========================================================== */
+
+
+.scenario-data-quality {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    margin-top: 18px;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    background: #f6f8fa;
+}
+
+
+.scenario-data-quality-icon {
+    display: grid;
+
+    width: 25px;
+    height: 25px;
+
+    place-items: center;
+
+    flex:
+        0
+        0
+        25px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            15,
+            118,
+            110,
+            0.10
+        );
+
+    color: var(--primary);
+
+    font-size: 11px;
+
+    font-weight: 900;
+}
+
+
+.scenario-data-quality strong {
+    color: var(--navy);
+
+    font-size: 11px;
+}
+
+
+.scenario-data-quality p {
+    margin:
+        4px
+        0
+        0;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   DISCLAIMER
+========================================================== */
+
+
+.scenario-disclaimer {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    margin-top: 17px;
+
+    padding-top: 16px;
+
+    border-top:
+        1px solid
+        #edf1f4;
+}
+
+
+.scenario-disclaimer strong {
+    flex: 0 0 auto;
+
+    color: var(--navy);
+
+    font-size: 10px;
+}
+
+
+.scenario-disclaimer p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   WHAT-IF RESPONSIVE
+========================================================== */
+
+
+@media (
+    max-width: 900px
+) {
+
+    .scenario-input-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .scenario-impact-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+@media (
+    max-width: 650px
+) {
+
+    .scenario-current-summary,
+    .scenario-comparison-grid,
+    .scenario-impact-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .scenario-results-heading {
+        flex-direction: column;
+    }
+
+
+    .scenario-position-list div {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .scenario-position-list dd {
+        text-align: left;
+    }
+
+
+    .scenario-form-actions {
+        justify-content: stretch;
+    }
+
+
+    .scenario-form-actions button {
+        width: 100%;
+    }
+
+
+    .scenario-disclaimer {
+        flex-direction: column;
+    }
+
+}
