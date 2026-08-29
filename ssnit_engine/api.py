@@ -879,7 +879,437 @@ def validate_retirement_plan_request(
 
 def retirement_plan_response(
     plan: RetirementPlan,
+    *,
+    scenario_result=None,
+    goal_result=None,
+    scenario_error: str | None = None,
+    goal_error: str | None = None,
+    data_quality: dict | None = None,
 ):
+
+    # ========================================================
+    # SCENARIO RESULT SERIALIZATION
+    # ========================================================
+
+    scenario_calculation = None
+
+
+    if scenario_result is not None:
+
+        baseline = scenario_result.baseline
+
+        what_if = scenario_result.scenario
+
+
+        scenario_calculation = {
+
+            "baseline": {
+
+                "contribution_months":
+                    baseline.contribution_months,
+
+                "annual_salary":
+                    str(
+                        baseline.annual_salary
+                    ),
+
+                "retirement_age":
+                    baseline.retirement_age,
+
+                "retirement_date":
+                    baseline
+                    .retirement_date
+                    .isoformat(),
+
+                "pension_right":
+                    (
+                        str(
+                            baseline.pension_right
+                        )
+                        if (
+                            baseline.pension_right
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "pension_right_percent":
+                    saved_plan_percentage(
+                        baseline.pension_right
+                    ),
+
+                "retirement_age_factor":
+                    (
+                        str(
+                            baseline
+                            .retirement_age_factor
+                        )
+                        if (
+                            baseline
+                            .retirement_age_factor
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "monthly_pension":
+                    (
+                        str(
+                            baseline.monthly_pension
+                        )
+                        if (
+                            baseline.monthly_pension
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "readiness_score":
+                    (
+                        str(
+                            baseline.readiness_score
+                        )
+                        if (
+                            baseline.readiness_score
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "readiness_rating":
+                    baseline.readiness_rating,
+
+                "readiness_provisional":
+                    baseline
+                    .readiness_provisional,
+            },
+
+
+            "scenario": {
+
+                "contribution_months":
+                    what_if.contribution_months,
+
+                "annual_salary":
+                    str(
+                        what_if.annual_salary
+                    ),
+
+                "retirement_age":
+                    what_if.retirement_age,
+
+                "retirement_date":
+                    what_if
+                    .retirement_date
+                    .isoformat(),
+
+                "pension_right":
+                    (
+                        str(
+                            what_if.pension_right
+                        )
+                        if (
+                            what_if.pension_right
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "pension_right_percent":
+                    saved_plan_percentage(
+                        what_if.pension_right
+                    ),
+
+                "retirement_age_factor":
+                    (
+                        str(
+                            what_if
+                            .retirement_age_factor
+                        )
+                        if (
+                            what_if
+                            .retirement_age_factor
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "monthly_pension":
+                    (
+                        str(
+                            what_if.monthly_pension
+                        )
+                        if (
+                            what_if.monthly_pension
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "readiness_score":
+                    (
+                        str(
+                            what_if.readiness_score
+                        )
+                        if (
+                            what_if.readiness_score
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "readiness_rating":
+                    what_if.readiness_rating,
+
+                "readiness_provisional":
+                    what_if
+                    .readiness_provisional,
+            },
+
+
+            "impact": {
+
+                "additional_contribution_months":
+                    scenario_result
+                    .additional_contribution_months,
+
+                "available_contribution_months":
+                    scenario_result
+                    .available_contribution_months,
+
+                "pension_right_change_percentage_points":
+                    str(
+                        scenario_result
+                        .pension_right_change_percentage_points
+                    ),
+
+                "monthly_pension_change":
+                    str(
+                        scenario_result
+                        .monthly_pension_change
+                    ),
+
+                "monthly_pension_change_percent":
+                    (
+                        str(
+                            scenario_result
+                            .monthly_pension_change_percent
+                        )
+                        if (
+                            scenario_result
+                            .monthly_pension_change_percent
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "readiness_score_change":
+                    (
+                        str(
+                            scenario_result
+                            .readiness_score_change
+                        )
+                        if (
+                            scenario_result
+                            .readiness_score_change
+                            is not None
+                        )
+                        else None
+                    ),
+
+                "became_monthly_pension_eligible":
+                    scenario_result
+                    .became_monthly_pension_eligible,
+
+                "continuity_assumption":
+                    serialize_value(
+                        scenario_result
+                        .continuity_assumption
+                    ),
+            },
+        }
+
+
+    # ========================================================
+    # GOAL RESULT SERIALIZATION
+    # ========================================================
+
+    goal_calculation = None
+
+
+    if goal_result is not None:
+
+        goal_calculation = {
+
+            "target_monthly_pension":
+                str(
+                    goal_result
+                    .target_monthly_pension
+                ),
+
+            "projected_annual_salary":
+                str(
+                    goal_result
+                    .projected_annual_salary
+                ),
+
+            "retirement_age":
+                goal_result.retirement_age,
+
+            "retirement_date":
+                goal_result
+                .retirement_date
+                .isoformat(),
+
+            "current_contribution_months":
+                goal_result
+                .current_contribution_months,
+
+            "available_contribution_months":
+                goal_result
+                .available_contribution_months,
+
+            "maximum_attainable_contribution_months":
+                goal_result
+                .maximum_attainable_contribution_months,
+
+            "current_projected_monthly_pension":
+                (
+                    str(
+                        goal_result
+                        .current_projected_monthly_pension
+                    )
+                    if (
+                        goal_result
+                        .current_projected_monthly_pension
+                        is not None
+                    )
+                    else None
+                ),
+
+            "required_contribution_months":
+                goal_result
+                .required_contribution_months,
+
+            "additional_contribution_months_required":
+                goal_result
+                .additional_contribution_months_required,
+
+            "estimated_monthly_pension_at_required_months":
+                (
+                    str(
+                        goal_result
+                        .estimated_monthly_pension_at_required_months
+                    )
+                    if (
+                        goal_result
+                        .estimated_monthly_pension_at_required_months
+                        is not None
+                    )
+                    else None
+                ),
+
+            "pension_right_at_required_months":
+                (
+                    str(
+                        goal_result
+                        .pension_right_at_required_months
+                    )
+                    if (
+                        goal_result
+                        .pension_right_at_required_months
+                        is not None
+                    )
+                    else None
+                ),
+
+            "pension_right_at_required_months_percent":
+                saved_plan_percentage(
+                    goal_result
+                    .pension_right_at_required_months
+                ),
+
+            "maximum_attainable_monthly_pension":
+                (
+                    str(
+                        goal_result
+                        .maximum_attainable_monthly_pension
+                    )
+                    if (
+                        goal_result
+                        .maximum_attainable_monthly_pension
+                        is not None
+                    )
+                    else None
+                ),
+
+            "maximum_attainable_pension_right":
+                (
+                    str(
+                        goal_result
+                        .maximum_attainable_pension_right
+                    )
+                    if (
+                        goal_result
+                        .maximum_attainable_pension_right
+                        is not None
+                    )
+                    else None
+                ),
+
+            "maximum_attainable_pension_right_percent":
+                saved_plan_percentage(
+                    goal_result
+                    .maximum_attainable_pension_right
+                ),
+
+            "retirement_age_factor":
+                (
+                    str(
+                        goal_result
+                        .retirement_age_factor
+                    )
+                    if (
+                        goal_result
+                        .retirement_age_factor
+                        is not None
+                    )
+                    else None
+                ),
+
+            "pension_gap_at_maximum":
+                str(
+                    goal_result
+                    .pension_gap_at_maximum
+                ),
+
+            "approximate_annual_salary_required":
+                (
+                    str(
+                        goal_result
+                        .approximate_annual_salary_required_at_maximum_months
+                    )
+                    if (
+                        goal_result
+                        .approximate_annual_salary_required_at_maximum_months
+                        is not None
+                    )
+                    else None
+                ),
+
+            "goal_achievable":
+                goal_result.goal_achievable,
+
+            "goal_status":
+                serialize_value(
+                    goal_result.goal_status
+                ),
+        }
+
+
+    # ========================================================
+    # FINAL RESPONSE
+    # ========================================================
 
     return {
 
@@ -900,10 +1330,8 @@ def retirement_plan_response(
                 ),
 
             "additional_contribution_months":
-                (
-                    plan
-                    .scenario_additional_contribution_months
-                ),
+                plan
+                .scenario_additional_contribution_months,
 
             "projected_annual_salary":
                 (
@@ -922,6 +1350,26 @@ def retirement_plan_response(
             "retirement_age":
                 plan
                 .scenario_retirement_age,
+
+            "calculation_status":
+                (
+                    "CALCULATED"
+                    if scenario_result
+                    is not None
+                    else (
+                        "INVALIDATED"
+                        if scenario_error
+                        is not None
+                        else
+                        "NOT_CALCULATED"
+                    )
+                ),
+
+            "calculation_error":
+                scenario_error,
+
+            "result":
+                scenario_calculation,
         },
 
 
@@ -965,22 +1413,42 @@ def retirement_plan_response(
             "retirement_age":
                 plan
                 .goal_retirement_age,
+
+            "calculation_status":
+                (
+                    "CALCULATED"
+                    if goal_result
+                    is not None
+                    else (
+                        "INVALIDATED"
+                        if goal_error
+                        is not None
+                        else
+                        "NOT_CALCULATED"
+                    )
+                ),
+
+            "calculation_error":
+                goal_error,
+
+            "result":
+                goal_calculation,
         },
 
 
+        "data_quality":
+            data_quality,
+
+
         "created_at":
-            (
-                plan
-                .created_at
-                .isoformat()
-            ),
+            plan
+            .created_at
+            .isoformat(),
 
         "updated_at":
-            (
-                plan
-                .updated_at
-                .isoformat()
-            ),
+            plan
+            .updated_at
+            .isoformat(),
     }
 
 
@@ -6008,6 +6476,28 @@ def get_retirement_plan(
     )
 
 
+    # ========================================================
+    # MEMBER
+    # ========================================================
+
+    member = db.get(
+        Member,
+        member_id,
+    )
+
+
+    if member is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Member not found.",
+        )
+
+
+    # ========================================================
+    # SAVED PLAN
+    # ========================================================
+
     plan = (
         db.scalar(
 
@@ -6035,11 +6525,292 @@ def get_retirement_plan(
         )
 
 
-    return retirement_plan_response(
-        plan
+    # ========================================================
+    # CONTRIBUTION HISTORY
+    # ========================================================
+
+    records = db.scalars(
+
+        select(
+            ContributionRecord
+        )
+
+        .where(
+            ContributionRecord.member_id
+            ==
+            member_id
+        )
+
+        .order_by(
+            ContributionRecord.year,
+            ContributionRecord.month,
+        )
+
+    ).all()
+
+
+    contribution_health = (
+        analyse_contribution_history(
+            records
+        )
     )
 
 
+    stored_contribution_months = (
+        member.contribution_months
+    )
+
+
+    detailed_records_stored = len(
+        records
+    )
+
+
+    # ========================================================
+    # DATA QUALITY
+    # ========================================================
+
+    if detailed_records_stored == 0:
+
+        record_alignment_status = (
+            "NO_DETAILED_HISTORY"
+        )
+
+
+    elif (
+        detailed_records_stored
+        ==
+        stored_contribution_months
+    ):
+
+        record_alignment_status = (
+            "ALIGNED"
+        )
+
+
+    else:
+
+        record_alignment_status = (
+            "TOTAL_AND_HISTORY_DIFFER"
+        )
+
+
+    continuity_ratio_percent = (
+        contribution_health.get(
+            "continuity_ratio_percent"
+        )
+    )
+
+
+    continuity_ratio = None
+
+    continuity_used = False
+
+
+    if (
+        record_alignment_status
+        ==
+        "ALIGNED"
+        and
+        continuity_ratio_percent
+        is not None
+    ):
+
+        continuity_ratio = (
+
+            Decimal(
+                str(
+                    continuity_ratio_percent
+                )
+            )
+
+            /
+
+            Decimal("100")
+        )
+
+
+        continuity_used = True
+
+
+    data_quality = {
+
+        "stored_contribution_months":
+            stored_contribution_months,
+
+        "detailed_records_stored":
+            detailed_records_stored,
+
+        "record_alignment_status":
+            record_alignment_status,
+
+        "continuity_ratio_percent":
+            continuity_ratio_percent,
+
+        "continuity_used_in_scenario":
+            continuity_used,
+    }
+
+
+    # ========================================================
+    # RECALCULATE SAVED WHAT-IF
+    # ========================================================
+
+    scenario_result = None
+
+    scenario_error = None
+
+
+    if (
+        plan
+        .scenario_retirement_age
+        is not None
+    ):
+
+        try:
+
+            scenario_result = (
+                calculate_retirement_scenario(
+
+                    date_of_birth=(
+                        member.date_of_birth
+                    ),
+
+                    current_contribution_months=(
+                        stored_contribution_months
+                    ),
+
+                    current_annual_salary=(
+                        Decimal(
+                            str(
+                                member
+                                .best_three_year_average_annual_salary
+                            )
+                        )
+                    ),
+
+                    additional_contribution_months=(
+                        plan
+                        .scenario_additional_contribution_months
+                    ),
+
+                    projected_annual_salary=(
+                        Decimal(
+                            str(
+                                plan
+                                .scenario_projected_annual_salary
+                            )
+                        )
+                    ),
+
+                    retirement_age=(
+                        plan
+                        .scenario_retirement_age
+                    ),
+
+                    continuity_ratio=(
+                        continuity_ratio
+                    ),
+                )
+            )
+
+
+        except ValueError as exc:
+
+            scenario_error = str(
+                exc
+            )
+
+
+    # ========================================================
+    # RECALCULATE SAVED GOAL
+    # ========================================================
+
+    goal_result = None
+
+    goal_error = None
+
+
+    if (
+        plan
+        .goal_retirement_age
+        is not None
+    ):
+
+        try:
+
+            goal_result = (
+                calculate_retirement_goal(
+
+                    date_of_birth=(
+                        member.date_of_birth
+                    ),
+
+                    current_contribution_months=(
+                        stored_contribution_months
+                    ),
+
+                    target_monthly_pension=(
+                        Decimal(
+                            str(
+                                plan
+                                .goal_target_monthly_pension
+                            )
+                        )
+                    ),
+
+                    projected_annual_salary=(
+                        Decimal(
+                            str(
+                                plan
+                                .goal_projected_annual_salary
+                            )
+                        )
+                    ),
+
+                    retirement_age=(
+                        plan
+                        .goal_retirement_age
+                    ),
+                )
+            )
+
+
+        except ValueError as exc:
+
+            goal_error = str(
+                exc
+            )
+
+
+    # ========================================================
+    # RESPONSE
+    # ========================================================
+
+    return retirement_plan_response(
+
+        plan,
+
+        scenario_result=(
+            scenario_result
+        ),
+
+        goal_result=(
+            goal_result
+        ),
+
+        scenario_error=(
+            scenario_error
+        ),
+
+        goal_error=(
+            goal_error
+        ),
+
+        data_quality=(
+            data_quality
+        ),
+    )
 # ============================================================
 # SAVED RETIREMENT PLAN — UPDATE
 # ============================================================

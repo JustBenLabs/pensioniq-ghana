@@ -5500,3 +5500,269 @@ def test_retirement_plan_rejects_empty_plan(
         ]
         .lower()
     )
+# ============================================================
+# SAVED PLAN — LIVE SCENARIO RECALCULATION
+# ============================================================
+
+
+def test_retirement_plan_get_recalculates_saved_scenario(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    create_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "scenario_additional_contribution_months":
+                12,
+
+            "scenario_projected_annual_salary":
+                "90000.00",
+
+            "scenario_retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        create_response.status_code
+        ==
+        200
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["scenario"][
+            "calculation_status"
+        ]
+        ==
+        "CALCULATED"
+    )
+
+
+    assert (
+        data["scenario"][
+            "calculation_error"
+        ]
+        is None
+    )
+
+
+    assert (
+        data["scenario"][
+            "result"
+        ][
+            "baseline"
+        ][
+            "contribution_months"
+        ]
+        ==
+        240
+    )
+
+
+    assert (
+        data["scenario"][
+            "result"
+        ][
+            "scenario"
+        ][
+            "contribution_months"
+        ]
+        ==
+        252
+    )
+
+
+    assert (
+        data["scenario"][
+            "result"
+        ][
+            "scenario"
+        ][
+            "annual_salary"
+        ]
+        ==
+        "90000.00"
+    )
+
+
+    assert (
+        data["data_quality"][
+            "record_alignment_status"
+        ]
+        ==
+        "NO_DETAILED_HISTORY"
+    )
+
+
+    assert (
+        data["data_quality"][
+            "continuity_used_in_scenario"
+        ]
+        is False
+    )
+
+
+# ============================================================
+# SAVED PLAN — LIVE GOAL RECALCULATION
+# ============================================================
+
+
+def test_retirement_plan_get_recalculates_saved_goal(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    create_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "goal_target_monthly_pension":
+                "3500.00",
+
+            "goal_projected_annual_salary":
+                "90000.00",
+
+            "goal_retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        create_response.status_code
+        ==
+        200
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["goal"][
+            "calculation_status"
+        ]
+        ==
+        "CALCULATED"
+    )
+
+
+    assert (
+        data["goal"][
+            "calculation_error"
+        ]
+        is None
+    )
+
+
+    assert (
+        data["goal"][
+            "result"
+        ]
+        is not None
+    )
+
+
+    assert (
+        data["goal"][
+            "result"
+        ][
+            "target_monthly_pension"
+        ]
+        ==
+        "3500.00"
+    )
+
+
+    assert (
+        data["goal"][
+            "result"
+        ][
+            "projected_annual_salary"
+        ]
+        ==
+        "90000.00"
+    )
+
+
+    assert (
+        data["goal"][
+            "result"
+        ][
+            "goal_achievable"
+        ]
+        is True
+    )
