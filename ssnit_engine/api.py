@@ -23,6 +23,8 @@ from fastapi import (
     HTTPException,
 )
 
+
+
 from fastapi.middleware.cors import (
     CORSMiddleware,
 )
@@ -75,6 +77,7 @@ from ssnit_engine.database.models import (
     ContributionRecord,
     Member,
     PasswordResetToken,
+    RetirementPlan,
     User,
 )
 
@@ -293,7 +296,32 @@ class RetirementGoalRequest(BaseModel):
 
     projected_annual_salary: Decimal
 
-    retirement_age: int    
+    retirement_age: int
+
+
+class RetirementPlanRequest(BaseModel):
+
+    # --------------------------------------------------------
+    # WHAT-IF SCENARIO
+    # --------------------------------------------------------
+
+    scenario_additional_contribution_months: int | None = None
+
+    scenario_projected_annual_salary: Decimal | None = None
+
+    scenario_retirement_age: int | None = None
+
+
+    # --------------------------------------------------------
+    # RETIREMENT GOAL
+    # --------------------------------------------------------
+
+    goal_target_monthly_pension: Decimal | None = None
+
+    goal_projected_annual_salary: Decimal | None = None
+
+    goal_retirement_age: int | None = None
+
 
 class RetirementEPVRequest(BaseModel):
 
@@ -548,7 +576,7 @@ def validate_member_dob_against_contribution_records(
                     "consistent with existing "
                     "contribution records."
                 ),
-            )    
+            )
 
 def validate_contribution_period(
     year: int,
@@ -631,7 +659,355 @@ def validate_contribution_period_for_member(
                 "Contribution period is not "
                 "plausible for the member's age."
             ),
-        )    
+        )
+
+
+def validate_retirement_plan_request(
+    request: RetirementPlanRequest,
+):
+
+    # ========================================================
+    # WHAT-IF SECTION
+    # ========================================================
+
+    scenario_values = (
+
+        request
+        .scenario_additional_contribution_months,
+
+        request
+        .scenario_projected_annual_salary,
+
+        request
+        .scenario_retirement_age,
+    )
+
+
+    scenario_supplied = any(
+        value is not None
+        for value in scenario_values
+    )
+
+
+    scenario_complete = all(
+        value is not None
+        for value in scenario_values
+    )
+
+
+    if (
+        scenario_supplied
+        and
+        not scenario_complete
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "A saved What-If scenario must include "
+                "additional contribution months, projected "
+                "annual salary and retirement age."
+            ),
+        )
+
+
+    if scenario_complete:
+
+        if (
+            request
+            .scenario_additional_contribution_months
+            <
+            0
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Scenario additional contribution months "
+                    "cannot be negative."
+                ),
+            )
+
+
+        if (
+            request
+            .scenario_projected_annual_salary
+            <
+            0
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Scenario projected annual salary "
+                    "cannot be negative."
+                ),
+            )
+
+
+        if not (
+            55
+            <=
+            request.scenario_retirement_age
+            <=
+            60
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Scenario retirement age must be "
+                    "between 55 and 60."
+                ),
+            )
+
+
+    # ========================================================
+    # GOAL SECTION
+    # ========================================================
+
+    goal_values = (
+
+        request
+        .goal_target_monthly_pension,
+
+        request
+        .goal_projected_annual_salary,
+
+        request
+        .goal_retirement_age,
+    )
+
+
+    goal_supplied = any(
+        value is not None
+        for value in goal_values
+    )
+
+
+    goal_complete = all(
+        value is not None
+        for value in goal_values
+    )
+
+
+    if (
+        goal_supplied
+        and
+        not goal_complete
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "A saved retirement goal must include "
+                "target monthly pension, projected annual "
+                "salary and retirement age."
+            ),
+        )
+
+
+    if goal_complete:
+
+        if (
+            request
+            .goal_target_monthly_pension
+            <=
+            0
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Goal target monthly pension must "
+                    "be greater than zero."
+                ),
+            )
+
+
+        if (
+            request
+            .goal_projected_annual_salary
+            <
+            0
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Goal projected annual salary "
+                    "cannot be negative."
+                ),
+            )
+
+
+        if not (
+            55
+            <=
+            request.goal_retirement_age
+            <=
+            60
+        ):
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Goal retirement age must be "
+                    "between 55 and 60."
+                ),
+            )
+
+
+    # ========================================================
+    # AT LEAST ONE PLANNER MUST BE SAVED
+    # ========================================================
+
+    if (
+        not scenario_supplied
+        and
+        not goal_supplied
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Save at least one What-If scenario "
+                "or retirement goal."
+            ),
+        )
+
+
+def retirement_plan_response(
+    plan: RetirementPlan,
+):
+
+    return {
+
+        "id":
+            plan.id,
+
+        "member_id":
+            plan.member_id,
+
+
+        "scenario": {
+
+            "saved":
+                (
+                    plan
+                    .scenario_retirement_age
+                    is not None
+                ),
+
+            "additional_contribution_months":
+                (
+                    plan
+                    .scenario_additional_contribution_months
+                ),
+
+            "projected_annual_salary":
+                (
+                    str(
+                        plan
+                        .scenario_projected_annual_salary
+                    )
+                    if (
+                        plan
+                        .scenario_projected_annual_salary
+                        is not None
+                    )
+                    else None
+                ),
+
+            "retirement_age":
+                plan
+                .scenario_retirement_age,
+        },
+
+
+        "goal": {
+
+            "saved":
+                (
+                    plan
+                    .goal_retirement_age
+                    is not None
+                ),
+
+            "target_monthly_pension":
+                (
+                    str(
+                        plan
+                        .goal_target_monthly_pension
+                    )
+                    if (
+                        plan
+                        .goal_target_monthly_pension
+                        is not None
+                    )
+                    else None
+                ),
+
+            "projected_annual_salary":
+                (
+                    str(
+                        plan
+                        .goal_projected_annual_salary
+                    )
+                    if (
+                        plan
+                        .goal_projected_annual_salary
+                        is not None
+                    )
+                    else None
+                ),
+
+            "retirement_age":
+                plan
+                .goal_retirement_age,
+        },
+
+
+        "created_at":
+            (
+                plan
+                .created_at
+                .isoformat()
+            ),
+
+        "updated_at":
+            (
+                plan
+                .updated_at
+                .isoformat()
+            ),
+    }
+
+
+
+
+def saved_plan_percentage(
+    value,
+):
+
+    if value is None:
+        return None
+
+    return str(
+        (
+            Decimal(
+                str(value)
+            )
+            *
+            Decimal("100")
+        )
+        .quantize(
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
+        )
+    )
+
+
 def extract_pension_right(
     result,
 ) -> str | None:
@@ -4198,7 +4574,7 @@ def get_member_dashboard(
     "continuity_ratio_percent":
         continuity_ratio_percent,
 
-},    
+},
 
     "components": {
 
@@ -5476,3 +5852,372 @@ def member_retirement_report_pdf(
                 "no-cache",
         },
     )
+
+# ============================================================
+# SAVED RETIREMENT PLAN — CREATE
+# ============================================================
+
+
+@app.post(
+    "/members/{member_id}/retirement-plan"
+)
+def create_retirement_plan(
+
+    member_id: int,
+
+    request: RetirementPlanRequest,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    member = db.get(
+        Member,
+        member_id,
+    )
+
+
+    if member is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Member not found.",
+        )
+
+
+    validate_retirement_plan_request(
+        request
+    )
+
+
+    existing_plan = (
+        db.scalar(
+
+            select(
+                RetirementPlan
+            )
+
+            .where(
+                RetirementPlan.member_id
+                ==
+                member_id
+            )
+
+        )
+    )
+
+
+    if existing_plan is not None:
+
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "A saved retirement plan already exists. "
+                "Use the update endpoint instead."
+            ),
+        )
+
+
+    plan = RetirementPlan(
+
+        member_id=
+            member_id,
+
+        scenario_additional_contribution_months=(
+            request
+            .scenario_additional_contribution_months
+        ),
+
+        scenario_projected_annual_salary=(
+            request
+            .scenario_projected_annual_salary
+        ),
+
+        scenario_retirement_age=(
+            request
+            .scenario_retirement_age
+        ),
+
+        goal_target_monthly_pension=(
+            request
+            .goal_target_monthly_pension
+        ),
+
+        goal_projected_annual_salary=(
+            request
+            .goal_projected_annual_salary
+        ),
+
+        goal_retirement_age=(
+            request
+            .goal_retirement_age
+        ),
+    )
+
+
+    db.add(
+        plan
+    )
+
+    db.commit()
+
+    db.refresh(
+        plan
+    )
+
+
+    return retirement_plan_response(
+        plan
+    )
+
+# ============================================================
+# SAVED RETIREMENT PLAN — READ
+# ============================================================
+
+
+@app.get(
+    "/members/{member_id}/retirement-plan"
+)
+def get_retirement_plan(
+
+    member_id: int,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    plan = (
+        db.scalar(
+
+            select(
+                RetirementPlan
+            )
+
+            .where(
+                RetirementPlan.member_id
+                ==
+                member_id
+            )
+
+        )
+    )
+
+
+    if plan is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No saved retirement plan exists."
+            ),
+        )
+
+
+    return retirement_plan_response(
+        plan
+    )
+
+
+# ============================================================
+# SAVED RETIREMENT PLAN — UPDATE
+# ============================================================
+
+
+@app.put(
+    "/members/{member_id}/retirement-plan"
+)
+def update_retirement_plan(
+
+    member_id: int,
+
+    request: RetirementPlanRequest,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    validate_retirement_plan_request(
+        request
+    )
+
+
+    plan = (
+        db.scalar(
+
+            select(
+                RetirementPlan
+            )
+
+            .where(
+                RetirementPlan.member_id
+                ==
+                member_id
+            )
+
+        )
+    )
+
+
+    if plan is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No saved retirement plan exists."
+            ),
+        )
+
+
+    plan.scenario_additional_contribution_months = (
+        request
+        .scenario_additional_contribution_months
+    )
+
+
+    plan.scenario_projected_annual_salary = (
+        request
+        .scenario_projected_annual_salary
+    )
+
+
+    plan.scenario_retirement_age = (
+        request
+        .scenario_retirement_age
+    )
+
+
+    plan.goal_target_monthly_pension = (
+        request
+        .goal_target_monthly_pension
+    )
+
+
+    plan.goal_projected_annual_salary = (
+        request
+        .goal_projected_annual_salary
+    )
+
+
+    plan.goal_retirement_age = (
+        request
+        .goal_retirement_age
+    )
+
+
+    db.commit()
+
+    db.refresh(
+        plan
+    )
+
+
+    return retirement_plan_response(
+        plan
+    )
+
+
+# ============================================================
+# SAVED RETIREMENT PLAN — DELETE
+# ============================================================
+
+
+@app.delete(
+    "/members/{member_id}/retirement-plan"
+)
+def delete_retirement_plan(
+
+    member_id: int,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    plan = (
+        db.scalar(
+
+            select(
+                RetirementPlan
+            )
+
+            .where(
+                RetirementPlan.member_id
+                ==
+                member_id
+            )
+
+        )
+    )
+
+
+    if plan is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No saved retirement plan exists."
+            ),
+        )
+
+
+    db.delete(
+        plan
+    )
+
+    db.commit()
+
+
+    return {
+
+        "message":
+            (
+                "Saved retirement plan "
+                "deleted successfully."
+            ),
+
+        "member_id":
+            member_id,
+    }

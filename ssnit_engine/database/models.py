@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from datetime import (
     UTC,
     datetime,
@@ -81,6 +82,127 @@ class Member(Base):
         default=datetime.now(UTC),
         nullable=False,
     )
+
+# ============================================================
+# SAVED RETIREMENT PLAN
+# ============================================================
+
+
+class RetirementPlan(Base):
+
+    __tablename__ = "retirement_plans"
+
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+    )
+
+
+    # One active saved plan per PensionIQ member.
+    member_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "members.id"
+        ),
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+
+
+    # ========================================================
+    # WHAT-IF RETIREMENT SCENARIO ASSUMPTIONS
+    # ========================================================
+
+    scenario_additional_contribution_months: Mapped[
+        int | None
+    ] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+
+    scenario_projected_annual_salary: Mapped[
+        Decimal | None
+    ] = mapped_column(
+        Numeric(
+            14,
+            2,
+        ),
+        nullable=True,
+    )
+
+
+    scenario_retirement_age: Mapped[
+        int | None
+    ] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+
+    # ========================================================
+    # RETIREMENT GOAL ASSUMPTIONS
+    # ========================================================
+
+    goal_target_monthly_pension: Mapped[
+        Decimal | None
+    ] = mapped_column(
+        Numeric(
+            14,
+            2,
+        ),
+        nullable=True,
+    )
+
+
+    goal_projected_annual_salary: Mapped[
+        Decimal | None
+    ] = mapped_column(
+        Numeric(
+            14,
+            2,
+        ),
+        nullable=True,
+    )
+
+
+    goal_retirement_age: Mapped[
+        int | None
+    ] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+
+    # ========================================================
+    # TIMESTAMPS
+    # ========================================================
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(
+            timezone=True
+        ),
+        default=lambda: datetime.now(
+            UTC
+        ),
+        nullable=False,
+    )
+
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(
+            timezone=True
+        ),
+        default=lambda: datetime.now(
+            UTC
+        ),
+        onupdate=lambda: datetime.now(
+            UTC
+        ),
+        nullable=False,
+    )
+
 class ContributionRecord(Base):
 
     __tablename__ = "contribution_records"
@@ -138,7 +260,7 @@ class ContributionRecord(Base):
         DateTime,
         default=lambda: datetime.now(UTC),
         nullable=False,
-    )   
+    )
 
 class User(Base):
 
@@ -226,4 +348,4 @@ class PasswordResetToken(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
         nullable=False,
-    )         
+    )

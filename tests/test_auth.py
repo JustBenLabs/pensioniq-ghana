@@ -1850,7 +1850,7 @@ def test_random_password_reset_token_is_rejected(
             "Invalid or expired "
             "password reset token."
         )
-    ) 
+    )
 def test_login_rate_limit_blocks_excessive_attempts(
     client,
 ):
@@ -1890,7 +1890,7 @@ def test_login_rate_limit_blocks_excessive_attempts(
         )
     }
 
-    assert "Retry-After" in blocked_response.headers       
+    assert "Retry-After" in blocked_response.headers
 def test_registration_rejects_future_date_of_birth(
     client,
 ):
@@ -2039,7 +2039,7 @@ def test_profile_update_rejects_future_date_of_birth(
         "detail":
             "Date of birth cannot be "
             "in the future."
-    }    
+    }
 def test_registration_rejects_implausible_contribution_months(
     client,
 ):
@@ -2391,7 +2391,7 @@ def test_update_contribution_rejects_period_before_plausible_start_age(
         "detail":
             "Contribution period is not "
             "plausible for the member's age."
-    }        
+    }
 def test_create_contribution_rejects_earnings_with_too_many_decimals(
     client,
 ):
@@ -2699,7 +2699,7 @@ def test_profile_update_rejects_dob_inconsistent_with_existing_contribution_reco
             "Date of birth is not "
             "consistent with existing "
             "contribution records."
-    } 
+    }
 
 # ============================================================
 # JWT CLAIM VALIDATION
@@ -2824,7 +2824,7 @@ def test_access_token_missing_required_claim_is_rejected(
     )
 
 
-    assert response.status_code == 401               
+    assert response.status_code == 401
 
 # ============================================================
 # RETIREMENT READINESS — DASHBOARD API
@@ -4464,7 +4464,7 @@ def test_retirement_goal_rejects_zero_target(
             "detail"
         ]
         .lower()
-    )   
+    )
 # ============================================================
 # PERSONAL RETIREMENT REPORT PDF
 # ============================================================
@@ -4684,4 +4684,819 @@ def test_retirement_report_pdf_rejects_other_member(
         response.status_code
         ==
         403
-    )         
+    )
+
+# ============================================================
+# SAVED RETIREMENT PLAN — CREATE
+# ============================================================
+
+
+def test_retirement_plan_create(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "scenario_additional_contribution_months":
+                24,
+
+            "scenario_projected_annual_salary":
+                "120000.00",
+
+            "scenario_retirement_age":
+                60,
+
+            "goal_target_monthly_pension":
+                "5000.00",
+
+            "goal_projected_annual_salary":
+                "120000.00",
+
+            "goal_retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["member_id"]
+        ==
+        member_id
+    )
+
+
+    assert (
+        data["scenario"][
+            "saved"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["scenario"][
+            "additional_contribution_months"
+        ]
+        ==
+        24
+    )
+
+
+    assert (
+        data["scenario"][
+            "projected_annual_salary"
+        ]
+        ==
+        "120000.00"
+    )
+
+
+    assert (
+        data["scenario"][
+            "retirement_age"
+        ]
+        ==
+        60
+    )
+
+
+    assert (
+        data["goal"][
+            "saved"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["goal"][
+            "target_monthly_pension"
+        ]
+        ==
+        "5000.00"
+    )
+
+
+    assert (
+        data["goal"][
+            "projected_annual_salary"
+        ]
+        ==
+        "120000.00"
+    )
+
+
+    assert (
+        data["goal"][
+            "retirement_age"
+        ]
+        ==
+        60
+    )
+
+
+# ============================================================
+# DUPLICATE PLAN
+# ============================================================
+
+
+def test_retirement_plan_duplicate_create_rejected(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    payload = {
+
+        "scenario_additional_contribution_months":
+            12,
+
+        "scenario_projected_annual_salary":
+            "90000.00",
+
+        "scenario_retirement_age":
+            60,
+    }
+
+
+    first_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json=payload,
+    )
+
+
+    assert (
+        first_response.status_code
+        ==
+        200
+    )
+
+
+    second_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json=payload,
+    )
+
+
+    assert (
+        second_response.status_code
+        ==
+        409
+    )
+
+
+# ============================================================
+# GET SAVED PLAN
+# ============================================================
+
+
+def test_retirement_plan_get(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    create_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "goal_target_monthly_pension":
+                "4500.00",
+
+            "goal_projected_annual_salary":
+                "100000.00",
+
+            "goal_retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        create_response.status_code
+        ==
+        200
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["member_id"]
+        ==
+        member_id
+    )
+
+
+    assert (
+        data["scenario"][
+            "saved"
+        ]
+        is False
+    )
+
+
+    assert (
+        data["goal"][
+            "saved"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["goal"][
+            "target_monthly_pension"
+        ]
+        ==
+        "4500.00"
+    )
+
+
+# ============================================================
+# UPDATE SAVED PLAN
+# ============================================================
+
+
+def test_retirement_plan_update(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    create_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "scenario_additional_contribution_months":
+                12,
+
+            "scenario_projected_annual_salary":
+                "90000.00",
+
+            "scenario_retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        create_response.status_code
+        ==
+        200
+    )
+
+
+    response = client.put(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "scenario_additional_contribution_months":
+                36,
+
+            "scenario_projected_annual_salary":
+                "120000.00",
+
+            "scenario_retirement_age":
+                59,
+
+            "goal_target_monthly_pension":
+                "5000.00",
+
+            "goal_projected_annual_salary":
+                "120000.00",
+
+            "goal_retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["scenario"][
+            "additional_contribution_months"
+        ]
+        ==
+        36
+    )
+
+
+    assert (
+        data["scenario"][
+            "projected_annual_salary"
+        ]
+        ==
+        "120000.00"
+    )
+
+
+    assert (
+        data["scenario"][
+            "retirement_age"
+        ]
+        ==
+        59
+    )
+
+
+    assert (
+        data["goal"][
+            "saved"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["goal"][
+            "target_monthly_pension"
+        ]
+        ==
+        "5000.00"
+    )
+
+
+# ============================================================
+# DELETE SAVED PLAN
+# ============================================================
+
+
+def test_retirement_plan_delete(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    create_response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "goal_target_monthly_pension":
+                "4000.00",
+
+            "goal_projected_annual_salary":
+                "90000.00",
+
+            "goal_retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        create_response.status_code
+        ==
+        200
+    )
+
+
+    delete_response = client.delete(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+
+    assert (
+        delete_response.status_code
+        ==
+        200
+    )
+
+
+    assert (
+        delete_response.json()[
+            "member_id"
+        ]
+        ==
+        member_id
+    )
+
+
+    get_response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+
+    assert (
+        get_response.status_code
+        ==
+        404
+    )
+
+
+# ============================================================
+# AUTHENTICATION REQUIRED
+# ============================================================
+
+
+def test_retirement_plan_requires_authentication(
+    client,
+):
+
+    register_response = (
+        register_user(
+            client
+        )
+    )
+
+
+    member_id = (
+        register_response
+        .json()[
+            "user"
+        ][
+            "member_id"
+        ]
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        )
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        401
+    )
+
+
+# ============================================================
+# OWNERSHIP PROTECTION
+# ============================================================
+
+
+def test_retirement_plan_rejects_other_member(
+    client,
+):
+
+    first_token, first_member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    # Create plan belonging to member 1.
+
+    create_response = client.post(
+
+        (
+            f"/members/"
+            f"{first_member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            first_token
+        ),
+
+        json={
+
+            "scenario_additional_contribution_months":
+                12,
+
+            "scenario_projected_annual_salary":
+                "90000.00",
+
+            "scenario_retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        create_response.status_code
+        ==
+        200
+    )
+
+
+    # Create another account.
+
+    second_email = (
+        "saved-plan-second@example.com"
+    )
+
+
+    register_response = (
+        register_user(
+
+            client,
+
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        register_response.status_code
+        ==
+        200
+    )
+
+
+    login_response = (
+        login_user(
+
+            client,
+
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        login_response.status_code
+        ==
+        200
+    )
+
+
+    second_token = (
+        login_response
+        .json()[
+            "access_token"
+        ]
+    )
+
+
+    # Member 2 must not be able to access
+    # member 1's saved plan.
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{first_member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            second_token
+        ),
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        403
+    )
+
+
+# ============================================================
+# PARTIAL SCENARIO REJECTED
+# ============================================================
+
+
+def test_retirement_plan_rejects_partial_scenario(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "scenario_retirement_age":
+                60
+
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        400
+    )
+
+
+    assert (
+        "must include"
+        in
+        response
+        .json()[
+            "detail"
+        ]
+        .lower()
+    )
+
+
+# ============================================================
+# EMPTY PLAN REJECTED
+# ============================================================
+
+
+def test_retirement_plan_rejects_empty_plan(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-plan"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={},
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        400
+    )
+
+
+    assert (
+        "at least one"
+        in
+        response
+        .json()[
+            "detail"
+        ]
+        .lower()
+    )
