@@ -35,7 +35,14 @@ from pydantic import (
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from fastapi.responses import Response
+from ssnit_engine.retirement_report import (
+    build_retirement_report_data,
+)
 
+from ssnit_engine.report_pdf import (
+    generate_retirement_report_pdf,
+)
 from ssnit_engine.auth import (
     DUMMY_HASH,
     create_access_token,
@@ -5345,3 +5352,127 @@ def member_retirement_goal(
             "salary forecast or guarantee of future pension."
         ),
     }
+
+# ============================================================
+# MEMBER - PERSONAL RETIREMENT REPORT PDF
+# ============================================================
+
+
+@app.get(
+    "/members/{member_id}/retirement-report.pdf"
+)
+def member_retirement_report_pdf(
+
+    member_id: int,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    # ========================================================
+    # AUTHORIZATION
+    # ========================================================
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    # ========================================================
+    # MEMBER
+    # ========================================================
+
+    member = db.get(
+        Member,
+        member_id,
+    )
+
+
+    if member is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Member not found.",
+        )
+
+
+    # ========================================================
+    # CONTRIBUTION RECORDS
+    # ========================================================
+
+    records = db.scalars(
+
+        select(
+            ContributionRecord
+        )
+
+        .where(
+            ContributionRecord.member_id
+            ==
+            member_id
+        )
+
+        .order_by(
+            ContributionRecord.year,
+            ContributionRecord.month,
+        )
+
+    ).all()
+
+
+    # ========================================================
+    # BUILD REPORT DATA
+    # ========================================================
+
+    report_data = (
+        build_retirement_report_data(
+
+            member=member,
+
+            contribution_records=records,
+        )
+    )
+
+
+    # ========================================================
+    # GENERATE PDF
+    # ========================================================
+
+    pdf_bytes = (
+        generate_retirement_report_pdf(
+            report_data
+        )
+    )
+
+
+    # ========================================================
+    # DOWNLOAD RESPONSE
+    # ========================================================
+
+    return Response(
+
+        content=pdf_bytes,
+
+        media_type="application/pdf",
+
+        headers={
+
+            "Content-Disposition":
+                (
+                    'attachment; '
+                    'filename="PensionIQ-Retirement-Report.pdf"'
+                ),
+
+            "Cache-Control":
+                "no-store, max-age=0",
+
+            "Pragma":
+                "no-cache",
+        },
+    )

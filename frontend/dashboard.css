@@ -4271,3 +4271,112 @@ tbody tr:hover {
     }
 
 }
+
+/* ==========================================================
+   PERSONAL RETIREMENT REPORT
+========================================================== */
+
+
+.retirement-report-card {
+    overflow: hidden;
+}
+
+
+.retirement-report-content {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 32px;
+}
+
+
+.retirement-report-content h3 {
+    margin:
+        5px
+        0
+        8px;
+
+    color: var(--navy);
+}
+
+
+.retirement-report-content p {
+    max-width: 680px;
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.7;
+}
+
+
+.retirement-report-action {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 8px;
+
+    flex: 0 0 auto;
+}
+
+
+.retirement-report-action small {
+    color: var(--muted);
+
+    font-size: 9px;
+
+    text-align: right;
+}
+
+
+.retirement-report-error {
+    margin-top: 16px;
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    background: #fff3f3;
+
+    color: #a53232;
+
+    font-size: 11px;
+
+    line-height: 1.55;
+}
+
+
+@media (
+    max-width: 760px
+) {
+
+    .retirement-report-content {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .retirement-report-action {
+        align-items: stretch;
+    }
+
+
+    .retirement-report-action button {
+        width: 100%;
+    }
+
+
+    .retirement-report-action small {
+        text-align: center;
+    }
+
+}

@@ -6774,3 +6774,322 @@ if (retirementGoalForm) {
     );
 
 }
+
+// ==========================================================
+// PERSONAL RETIREMENT REPORT
+// ==========================================================
+
+
+async function downloadRetirementReport() {
+
+    hideRetirementReportError();
+
+
+    if (!currentMemberId) {
+
+        showRetirementReportError(
+            "No authenticated member profile is available."
+        );
+
+        return;
+
+    }
+
+
+    setRetirementReportLoading(
+        true
+    );
+
+
+    try {
+
+        const response =
+            await authenticatedFetch(
+
+                (
+                    `${API_BASE_URL}/members/`
+                    +
+                    `${currentMemberId}/`
+                    +
+                    "retirement-report.pdf"
+                ),
+
+                {
+                    method:
+                        "GET"
+                }
+
+            );
+
+
+        // --------------------------------------------------
+        // HANDLE API ERROR
+        // --------------------------------------------------
+
+        if (!response.ok) {
+
+            let errorMessage =
+                (
+                    "Unable to generate your "
+                    +
+                    "retirement report."
+                );
+
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+
+                if (
+                    errorData
+                    &&
+                    errorData.detail
+                ) {
+
+                    errorMessage =
+                        errorData.detail;
+
+                }
+
+            }
+
+            catch (error) {
+
+                // Keep the fallback message when
+                // the response is not JSON.
+
+            }
+
+
+            throw new Error(
+                errorMessage
+            );
+
+        }
+
+
+        // --------------------------------------------------
+        // PDF
+        // --------------------------------------------------
+
+        const pdfBlob =
+            await response.blob();
+
+
+        if (
+            !pdfBlob
+            ||
+            pdfBlob.size === 0
+        ) {
+
+            throw new Error(
+                "The generated retirement report was empty."
+            );
+
+        }
+
+
+        // --------------------------------------------------
+        // TEMPORARY DOWNLOAD URL
+        // --------------------------------------------------
+
+        const downloadUrl =
+            URL.createObjectURL(
+                pdfBlob
+            );
+
+
+        const downloadLink =
+            document.createElement(
+                "a"
+            );
+
+
+        downloadLink.href =
+            downloadUrl;
+
+
+        downloadLink.download =
+            "PensionIQ-Retirement-Report.pdf";
+
+
+        downloadLink.style.display =
+            "none";
+
+
+        document.body.appendChild(
+            downloadLink
+        );
+
+
+        downloadLink.click();
+
+
+        downloadLink.remove();
+
+
+        // Give the browser a short moment to
+        // start the download before releasing
+        // the object URL.
+
+        window.setTimeout(
+            () => {
+
+                URL.revokeObjectURL(
+                    downloadUrl
+                );
+
+            },
+            1000
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Retirement report download failed:",
+            error
+        );
+
+
+        showRetirementReportError(
+
+            error.message
+            ||
+            (
+                "Unable to download your "
+                +
+                "retirement report."
+            )
+
+        );
+
+    }
+
+    finally {
+
+        setRetirementReportLoading(
+            false
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// REPORT ERROR
+// ==========================================================
+
+
+function showRetirementReportError(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "retirement-report-error"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+function hideRetirementReportError() {
+
+    const element =
+        document.getElementById(
+            "retirement-report-error"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        "";
+
+
+    element.classList.add(
+        "hidden"
+    );
+
+}
+
+
+// ==========================================================
+// REPORT LOADING STATE
+// ==========================================================
+
+
+function setRetirementReportLoading(
+    isLoading
+) {
+
+    const button =
+        document.getElementById(
+            "download-retirement-report-button"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.disabled =
+        isLoading;
+
+
+    button.textContent =
+        (
+            isLoading
+            ?
+            "Generating Report..."
+            :
+            "Download Retirement Report"
+        );
+
+}
+
+
+// ==========================================================
+// REPORT BUTTON
+// ==========================================================
+
+
+const retirementReportButton =
+    document.getElementById(
+        "download-retirement-report-button"
+    );
+
+
+if (retirementReportButton) {
+
+    retirementReportButton.addEventListener(
+
+        "click",
+
+        downloadRetirementReport
+
+    );
+
+}

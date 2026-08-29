@@ -9,3 +9,4 @@ email-validator
 python-dotenv
 httpx2
 psycopg[binary]
+reportlab==5.0.1

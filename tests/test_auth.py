@@ -4464,4 +4464,224 @@ def test_retirement_goal_rejects_zero_target(
             "detail"
         ]
         .lower()
-    )        
+    )   
+# ============================================================
+# PERSONAL RETIREMENT REPORT PDF
+# ============================================================
+
+
+def test_retirement_report_pdf_authenticated_member(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-report.pdf"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        200
+    )
+
+
+    assert (
+        response.headers[
+            "content-type"
+        ]
+        .startswith(
+            "application/pdf"
+        )
+    )
+
+
+    assert (
+        "attachment"
+        in
+        response.headers[
+            "content-disposition"
+        ]
+        .lower()
+    )
+
+
+    assert (
+        "PensionIQ-Retirement-Report.pdf"
+        in
+        response.headers[
+            "content-disposition"
+        ]
+    )
+
+
+    assert (
+        response.content
+        .startswith(
+            b"%PDF-"
+        )
+    )
+
+
+    assert (
+        response.content
+        .rstrip()
+        .endswith(
+            b"%%EOF"
+        )
+    )
+
+
+    assert (
+        len(
+            response.content
+        )
+        >
+        3000
+    )
+
+
+# ============================================================
+# REPORT REQUIRES LOGIN
+# ============================================================
+
+
+def test_retirement_report_pdf_requires_authentication(
+    client,
+):
+
+    register_response = (
+        register_user(
+            client
+        )
+    )
+
+
+    member_id = (
+        register_response
+        .json()[
+            "user"
+        ][
+            "member_id"
+        ]
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-report.pdf"
+        )
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        401
+    )
+
+
+# ============================================================
+# REPORT OWNERSHIP
+# ============================================================
+
+
+def test_retirement_report_pdf_rejects_other_member(
+    client,
+):
+
+    first_token, first_member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    assert first_token
+
+
+    second_email = (
+        "report-second@example.com"
+    )
+
+
+    register_response = (
+        register_user(
+
+            client,
+
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        register_response.status_code
+        ==
+        200
+    )
+
+
+    login_response = (
+        login_user(
+
+            client,
+
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        login_response.status_code
+        ==
+        200
+    )
+
+
+    second_token = (
+        login_response
+        .json()[
+            "access_token"
+        ]
+    )
+
+
+    response = client.get(
+
+        (
+            f"/members/"
+            f"{first_member_id}/"
+            "retirement-report.pdf"
+        ),
+
+        headers=authorization_headers(
+            second_token
+        ),
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        403
+    )         
