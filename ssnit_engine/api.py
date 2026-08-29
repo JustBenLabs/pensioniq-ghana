@@ -56,6 +56,10 @@ from ssnit_engine.scenario import (
     calculate_retirement_scenario,
 )
 
+from ssnit_engine.goal_planner import (
+    calculate_retirement_goal,
+)
+
 from ssnit_engine.database.connection import (
     get_db,
 )
@@ -275,6 +279,14 @@ class RetirementScenarioRequest(BaseModel):
     projected_annual_salary: Decimal
 
     retirement_age: int
+
+class RetirementGoalRequest(BaseModel):
+
+    target_monthly_pension: Decimal
+
+    projected_annual_salary: Decimal
+
+    retirement_age: int    
 
 class RetirementEPVRequest(BaseModel):
 
@@ -4999,5 +5011,337 @@ def member_retirement_scenario(
             "contribution data. It is not an official "
             "SSNIT benefit determination, entitlement "
             "decision, or guarantee of future pension."
+        ),
+    }
+
+    # ============================================================
+# MEMBER — RETIREMENT GOAL PLANNER
+# ============================================================
+
+
+@app.post(
+    "/members/{member_id}/retirement-goal"
+)
+def member_retirement_goal(
+
+    member_id: int,
+
+    request: RetirementGoalRequest,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
+
+    # ========================================================
+    # AUTHORIZATION
+    # ========================================================
+
+    require_member_ownership(
+        member_id,
+        current_user,
+    )
+
+
+    # ========================================================
+    # MEMBER
+    # ========================================================
+
+    member = db.get(
+        Member,
+        member_id,
+    )
+
+
+    if member is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Member not found.",
+        )
+
+
+    # ========================================================
+    # CALCULATE GOAL
+    # ========================================================
+
+    try:
+
+        result = (
+            calculate_retirement_goal(
+
+                date_of_birth=(
+                    member.date_of_birth
+                ),
+
+                current_contribution_months=(
+                    member.contribution_months
+                ),
+
+                target_monthly_pension=(
+                    request
+                    .target_monthly_pension
+                ),
+
+                projected_annual_salary=(
+                    request
+                    .projected_annual_salary
+                ),
+
+                retirement_age=(
+                    request.retirement_age
+                ),
+            )
+        )
+
+    except ValueError as exc:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+
+    # ========================================================
+    # HELPERS
+    # ========================================================
+
+    def decimal_string(
+        value,
+    ):
+
+        if value is None:
+            return None
+
+        return str(
+            value
+        )
+
+
+    def percentage_string(
+        value,
+    ):
+
+        if value is None:
+            return None
+
+        return str(
+            (
+                value
+                *
+                Decimal("100")
+            )
+            .quantize(
+                Decimal("0.01"),
+                rounding=ROUND_HALF_UP,
+            )
+        )
+
+
+    # ========================================================
+    # RESPONSE
+    # ========================================================
+
+    return {
+
+        "member_id":
+            member.id,
+
+
+        # ----------------------------------------------------
+        # GOAL
+        # ----------------------------------------------------
+
+        "goal": {
+
+            "target_monthly_pension":
+                decimal_string(
+                    result
+                    .target_monthly_pension
+                ),
+
+            "projected_annual_salary":
+                decimal_string(
+                    result
+                    .projected_annual_salary
+                ),
+
+            "retirement_age":
+                result.retirement_age,
+
+            "retirement_date":
+                (
+                    result
+                    .retirement_date
+                    .isoformat()
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # CURRENT POSITION
+        # ----------------------------------------------------
+
+        "current_position": {
+
+            "contribution_months":
+                (
+                    result
+                    .current_contribution_months
+                ),
+
+            "projected_monthly_pension":
+                decimal_string(
+                    result
+                    .current_projected_monthly_pension
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # CONTRIBUTION CAPACITY
+        # ----------------------------------------------------
+
+        "contribution_capacity": {
+
+            "months_available_before_retirement":
+                (
+                    result
+                    .available_contribution_months
+                ),
+
+            "maximum_attainable_contribution_months":
+                (
+                    result
+                    .maximum_attainable_contribution_months
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # REQUIREMENT
+        # ----------------------------------------------------
+
+        "requirement": {
+
+            "required_contribution_months":
+                (
+                    result
+                    .required_contribution_months
+                ),
+
+            "additional_contribution_months_required":
+                (
+                    result
+                    .additional_contribution_months_required
+                ),
+
+            "estimated_monthly_pension":
+                decimal_string(
+                    result
+                    .estimated_monthly_pension_at_required_months
+                ),
+
+            "pension_right":
+                decimal_string(
+                    result
+                    .pension_right_at_required_months
+                ),
+
+            "pension_right_percent":
+                percentage_string(
+                    result
+                    .pension_right_at_required_months
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # MAXIMUM ATTAINABLE POSITION
+        # ----------------------------------------------------
+
+        "maximum_position": {
+
+            "contribution_months":
+                (
+                    result
+                    .maximum_attainable_contribution_months
+                ),
+
+            "pension_right":
+                decimal_string(
+                    result
+                    .maximum_attainable_pension_right
+                ),
+
+            "pension_right_percent":
+                percentage_string(
+                    result
+                    .maximum_attainable_pension_right
+                ),
+
+            "estimated_monthly_pension":
+                decimal_string(
+                    result
+                    .maximum_attainable_monthly_pension
+                ),
+
+            "retirement_age_factor":
+                decimal_string(
+                    result
+                    .retirement_age_factor
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # GAP / ALTERNATIVE
+        # ----------------------------------------------------
+
+        "gap_analysis": {
+
+            "pension_gap_at_maximum":
+                decimal_string(
+                    result
+                    .pension_gap_at_maximum
+                ),
+
+            "approximate_annual_salary_required":
+                decimal_string(
+                    result
+                    .approximate_annual_salary_required_at_maximum_months
+                ),
+        },
+
+
+        # ----------------------------------------------------
+        # STATUS
+        # ----------------------------------------------------
+
+        "goal_result": {
+
+            "achievable":
+                result.goal_achievable,
+
+            "status":
+                result.goal_status,
+        },
+
+
+        # ----------------------------------------------------
+        # DISCLAIMER
+        # ----------------------------------------------------
+
+        "disclaimer": (
+            "This PensionIQ retirement-goal analysis is a "
+            "planning simulation based on the member's stored "
+            "contribution total, projected salary assumption "
+            "and selected retirement age. It is not an official "
+            "SSNIT entitlement decision, benefit quotation, "
+            "salary forecast or guarantee of future pension."
         ),
     }

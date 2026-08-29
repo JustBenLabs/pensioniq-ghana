@@ -1140,6 +1140,494 @@
 </section>
 
 
+<!-- =================================================
+     RETIREMENT GOAL PLANNER
+================================================== -->
+
+<section
+    class="dashboard-card goal-planner-card"
+    id="retirement-goal-card"
+>
+
+    <div class="card-heading">
+
+        <div>
+
+            <span class="section-label">
+                Retirement Planning
+            </span>
+
+            <h3>
+                Set My Retirement Goal
+            </h3>
+
+            <p class="card-description">
+                Choose the monthly pension you would like to
+                target and let PensionIQ estimate what may be
+                required by your selected retirement age.
+            </p>
+
+        </div>
+
+        <span class="goal-planner-badge">
+            Goal Planning
+        </span>
+
+    </div>
+
+
+    <form
+        id="retirement-goal-form"
+        class="goal-planner-form"
+    >
+
+        <div class="goal-input-grid">
+
+            <div class="form-group">
+
+                <label for="goal-monthly-pension">
+                    Target Monthly Pension
+                </label>
+
+                <div class="money-field">
+
+                    <span>
+                        GH¢
+                    </span>
+
+                    <input
+                        type="number"
+                        id="goal-monthly-pension"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="e.g. 5000"
+                        required
+                    >
+
+                </div>
+
+                <small>
+                    The estimated monthly pension you would
+                    like to target at retirement.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="goal-projected-salary">
+                    Projected Best 3-Year Average Annual Salary
+                </label>
+
+                <div class="money-field">
+
+                    <span>
+                        GH¢
+                    </span>
+
+                    <input
+                        type="number"
+                        id="goal-projected-salary"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+                <small>
+                    Enter an annual salary assumption, not a
+                    monthly salary.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="goal-retirement-age">
+                    Retirement Age
+                </label>
+
+                <select
+                    id="goal-retirement-age"
+                    required
+                >
+
+                    <option value="55">
+                        55
+                    </option>
+
+                    <option value="56">
+                        56
+                    </option>
+
+                    <option value="57">
+                        57
+                    </option>
+
+                    <option value="58">
+                        58
+                    </option>
+
+                    <option value="59">
+                        59
+                    </option>
+
+                    <option
+                        value="60"
+                        selected
+                    >
+                        60
+                    </option>
+
+                </select>
+
+                <small>
+                    Choose an ordinary retirement age
+                    between 55 and 60.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="goal-form-error"
+            class="goal-planner-error hidden"
+        ></div>
+
+
+        <div class="goal-planner-actions">
+
+            <button
+                type="submit"
+                id="goal-submit-button"
+                class="primary-button"
+            >
+                Analyse My Goal
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- =============================================
+         RESULTS
+    ============================================== -->
+
+    <div
+        id="goal-results"
+        class="goal-results hidden"
+    >
+
+        <div class="goal-result-header">
+
+            <div>
+
+                <span class="section-label">
+                    Goal Analysis
+                </span>
+
+                <h4 id="goal-result-heading">
+                    -
+                </h4>
+
+                <p id="goal-result-message">
+                    -
+                </p>
+
+            </div>
+
+            <span
+                id="goal-status-badge"
+                class="goal-status-badge"
+            >
+                -
+            </span>
+
+        </div>
+
+
+        <!-- =========================================
+             GOAL SUMMARY
+        ========================================== -->
+
+        <div class="goal-summary-grid">
+
+            <div class="goal-summary-item">
+
+                <span>
+                    Target Pension
+                </span>
+
+                <strong id="goal-result-target">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="goal-summary-item">
+
+                <span>
+                    Retirement Age
+                </span>
+
+                <strong id="goal-result-age">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="goal-summary-item">
+
+                <span>
+                    Retirement Date
+                </span>
+
+                <strong id="goal-result-date">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="goal-summary-item">
+
+                <span>
+                    Projected Annual Salary
+                </span>
+
+                <strong id="goal-result-salary">
+                    -
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             ACHIEVABLE RESULT
+        ========================================== -->
+
+        <div
+            id="goal-achievable-panel"
+            class="goal-achievable-panel hidden"
+        >
+
+            <div class="goal-panel-heading">
+
+                <span>
+                    CONTRIBUTION REQUIREMENT
+                </span>
+
+                <h4>
+                    Estimated path to your goal
+                </h4>
+
+            </div>
+
+
+            <div class="goal-detail-grid">
+
+                <div>
+
+                    <span>
+                        Current Contribution Months
+                    </span>
+
+                    <strong id="goal-current-months">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Required Contribution Months
+                    </span>
+
+                    <strong id="goal-required-months">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Additional Months Required
+                    </span>
+
+                    <strong id="goal-additional-months">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Required Pension Right
+                    </span>
+
+                    <strong id="goal-required-right">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Estimated Monthly Pension
+                    </span>
+
+                    <strong id="goal-required-pension">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Months Available
+                    </span>
+
+                    <strong id="goal-months-available">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             GOAL NEEDS ADJUSTMENT
+        ========================================== -->
+
+        <div
+            id="goal-adjustment-panel"
+            class="goal-adjustment-panel hidden"
+        >
+
+            <div class="goal-panel-heading">
+
+                <span>
+                    GOAL GAP
+                </span>
+
+                <h4>
+                    What may need to change
+                </h4>
+
+            </div>
+
+
+            <div class="goal-detail-grid">
+
+                <div>
+
+                    <span>
+                        Maximum Contribution Months
+                    </span>
+
+                    <strong id="goal-maximum-months">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Maximum Pension Right
+                    </span>
+
+                    <strong id="goal-maximum-right">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Maximum Estimated Pension
+                    </span>
+
+                    <strong id="goal-maximum-pension">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Remaining Pension Gap
+                    </span>
+
+                    <strong id="goal-pension-gap">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Approx. Annual Salary Needed
+                    </span>
+
+                    <strong id="goal-required-salary">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="goal-disclaimer">
+
+            <strong>
+                Planning note
+            </strong>
+
+            <p id="goal-disclaimer-text">
+                -
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
 
             <!-- =============================================
                  PENSION POSITION

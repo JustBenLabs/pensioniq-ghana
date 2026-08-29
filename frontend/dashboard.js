@@ -835,6 +835,10 @@ function displayDashboard(
     data.member
 );
 
+prepareRetirementGoal(
+    data.member
+);
+
 
     displayContributionSummary(
         data.contribution_summary
@@ -5655,6 +5659,1118 @@ if (retirementScenarioForm) {
     retirementScenarioForm.addEventListener(
         "submit",
         runRetirementScenario
+    );
+
+}
+
+// ==========================================================
+// RETIREMENT GOAL PLANNER
+// ==========================================================
+
+
+function prepareRetirementGoal(
+    member
+) {
+
+    if (!member) {
+        return;
+    }
+
+
+    const salaryInput =
+        document.getElementById(
+            "goal-projected-salary"
+        );
+
+
+    if (
+        salaryInput
+        &&
+        document.activeElement
+        !==
+        salaryInput
+    ) {
+
+        salaryInput.value =
+            Number(
+                member
+                .best_three_year_average_annual_salary
+                ||
+                0
+            )
+            .toFixed(
+                2
+            );
+
+    }
+
+}
+
+
+// ==========================================================
+// RUN GOAL ANALYSIS
+// ==========================================================
+
+
+async function runRetirementGoal(
+    event
+) {
+
+    event.preventDefault();
+
+
+    hideGoalError();
+
+
+    if (!currentMemberId) {
+
+        showGoalError(
+            "No authenticated member profile is available."
+        );
+
+        return;
+
+    }
+
+
+    const targetInput =
+        document.getElementById(
+            "goal-monthly-pension"
+        );
+
+
+    const salaryInput =
+        document.getElementById(
+            "goal-projected-salary"
+        );
+
+
+    const ageInput =
+        document.getElementById(
+            "goal-retirement-age"
+        );
+
+
+    const target =
+        Number(
+            targetInput.value
+        );
+
+
+    const salary =
+        Number(
+            salaryInput.value
+        );
+
+
+    const retirementAge =
+        Number(
+            ageInput.value
+        );
+
+
+    if (
+        !Number.isFinite(
+            target
+        )
+        ||
+        target <= 0
+    ) {
+
+        showGoalError(
+            "Target monthly pension must be greater than zero."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isFinite(
+            salary
+        )
+        ||
+        salary < 0
+    ) {
+
+        showGoalError(
+            "Projected annual salary must be zero or greater."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isInteger(
+            retirementAge
+        )
+        ||
+        retirementAge < 55
+        ||
+        retirementAge > 60
+    ) {
+
+        showGoalError(
+            "Retirement age must be between 55 and 60."
+        );
+
+        return;
+
+    }
+
+
+    setGoalLoading(
+        true
+    );
+
+
+    try {
+
+        const response =
+            await authenticatedFetch(
+
+                (
+                    `${API_BASE_URL}/members/`
+                    +
+                    `${currentMemberId}/`
+                    +
+                    "retirement-goal"
+                ),
+
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+
+                                target_monthly_pension:
+                                    target.toFixed(
+                                        2
+                                    ),
+
+                                projected_annual_salary:
+                                    salary.toFixed(
+                                        2
+                                    ),
+
+                                retirement_age:
+                                    retirementAge
+
+                            }
+                        )
+
+                }
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+
+                getApiErrorMessage(
+                    data,
+                    "Unable to analyse your retirement goal."
+                )
+
+            );
+
+        }
+
+
+        displayRetirementGoal(
+            data
+        );
+
+    }
+
+    catch (error) {
+
+        showGoalError(
+            error.message
+        );
+
+    }
+
+    finally {
+
+        setGoalLoading(
+            false
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// DISPLAY GOAL RESULT
+// ==========================================================
+
+
+function displayRetirementGoal(
+    data
+) {
+
+    const goal =
+        data.goal
+        ||
+        {};
+
+
+    const current =
+        data.current_position
+        ||
+        {};
+
+
+    const capacity =
+        data.contribution_capacity
+        ||
+        {};
+
+
+    const requirement =
+        data.requirement
+        ||
+        {};
+
+
+    const maximum =
+        data.maximum_position
+        ||
+        {};
+
+
+    const gap =
+        data.gap_analysis
+        ||
+        {};
+
+
+    const result =
+        data.goal_result
+        ||
+        {};
+
+
+    // ------------------------------------------------------
+    // SUMMARY
+    // ------------------------------------------------------
+
+
+    setGoalText(
+        "goal-result-target",
+        (
+            formatGoalCurrency(
+                goal.target_monthly_pension
+            )
+            +
+            " / month"
+        )
+    );
+
+
+    setGoalText(
+        "goal-result-age",
+        (
+            goal.retirement_age
+            +
+            " years"
+        )
+    );
+
+
+    setGoalText(
+        "goal-result-date",
+        formatGoalDate(
+            goal.retirement_date
+        )
+    );
+
+
+    setGoalText(
+        "goal-result-salary",
+        formatGoalCurrency(
+            goal.projected_annual_salary
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // STATUS
+    // ------------------------------------------------------
+
+
+    setGoalStatus(
+        result.status,
+        result.achievable
+    );
+
+
+    // ------------------------------------------------------
+    // ACHIEVABLE PANEL
+    // ------------------------------------------------------
+
+
+    setGoalText(
+        "goal-current-months",
+        (
+            Number(
+                current.contribution_months
+                ||
+                0
+            )
+            .toLocaleString()
+            +
+            " months"
+        )
+    );
+
+
+    setGoalText(
+        "goal-required-months",
+        formatGoalMonths(
+            requirement
+            .required_contribution_months
+        )
+    );
+
+
+    setGoalText(
+        "goal-additional-months",
+        formatGoalAdditionalMonths(
+            requirement
+            .additional_contribution_months_required
+        )
+    );
+
+
+    setGoalText(
+        "goal-required-right",
+        formatGoalPercentage(
+            requirement
+            .pension_right_percent
+        )
+    );
+
+
+    setGoalText(
+        "goal-required-pension",
+        formatGoalPension(
+            requirement
+            .estimated_monthly_pension
+        )
+    );
+
+
+    setGoalText(
+        "goal-months-available",
+        (
+            Number(
+                capacity
+                .months_available_before_retirement
+                ||
+                0
+            )
+            .toLocaleString()
+            +
+            " months"
+        )
+    );
+
+
+    // ------------------------------------------------------
+    // MAXIMUM / GAP PANEL
+    // ------------------------------------------------------
+
+
+    setGoalText(
+        "goal-maximum-months",
+        formatGoalMonths(
+            maximum
+            .contribution_months
+        )
+    );
+
+
+    setGoalText(
+        "goal-maximum-right",
+        formatGoalPercentage(
+            maximum
+            .pension_right_percent
+        )
+    );
+
+
+    setGoalText(
+        "goal-maximum-pension",
+        formatGoalPension(
+            maximum
+            .estimated_monthly_pension
+        )
+    );
+
+
+    setGoalText(
+        "goal-pension-gap",
+        formatGoalPension(
+            gap
+            .pension_gap_at_maximum
+        )
+    );
+
+
+    setGoalText(
+        "goal-required-salary",
+        (
+            gap
+            .approximate_annual_salary_required
+            ===
+            null
+            ?
+            "Not applicable"
+            :
+            formatGoalCurrency(
+                gap
+                .approximate_annual_salary_required
+            )
+        )
+    );
+
+
+    setGoalText(
+        "goal-disclaimer-text",
+        (
+            data.disclaimer
+            ||
+            "This is a PensionIQ retirement-planning simulation."
+        )
+    );
+
+
+    const results =
+        document.getElementById(
+            "goal-results"
+        );
+
+
+    if (results) {
+
+        results.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// GOAL STATUS
+// ==========================================================
+
+
+function setGoalStatus(
+    status,
+    achievable
+) {
+
+    const heading =
+        document.getElementById(
+            "goal-result-heading"
+        );
+
+
+    const message =
+        document.getElementById(
+            "goal-result-message"
+        );
+
+
+    const badge =
+        document.getElementById(
+            "goal-status-badge"
+        );
+
+
+    const achievablePanel =
+        document.getElementById(
+            "goal-achievable-panel"
+        );
+
+
+    const adjustmentPanel =
+        document.getElementById(
+            "goal-adjustment-panel"
+        );
+
+
+    if (
+        achievablePanel
+        &&
+        adjustmentPanel
+    ) {
+
+        achievablePanel.classList.add(
+            "hidden"
+        );
+
+        adjustmentPanel.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    let headingText;
+    let messageText;
+    let badgeText;
+
+
+    switch (status) {
+
+        case "ALREADY_ACHIEVABLE":
+
+            headingText =
+                "Your goal is already achievable";
+
+            messageText =
+                (
+                    "At the salary and retirement age you selected, "
+                    +
+                    "your current contribution-month total already "
+                    +
+                    "supports the pension target in this simulation."
+                );
+
+            badgeText =
+                "Already Achievable";
+
+            if (achievablePanel) {
+
+                achievablePanel.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+            break;
+
+
+        case "ACHIEVABLE":
+
+            headingText =
+                "Your goal is achievable";
+
+            messageText =
+                (
+                    "PensionIQ found an estimated contribution-month "
+                    +
+                    "total that reaches your target before the "
+                    +
+                    "selected retirement age."
+                );
+
+            badgeText =
+                "Achievable";
+
+            if (achievablePanel) {
+
+                achievablePanel.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+            break;
+
+
+        case "NOT_ACHIEVABLE_WITH_PROJECTED_SALARY":
+
+            headingText =
+                "Your goal needs adjustment";
+
+            messageText =
+                (
+                    "The target cannot be reached with the selected "
+                    +
+                    "salary assumption by contribution months alone. "
+                    +
+                    "PensionIQ has shown the remaining gap and an "
+                    +
+                    "approximate salary basis that may be required."
+                );
+
+            badgeText =
+                "Needs Adjustment";
+
+            if (adjustmentPanel) {
+
+                adjustmentPanel.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+            break;
+
+
+        case "MONTHLY_PENSION_THRESHOLD_UNREACHABLE":
+
+            headingText =
+                "Monthly pension threshold not reachable";
+
+            messageText =
+                (
+                    "There is not enough modeled time before the "
+                    +
+                    "selected retirement age to reach the minimum "
+                    +
+                    "contribution-month threshold for a monthly "
+                    +
+                    "old-age pension."
+                );
+
+            badgeText =
+                "Threshold Unreachable";
+
+            if (adjustmentPanel) {
+
+                adjustmentPanel.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+            break;
+
+
+        default:
+
+            headingText =
+                "Goal analysis completed";
+
+            messageText =
+                "Review the estimated retirement goal results below.";
+
+            badgeText =
+                achievable
+                ?
+                "Achievable"
+                :
+                "Review Required";
+
+    }
+
+
+    if (heading) {
+
+        heading.textContent =
+            headingText;
+
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            messageText;
+
+    }
+
+
+    if (badge) {
+
+        badge.textContent =
+            badgeText;
+
+    }
+
+}
+
+
+// ==========================================================
+// GOAL FORMATTERS
+// ==========================================================
+
+
+function formatGoalCurrency(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Unavailable";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return "Unavailable";
+
+    }
+
+
+    return (
+        "GH¢"
+        +
+        number.toLocaleString(
+            "en-GH",
+            {
+                minimumFractionDigits:
+                    2,
+
+                maximumFractionDigits:
+                    2
+            }
+        )
+    );
+
+}
+
+
+function formatGoalPension(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not available";
+
+    }
+
+
+    return (
+        formatGoalCurrency(
+            value
+        )
+        +
+        " / month"
+    );
+
+}
+
+
+function formatGoalPercentage(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not available";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (!Number.isFinite(number)) {
+
+        return "Not available";
+
+    }
+
+
+    return (
+        number.toFixed(
+            2
+        )
+        +
+        "%"
+    );
+
+}
+
+
+function formatGoalMonths(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not available";
+
+    }
+
+
+    return (
+        Number(
+            value
+        )
+        .toLocaleString()
+        +
+        " months"
+    );
+
+}
+
+
+function formatGoalAdditionalMonths(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "Not available";
+
+    }
+
+
+    const months =
+        Number(
+            value
+        );
+
+
+    if (months === 0) {
+
+        return "No additional months required";
+
+    }
+
+
+    return (
+        "+"
+        +
+        months.toLocaleString()
+        +
+        " months"
+    );
+
+}
+
+
+function formatGoalDate(
+    value
+) {
+
+    if (!value) {
+
+        return "Unavailable";
+
+    }
+
+
+    const dateValue =
+        new Date(
+            `${value}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            dateValue.getTime()
+        )
+    ) {
+
+        return value;
+
+    }
+
+
+    return dateValue.toLocaleDateString(
+        "en-GH",
+        {
+            day:
+                "numeric",
+
+            month:
+                "short",
+
+            year:
+                "numeric"
+        }
+    );
+
+}
+
+
+// ==========================================================
+// SAFE TEXT OUTPUT
+// ==========================================================
+
+
+function setGoalText(
+    elementId,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            value;
+
+    }
+
+}
+
+
+// ==========================================================
+// ERROR
+// ==========================================================
+
+
+function showGoalError(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "goal-form-error"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        message;
+
+
+    element.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+function hideGoalError() {
+
+    const element =
+        document.getElementById(
+            "goal-form-error"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        "";
+
+
+    element.classList.add(
+        "hidden"
+    );
+
+}
+
+
+// ==========================================================
+// LOADING
+// ==========================================================
+
+
+function setGoalLoading(
+    isLoading
+) {
+
+    const button =
+        document.getElementById(
+            "goal-submit-button"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.disabled =
+        isLoading;
+
+
+    button.textContent =
+        (
+            isLoading
+            ?
+            "Analysing Goal..."
+            :
+            "Analyse My Goal"
+        );
+
+}
+
+
+// ==========================================================
+// FORM EVENT
+// ==========================================================
+
+
+const retirementGoalForm =
+    document.getElementById(
+        "retirement-goal-form"
+    );
+
+
+if (retirementGoalForm) {
+
+    retirementGoalForm.addEventListener(
+        "submit",
+        runRetirementGoal
     );
 
 }

@@ -4028,4 +4028,440 @@ def test_retirement_scenario_rejects_impossible_future_months(
         "cannot exceed"
         in
         data["detail"].lower()
+    )
+
+    # ============================================================
+# RETIREMENT GOAL PLANNER API
+# ============================================================
+
+
+def test_retirement_goal_authenticated_member(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-goal"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "target_monthly_pension":
+                "3500.00",
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["member_id"]
+        ==
+        member_id
+    )
+
+
+    assert (
+        data["goal"][
+            "target_monthly_pension"
+        ]
+        ==
+        "3500.00"
+    )
+
+
+    assert (
+        data["current_position"][
+            "contribution_months"
+        ]
+        ==
+        240
+    )
+
+
+    assert (
+        data["requirement"][
+            "required_contribution_months"
+        ]
+        ==
+        278
+    )
+
+
+    assert (
+        data["requirement"][
+            "additional_contribution_months_required"
+        ]
+        ==
+        38
+    )
+
+
+    assert (
+        data["requirement"][
+            "pension_right_percent"
+        ]
+        ==
+        "46.69"
+    )
+
+
+    assert (
+        data["requirement"][
+            "estimated_monthly_pension"
+        ]
+        ==
+        "3501.56"
+    )
+
+
+    assert (
+        data["goal_result"][
+            "achievable"
+        ]
+        is True
+    )
+
+
+    assert (
+        data["goal_result"][
+            "status"
+        ]
+        ==
+        "ACHIEVABLE"
+    )
+
+
+# ============================================================
+# AUTHENTICATION REQUIRED
+# ============================================================
+
+
+def test_retirement_goal_requires_authentication(
+    client,
+):
+
+    register_response = (
+        register_user(
+            client
+        )
+    )
+
+
+    member_id = (
+        register_response
+        .json()[
+            "user"
+        ][
+            "member_id"
+        ]
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-goal"
+        ),
+
+        json={
+
+            "target_monthly_pension":
+                "3500.00",
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        401
+    )
+
+
+# ============================================================
+# MEMBER OWNERSHIP
+# ============================================================
+
+
+def test_retirement_goal_rejects_other_member(
+    client,
+):
+
+    first_token, first_member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    assert first_token
+
+
+    second_email = (
+        "goal-second@example.com"
+    )
+
+
+    register_response = (
+        register_user(
+            client,
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        register_response.status_code
+        ==
+        200
+    )
+
+
+    login_response = (
+        login_user(
+            client,
+            email=second_email,
+        )
+    )
+
+
+    assert (
+        login_response.status_code
+        ==
+        200
+    )
+
+
+    second_token = (
+        login_response
+        .json()[
+            "access_token"
+        ]
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{first_member_id}/"
+            "retirement-goal"
+        ),
+
+        headers=authorization_headers(
+            second_token
+        ),
+
+        json={
+
+            "target_monthly_pension":
+                "3500.00",
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        403
+    )
+
+
+# ============================================================
+# GOAL NOT ACHIEVABLE WITH PROJECTED SALARY
+# ============================================================
+
+
+def test_retirement_goal_reports_salary_constraint(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-goal"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "target_monthly_pension":
+                "4000.00",
+
+            "projected_annual_salary":
+                "60000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert response.status_code == 200
+
+
+    data = response.json()
+
+
+    assert (
+        data["goal_result"][
+            "achievable"
+        ]
+        is False
+    )
+
+
+    assert (
+        data["goal_result"][
+            "status"
+        ]
+        ==
+        "NOT_ACHIEVABLE_WITH_PROJECTED_SALARY"
+    )
+
+
+    assert (
+        data["maximum_position"][
+            "pension_right_percent"
+        ]
+        ==
+        "60.00"
+    )
+
+
+    assert (
+        data["maximum_position"][
+            "estimated_monthly_pension"
+        ]
+        ==
+        "3000.00"
+    )
+
+
+    assert (
+        data["gap_analysis"][
+            "pension_gap_at_maximum"
+        ]
+        ==
+        "1000.00"
+    )
+
+
+    assert (
+        data["gap_analysis"][
+            "approximate_annual_salary_required"
+        ]
+        ==
+        "80000.00"
+    )
+
+
+# ============================================================
+# INVALID GOAL
+# ============================================================
+
+
+def test_retirement_goal_rejects_zero_target(
+    client,
+):
+
+    token, member_id = (
+        register_and_login(
+            client
+        )
+    )
+
+
+    response = client.post(
+
+        (
+            f"/members/"
+            f"{member_id}/"
+            "retirement-goal"
+        ),
+
+        headers=authorization_headers(
+            token
+        ),
+
+        json={
+
+            "target_monthly_pension":
+                "0.00",
+
+            "projected_annual_salary":
+                "90000.00",
+
+            "retirement_age":
+                60,
+        },
+    )
+
+
+    assert (
+        response.status_code
+        ==
+        400
+    )
+
+
+    assert (
+        "greater than zero"
+        in
+        response
+        .json()[
+            "detail"
+        ]
+        .lower()
     )        

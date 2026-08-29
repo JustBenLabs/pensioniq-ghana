@@ -3832,3 +3832,442 @@ tbody tr:hover {
     }
 
 }
+
+/* ==========================================================
+   RETIREMENT GOAL PLANNER
+========================================================== */
+
+
+.goal-planner-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(
+            15,
+            118,
+            110,
+            0.10
+        );
+
+    color: var(--primary);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+
+.goal-planner-form {
+    margin-top: 22px;
+
+    padding: 22px;
+
+    border:
+        1px solid
+        #e7ecef;
+
+    border-radius: 16px;
+
+    background: #f8fafb;
+}
+
+
+.goal-input-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+}
+
+
+.goal-planner-form select {
+    width: 100%;
+
+    min-height: 44px;
+
+    padding:
+        0
+        12px;
+
+    border:
+        1px solid
+        #ccd6dd;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: var(--navy);
+
+    font: inherit;
+}
+
+
+.goal-planner-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 20px;
+}
+
+
+.goal-planner-error {
+    margin-top: 16px;
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    background: #fff3f3;
+
+    color: #a53232;
+
+    font-size: 12px;
+
+    line-height: 1.55;
+}
+
+
+/* ==========================================================
+   GOAL RESULT
+========================================================== */
+
+
+.goal-results {
+    margin-top: 26px;
+
+    padding-top: 24px;
+
+    border-top:
+        1px solid
+        #e8edf1;
+}
+
+
+.goal-result-header {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.goal-result-header h4 {
+    margin:
+        4px
+        0
+        5px;
+
+    color: var(--navy);
+
+    font-size: 21px;
+}
+
+
+.goal-result-header p {
+    max-width: 720px;
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+.goal-status-badge {
+    display: inline-flex;
+
+    padding:
+        7px
+        12px;
+
+    border-radius: 999px;
+
+    background: #eef3f5;
+
+    color: var(--navy);
+
+    font-size: 10px;
+
+    font-weight: 800;
+}
+
+
+/* ==========================================================
+   SUMMARY
+========================================================== */
+
+
+.goal-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+
+    margin-top: 21px;
+}
+
+
+.goal-summary-item {
+    padding: 15px;
+
+    border:
+        1px solid
+        #e5eaee;
+
+    border-radius: 12px;
+
+    background: #fafbfc;
+}
+
+
+.goal-summary-item span,
+.goal-detail-grid span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+
+.goal-summary-item strong,
+.goal-detail-grid strong {
+    color: var(--navy);
+
+    font-size: 13px;
+}
+
+
+/* ==========================================================
+   GOAL PANELS
+========================================================== */
+
+
+.goal-achievable-panel,
+.goal-adjustment-panel {
+    margin-top: 19px;
+
+    padding: 20px;
+
+    border-radius: 16px;
+}
+
+
+.goal-achievable-panel {
+    border:
+        1px solid
+        rgba(
+            15,
+            118,
+            110,
+            0.20
+        );
+
+    background:
+        rgba(
+            15,
+            118,
+            110,
+            0.045
+        );
+}
+
+
+.goal-adjustment-panel {
+    border:
+        1px solid
+        #eadfce;
+
+    background: #fffaf3;
+}
+
+
+.goal-panel-heading span {
+    color: var(--primary);
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: 0.08em;
+}
+
+
+.goal-panel-heading h4 {
+    margin:
+        4px
+        0
+        16px;
+
+    color: var(--navy);
+
+    font-size: 17px;
+}
+
+
+.goal-detail-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.goal-detail-grid > div {
+    padding: 14px;
+
+    border-radius: 11px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+}
+
+
+/* ==========================================================
+   DISCLAIMER
+========================================================== */
+
+
+.goal-disclaimer {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    margin-top: 18px;
+
+    padding-top: 16px;
+
+    border-top:
+        1px solid
+        #edf1f4;
+}
+
+
+.goal-disclaimer strong {
+    flex: 0 0 auto;
+
+    color: var(--navy);
+
+    font-size: 10px;
+}
+
+
+.goal-disclaimer p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+
+@media (
+    max-width: 900px
+) {
+
+    .goal-input-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .goal-summary-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .goal-detail-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+@media (
+    max-width: 600px
+) {
+
+    .goal-result-header {
+        flex-direction: column;
+    }
+
+
+    .goal-summary-grid,
+    .goal-detail-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .goal-planner-actions {
+        justify-content: stretch;
+    }
+
+
+    .goal-planner-actions button {
+        width: 100%;
+    }
+
+
+    .goal-disclaimer {
+        flex-direction: column;
+    }
+
+}
