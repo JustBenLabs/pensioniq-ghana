@@ -31,6 +31,42 @@
 <body>
 
     <!-- =====================================================
+         ACTUARIAL MATHEMATICS BACKGROUND
+         Decorative only — hidden from assistive technology
+    ====================================================== -->
+
+    <div
+        class="math-background"
+        aria-hidden="true"
+    >
+        <span class="math-symbol symbol-1">∑</span>
+        <span class="math-symbol symbol-2">∫</span>
+        <span class="math-symbol symbol-3">√</span>
+        <span class="math-symbol symbol-4">π</span>
+        <span class="math-symbol symbol-5">λ</span>
+        <span class="math-symbol symbol-6">μ</span>
+        <span class="math-symbol symbol-7">σ²</span>
+        <span class="math-symbol symbol-8">∞</span>
+        <span class="math-symbol formula symbol-9">qₓ</span>
+        <span class="math-symbol formula symbol-10">pₓ</span>
+        <span class="math-symbol formula symbol-11">aₓ</span>
+        <span class="math-symbol formula symbol-12">E[X]</span>
+        <span class="math-symbol formula symbol-13">Var(X)</span>
+        <span class="math-symbol formula symbol-14">vᵗ</span>
+        <span class="math-symbol formula symbol-15">(1+i)⁻ᵗ</span>
+        <span class="math-symbol formula symbol-16">PR(M)</span>
+        <span class="math-symbol formula symbol-17">P = B₃ × PR</span>
+        <span class="math-symbol formula symbol-18">37.5% → 60%</span>
+        <span class="math-symbol formula symbol-19">180 → 420</span>
+        <span class="math-symbol formula symbol-20">∫₀ᵀ vᵗpₓ(t)dt</span>
+        <span class="math-symbol formula symbol-21">P(T &gt; x)</span>
+        <span class="math-symbol symbol-22">Δ</span>
+        <span class="math-symbol symbol-23">∂</span>
+        <span class="math-symbol formula symbol-24">eˣ</span>
+    </div>
+
+
+    <!-- =====================================================
          HEADER
     ====================================================== -->
 
@@ -102,7 +138,56 @@
                     your future pension.
                 </p>
 
+                <div class="hero-fact-strip" aria-label="PensionIQ model highlights">
+                    <span>Act 766 / Act 883</span>
+                    <span>180-month threshold</span>
+                    <span>60% maximum right</span>
+                    <span>Ages 55–60</span>
+                </div>
+
             </div>
+
+            <aside
+                class="hero-formula-panel"
+                aria-label="Actuarial formula preview"
+            >
+                <div class="formula-panel-heading">
+                    <span>ACTUARIAL INTELLIGENCE</span>
+                    <strong>Retirement mathematics</strong>
+                </div>
+
+                <div class="formula-panel-equation">
+                    P = B₃ × PR(M) × RF
+                </div>
+
+                <div class="formula-panel-grid">
+                    <div>
+                        <span>Minimum right</span>
+                        <strong>PR(180) = 37.5%</strong>
+                    </div>
+
+                    <div>
+                        <span>Maximum right</span>
+                        <strong>PR(420+) = 60%</strong>
+                    </div>
+
+                    <div>
+                        <span>Discount factor</span>
+                        <strong>vᵗ = (1+i)⁻ᵗ</strong>
+                    </div>
+
+                    <div>
+                        <span>Actuarial lens</span>
+                        <strong>EPV = E[PV]</strong>
+                    </div>
+                </div>
+
+                <p>
+                    Mathematical notation is shown for context.
+                    PensionIQ calculations are produced by the
+                    application&apos;s actuarial engine.
+                </p>
+            </aside>
 
         </section>
 
@@ -961,7 +1046,7 @@
 
                             <input
                                 type="number"
-                                id="salary"
+                                id="comparison-salary"
                                 min="0"
                                 step="0.01"
                                 placeholder="72000"
@@ -1069,7 +1154,30 @@
 
 </div>
 
-                
+
+
+
+            <div
+                id="comparison-loading-state"
+                class="comparison-loading-state hidden"
+                role="status"
+                aria-live="polite"
+            >
+                <div class="analysis-loading-orbit" aria-hidden="true">
+                    <span>∑</span>
+                </div>
+
+                <div>
+                    <strong>
+                        Running actuarial scenarios
+                    </strong>
+
+                    <p>
+                        Comparing monthly pension, break-even timing,
+                        discounted value and mortality-adjusted EPV.
+                    </p>
+                </div>
+            </div>
 
 
             <!-- =================================================
@@ -1080,6 +1188,118 @@
                 id="comparison-results"
                 class="comparison-results hidden"
             >
+
+
+                <!-- =============================================
+                     ANALYSIS AT A GLANCE
+                ============================================== -->
+
+                <section
+                    class="analysis-overview"
+                    aria-labelledby="analysis-overview-title"
+                >
+
+                    <div class="analysis-overview-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                Analysis at a glance
+                            </span>
+
+                            <h4 id="analysis-overview-title">
+                                What stands out in this comparison?
+                            </h4>
+
+                        </div>
+
+                        <span class="analysis-assumption-chip">
+                            Based on selected assumptions
+                        </span>
+
+                    </div>
+
+
+                    <div class="analysis-insight-grid">
+
+                        <article
+                            id="monthly-pension-insight"
+                            class="analysis-insight-card"
+                        >
+                            <span>
+                                Highest Monthly Pension
+                            </span>
+
+                            <strong>
+                                Awaiting analysis
+                            </strong>
+
+                            <small>
+                                Run the comparison to see the
+                                strongest monthly benefit.
+                            </small>
+                        </article>
+
+
+                        <article
+                            id="breakeven-insight"
+                            class="analysis-insight-card"
+                        >
+                            <span>
+                                Age 55 vs Age 60
+                            </span>
+
+                            <strong>
+                                Awaiting analysis
+                            </strong>
+
+                            <small>
+                                Shows when the later pension catches
+                                up in cumulative undiscounted cash flow.
+                            </small>
+                        </article>
+
+
+                        <article
+                            id="pv-insight"
+                            class="analysis-insight-card"
+                        >
+                            <span>
+                                Highest Discounted PV
+                            </span>
+
+                            <strong>
+                                Awaiting analysis
+                            </strong>
+
+                            <small>
+                                Value measured at age 55 under the
+                                selected discount and projection assumptions.
+                            </small>
+                        </article>
+
+
+                        <article
+                            id="epv-insight"
+                            class="analysis-insight-card"
+                        >
+                            <span>
+                                Highest Mortality-Adjusted EPV
+                            </span>
+
+                            <strong>
+                                Awaiting analysis
+                            </strong>
+
+                            <small>
+                                Incorporates the selected mortality
+                                basis and discount assumptions.
+                            </small>
+                        </article>
+
+                    </div>
+
+                </section>
 
 
                 <!-- =============================================
@@ -1105,7 +1325,20 @@
                     <div
                         id="retirement-chart"
                         class="retirement-chart"
+                        aria-label="Monthly pension comparison by retirement age"
                     >
+                    </div>
+
+                    <div class="chart-legend">
+                        <span>
+                            <i class="legend-dot legend-dot-primary"></i>
+                            Estimated monthly pension
+                        </span>
+
+                        <span>
+                            <i class="legend-dot legend-dot-highlight"></i>
+                            Highest value in this comparison
+                        </span>
                     </div>
 
                 </div>
@@ -1253,7 +1486,20 @@
                     <div
                         id="epv-chart"
                         class="epv-chart"
+                        aria-label="Mortality-adjusted expected present value by retirement age"
                     >
+                    </div>
+
+                    <div class="chart-legend epv-legend">
+                        <span>
+                            <i class="legend-dot legend-dot-epv"></i>
+                            Mortality-adjusted expected present value
+                        </span>
+
+                        <span>
+                            <i class="legend-dot legend-dot-highlight"></i>
+                            Highest EPV under selected assumptions
+                        </span>
                     </div>
 
 
@@ -1429,6 +1675,12 @@
                 Independent educational and retirement-planning
                 platform. Not affiliated with or operated by SSNIT.
             </small>
+
+            <div class="calculator-company-credit">
+                <span>Built by</span>
+                <strong>JustBenLabs</strong>
+                <small>An emerging fintech company</small>
+            </div>
 
         </footer>
 

@@ -48,7 +48,7 @@
                 </h1>
 
                 <span>
-                    Member Dashboard
+                    Retirement Control Centre
                 </span>
 
             </div>
@@ -156,12 +156,140 @@
             class="dashboard hidden"
         >
 
+            <div class="dashboard-shell">
+
+                <aside
+                    class="dashboard-sidebar"
+                    aria-label="PensionIQ dashboard navigation"
+                >
+
+                    <div class="sidebar-brand">
+
+                        <div class="sidebar-brand-mark">
+                            P
+                        </div>
+
+                        <div>
+                            <strong>
+                                PensionIQ Ghana
+                            </strong>
+
+                            <span>
+                                Retirement Intelligence
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <nav class="dashboard-nav">
+
+                        <button type="button" class="dashboard-nav-button is-active" data-dashboard-target="overview">
+                            <span class="dashboard-nav-icon">⌂</span>
+                            <span>Overview</span>
+                        </button>
+
+                        <button type="button" class="dashboard-nav-button" data-dashboard-target="pension">
+                            <span class="dashboard-nav-icon">₵</span>
+                            <span>My Pension</span>
+                        </button>
+
+                        <button type="button" class="dashboard-nav-button" data-dashboard-target="planning">
+                            <span class="dashboard-nav-icon">◇</span>
+                            <span>Planning</span>
+                        </button>
+
+                        <button type="button" class="dashboard-nav-button" data-dashboard-target="contributions">
+                            <span class="dashboard-nav-icon">▤</span>
+                            <span>Contributions</span>
+                        </button>
+
+                        <button type="button" class="dashboard-nav-button" data-dashboard-target="reports">
+                            <span class="dashboard-nav-icon">▧</span>
+                            <span>Reports</span>
+                        </button>
+
+                        <button type="button" class="dashboard-nav-button" data-dashboard-target="account">
+                            <span class="dashboard-nav-icon">⚙</span>
+                            <span>Account</span>
+                        </button>
+
+                    </nav>
+
+
+                    <div class="sidebar-readiness">
+
+                        <span>
+                            Retirement readiness
+                        </span>
+
+                        <div class="sidebar-readiness-value">
+                            <strong id="sidebar-readiness-score">-</strong>
+                            <small>/ 100</small>
+                        </div>
+
+                        <p id="sidebar-readiness-rating">
+                            Assessing your position
+                        </p>
+
+                    </div>
+
+
+                    <div class="sidebar-company-credit">
+
+                        <span>
+                            Built by
+                        </span>
+
+                        <strong>
+                            JustBenLabs
+                        </strong>
+
+                        <small>
+                            An emerging fintech company
+                        </small>
+
+                    </div>
+
+                </aside>
+
+
+                <div class="dashboard-workspace">
+
+                    <header class="dashboard-view-header">
+
+                        <div>
+
+                            <span class="dashboard-view-eyebrow">
+                                PENSIONIQ CONTROL CENTRE
+                            </span>
+
+                            <h2 id="dashboard-view-title">
+                                Overview
+                            </h2>
+
+                            <p id="dashboard-view-description">
+                                Your retirement position at a glance.
+                            </p>
+
+                        </div>
+
+
+                        <a href="index.html" class="workspace-calculator-link">
+                            Open Calculator
+                        </a>
+
+                    </header>
+
+
+                    <div class="dashboard-view-stack">
+
 
             <!-- =============================================
                  WELCOME
             ============================================== -->
 
-            <section class="welcome-card">
+            <section class="welcome-card dashboard-view-block is-active-view" data-dashboard-view="overview">
 
                 <div>
 
@@ -196,10 +324,16 @@
                  TOP METRICS
             ============================================== -->
 
-            <section class="metric-grid">
+            <section class="metric-grid dashboard-view-block is-active-view" data-dashboard-view="overview">
 
 
-                <article class="metric-card">
+                <button
+                    type="button"
+                    class="metric-card metric-action-card metric-contribution-card"
+                    data-dashboard-target="contributions"
+                    data-contribution-target="history"
+                    aria-label="Open contribution history"
+                >
 
                     <span>
                         Contribution Months
@@ -213,11 +347,16 @@
                         0 contribution years
                     </small>
 
-                </article>
+                </button>
 
 
 
-                <article class="metric-card">
+                <button
+                    type="button"
+                    class="metric-card metric-action-card metric-right-card"
+                    data-dashboard-target="pension"
+                    aria-label="Open my pension position"
+                >
 
                     <span>
                         Pension Right
@@ -231,11 +370,17 @@
                         Current estimated pension percentage
                     </small>
 
-                </article>
+                </button>
 
 
 
-                <article class="metric-card">
+                <button
+                    type="button"
+                    class="metric-card metric-action-card metric-health-card"
+                    data-dashboard-target="contributions"
+                    data-contribution-target="health"
+                    aria-label="Open contribution health diagnostics"
+                >
 
                     <span>
                         Contribution Health
@@ -249,11 +394,17 @@
                         -
                     </small>
 
-                </article>
+                </button>
 
 
 
-                <article class="metric-card">
+                <button
+                    type="button"
+                    class="metric-card metric-action-card metric-missing-card"
+                    data-dashboard-target="contributions"
+                    data-contribution-target="health"
+                    aria-label="Review missing contribution records"
+                >
 
                     <span>
                         Missing Records
@@ -267,8 +418,179 @@
                         Gaps in records stored in PensionIQ
                     </small>
 
-                </article>
+                </button>
 
+
+            </section>
+
+
+            <!-- =============================================
+                 RETIREMENT JOURNEY
+            ============================================== -->
+
+            <section
+                class="retirement-journey-card dashboard-view-block is-active-view"
+                id="retirement-journey-card"
+                data-dashboard-view="overview"
+            >
+
+                <div class="retirement-journey-heading">
+
+                    <div>
+                        <span class="section-label">
+                            Retirement Journey
+                        </span>
+
+                        <h3>
+                            Your contribution path
+                        </h3>
+
+                        <p>
+                            See where your recorded contribution months sit between
+                            the minimum monthly-pension threshold and the maximum
+                            pension-right level used by PensionIQ.
+                        </p>
+                    </div>
+
+                    <span id="journey-status-chip" class="journey-status-chip">
+                        Assessing
+                    </span>
+
+                </div>
+
+                <div class="retirement-journey-layout">
+
+                    <div id="retirement-journey-rail" class="retirement-journey-rail">
+
+                        <div class="journey-track" aria-hidden="true">
+                            <div id="journey-progress-fill" class="journey-progress-fill"></div>
+                            <span class="journey-marker journey-marker-minimum"></span>
+                            <span class="journey-marker journey-marker-maximum"></span>
+                            <span id="journey-current-marker" class="journey-current-marker"></span>
+                        </div>
+
+                        <div class="journey-labels">
+                            <div>
+                                <span>Start</span>
+                                <strong>0</strong>
+                            </div>
+                            <div>
+                                <span>Minimum threshold</span>
+                                <strong>180 months</strong>
+                            </div>
+                            <div>
+                                <span>Maximum right level</span>
+                                <strong>420 months</strong>
+                            </div>
+                        </div>
+
+                        <div class="journey-current-position">
+                            <span>Recorded position</span>
+                            <strong id="journey-current-months">0 months</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="journey-insight-card">
+                        <span class="journey-insight-kicker">NEXT MILESTONE</span>
+                        <strong id="journey-headline">Assessing your contribution path</strong>
+                        <p id="journey-detail">
+                            PensionIQ will highlight the next contribution milestone
+                            after your dashboard finishes loading.
+                        </p>
+                        <button
+                            type="button"
+                            class="journey-action-button"
+                            data-dashboard-target="planning"
+                            data-planner-target="what-if"
+                        >
+                            Explore a What-If scenario
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section
+                class="overview-actions dashboard-view-block is-active-view"
+                data-dashboard-view="overview"
+                aria-label="Retirement planning quick actions"
+            >
+
+                <a
+                    href="index.html"
+                    class="overview-action-card mobile-calculator-action"
+                    aria-label="Open PensionIQ Retirement Calculator"
+                >
+                    <span class="overview-action-icon">∑</span>
+
+                    <span>
+                        <strong>Open Pension Calculator</strong>
+                        <small>
+                            Estimate your pension and compare retirement ages.
+                        </small>
+                    </span>
+
+                    <span class="overview-action-arrow">→</span>
+                </a>
+
+
+                <button
+                    type="button"
+                    class="overview-action-card"
+                    data-dashboard-target="planning"
+                    data-planner-target="what-if"
+                >
+                    <span class="overview-action-icon">◇</span>
+
+                    <span>
+                        <strong>Run a What-If</strong>
+                        <small>
+                            Test how salary, contribution months and retirement age could change your outlook.
+                        </small>
+                    </span>
+
+                    <span class="overview-action-arrow">→</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="overview-action-card"
+                    data-dashboard-target="planning"
+                    data-planner-target="goal"
+                >
+                    <span class="overview-action-icon">◎</span>
+
+                    <span>
+                        <strong>Review My Goal</strong>
+                        <small>
+                            Work backwards from the monthly pension you want to target.
+                        </small>
+                    </span>
+
+                    <span class="overview-action-arrow">→</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="overview-action-card"
+                    data-dashboard-target="reports"
+                >
+                    <span class="overview-action-icon">▧</span>
+
+                    <span>
+                        <strong>Open My Report</strong>
+                        <small>
+                            Generate your personal PensionIQ retirement planning report.
+                        </small>
+                    </span>
+
+                    <span class="overview-action-arrow">→</span>
+                </button>
 
             </section>
 
@@ -277,8 +599,9 @@
 ============================================== -->
 
 <section
-    class="dashboard-card readiness-card"
+    class="dashboard-card readiness-card dashboard-view-block is-active-view"
     id="retirement-readiness-card"
+    data-dashboard-view="overview"
 >
 
     <div class="card-heading">
@@ -427,9 +750,21 @@
     </div>
 
 
+    <div class="readiness-detail-toggle-row">
+        <button
+            type="button"
+            id="readiness-details-toggle"
+            class="readiness-detail-toggle"
+            aria-expanded="false"
+        >
+            View detailed readiness
+        </button>
+    </div>
+
+
     <!-- POSITION DETAILS -->
 
-    <div class="readiness-detail-grid">
+    <div class="readiness-detail-grid readiness-secondary-detail">
 
         <div class="readiness-detail">
 
@@ -503,7 +838,7 @@
 
     <!-- RECOMMENDATIONS -->
 
-    <div class="readiness-recommendations">
+    <div class="readiness-recommendations readiness-secondary-detail">
 
         <div class="readiness-recommendation-heading">
 
@@ -534,7 +869,7 @@
 
     <!-- DISCLAIMER -->
 
-    <div class="readiness-disclaimer">
+    <div class="readiness-disclaimer readiness-secondary-detail">
 
         <strong>
             Planning indicator
@@ -548,13 +883,64 @@
     </div>
 
 </section>
+<section
+    class="planning-switcher dashboard-view-block"
+    data-dashboard-view="planning"
+    aria-label="Retirement planning tools"
+>
+
+    <div>
+        <span class="section-label">
+            Planning Workspace
+        </span>
+
+        <h3>
+            Explore your retirement options
+        </h3>
+
+        <p>
+            Switch between scenario testing and goal-based planning without leaving this workspace.
+        </p>
+    </div>
+
+
+    <div class="planning-tabs" role="tablist" aria-label="Retirement planner">
+
+        <button
+            type="button"
+            class="planning-tab is-active"
+            data-planner-target="what-if"
+            data-saved="false"
+            role="tab"
+            aria-selected="true"
+        >
+            What-If Scenario
+        </button>
+
+        <button
+            type="button"
+            class="planning-tab"
+            data-planner-target="goal"
+            data-saved="false"
+            role="tab"
+            aria-selected="false"
+        >
+            Retirement Goal
+        </button>
+
+    </div>
+
+</section>
+
 <!-- =================================================
      WHAT-IF RETIREMENT PLANNER
 ================================================== -->
 
 <section
-    class="dashboard-card scenario-card"
+    class="dashboard-card scenario-card dashboard-view-block planner-panel is-active-planner"
     id="retirement-scenario-card"
+    data-dashboard-view="planning"
+    data-planner-panel="what-if"
 >
 
     <div class="card-heading">
@@ -818,6 +1204,21 @@
 
         </div>
 
+        <div class="scenario-lift-card">
+            <div>
+                <span>BASELINE MONTHLY PENSION</span>
+                <strong id="scenario-lift-baseline">-</strong>
+            </div>
+            <div class="scenario-lift-arrow" aria-hidden="true">→</div>
+            <div>
+                <span>WHAT-IF MONTHLY PENSION</span>
+                <strong id="scenario-lift-projected">-</strong>
+            </div>
+            <div class="scenario-lift-change">
+                <span>POTENTIAL CHANGE</span>
+                <strong id="scenario-lift-change">-</strong>
+            </div>
+        </div>
 
         <!-- =========================================
              BASELINE / SCENARIO COMPARISON
@@ -1172,8 +1573,10 @@
 
 
 <section
-    class="dashboard-card goal-planner-card"
+    class="dashboard-card goal-planner-card dashboard-view-block planner-panel"
     id="retirement-goal-card"
+    data-dashboard-view="planning"
+    data-planner-panel="goal"
 >
 
     <div class="card-heading">
@@ -1464,6 +1867,22 @@
 
         </div>
 
+        <div id="goal-progress-card" class="goal-progress-card hidden">
+            <div class="goal-progress-heading">
+                <div>
+                    <span>GOAL PROGRESS</span>
+                    <strong id="goal-progress-percent">-</strong>
+                </div>
+                <small>Current projected pension compared with your target</small>
+            </div>
+            <div class="goal-progress-track" aria-hidden="true">
+                <div id="goal-progress-fill" class="goal-progress-fill"></div>
+            </div>
+            <div class="goal-progress-labels">
+                <span id="goal-progress-current">Current: -</span>
+                <span id="goal-progress-target-label">Target: -</span>
+            </div>
+        </div>
 
         <!-- =========================================
              ACHIEVABLE RESULT
@@ -1685,8 +2104,9 @@
 ================================================== -->
 
 <section
-    class="dashboard-card retirement-report-card"
+    class="dashboard-card retirement-report-card dashboard-view-block"
     id="retirement-report-card"
+    data-dashboard-view="reports"
 >
 
     <div class="retirement-report-content">
@@ -1745,7 +2165,7 @@
                  PENSION POSITION
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block" id="pension-position-card" data-dashboard-view="pension">
 
                 <div class="card-heading">
 
@@ -1872,11 +2292,57 @@
 
 
 
+            <section
+                class="workspace-subnav dashboard-view-block"
+                data-dashboard-view="contributions"
+                aria-label="Contribution workspace"
+            >
+                <div>
+                    <span class="section-label">
+                        Contribution Workspace
+                    </span>
+
+                    <p>
+                        Move between recording, history and contribution diagnostics without scrolling through every section.
+                    </p>
+                </div>
+
+                <div class="workspace-subnav-tabs" role="tablist" aria-label="Contribution workspace tabs">
+                    <button
+                        type="button"
+                        class="workspace-subnav-button is-active"
+                        data-contribution-target="entry"
+                        aria-selected="true"
+                    >
+                        Add Record
+                    </button>
+
+                    <button
+                        type="button"
+                        class="workspace-subnav-button"
+                        data-contribution-target="history"
+                        aria-selected="false"
+                    >
+                        History
+                    </button>
+
+                    <button
+                        type="button"
+                        class="workspace-subnav-button"
+                        data-contribution-target="health"
+                        aria-selected="false"
+                    >
+                        Health & Gaps
+                    </button>
+                </div>
+            </section>
+
+
             <!-- =============================================
                  ADD / EDIT CONTRIBUTION
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block contribution-panel is-active-subpanel" id="contribution-entry-card" data-dashboard-view="contributions" data-contribution-panel="entry">
 
                 <div class="card-heading">
 
@@ -2102,7 +2568,7 @@
                  CONTRIBUTION HISTORY
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block contribution-panel" id="contribution-history-card" data-dashboard-view="contributions" data-contribution-panel="history">
 
                 <div class="card-heading">
 
@@ -2185,7 +2651,7 @@
                  CONTRIBUTION HEALTH
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block contribution-panel" id="contribution-health-card" data-dashboard-view="contributions" data-contribution-panel="health">
 
                 <div class="card-heading">
 
@@ -2322,7 +2788,7 @@
                  MISSING MONTHS
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block contribution-panel" id="missing-contributions-card" data-dashboard-view="contributions" data-contribution-panel="health">
 
                 <div class="card-heading">
 
@@ -2355,7 +2821,7 @@
                  CONTRIBUTION VALIDATION
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block contribution-panel" id="contribution-validation-card" data-dashboard-view="contributions" data-contribution-panel="health">
 
                 <div class="card-heading">
 
@@ -2433,11 +2899,48 @@
 
 
 
+            <section
+                class="workspace-subnav dashboard-view-block"
+                data-dashboard-view="account"
+                aria-label="Account workspace"
+            >
+                <div>
+                    <span class="section-label">
+                        Account Workspace
+                    </span>
+
+                    <p>
+                        Keep profile details and account security in separate focused views.
+                    </p>
+                </div>
+
+                <div class="workspace-subnav-tabs" role="tablist" aria-label="Account workspace tabs">
+                    <button
+                        type="button"
+                        class="workspace-subnav-button is-active"
+                        data-account-target="profile"
+                        aria-selected="true"
+                    >
+                        Profile
+                    </button>
+
+                    <button
+                        type="button"
+                        class="workspace-subnav-button"
+                        data-account-target="security"
+                        aria-selected="false"
+                    >
+                        Security
+                    </button>
+                </div>
+            </section>
+
+
             <!-- =============================================
                  MEMBER PROFILE
             ============================================== -->
 
-            <section class="dashboard-card">
+            <section class="dashboard-card dashboard-view-block account-panel is-active-subpanel" id="member-profile-card" data-dashboard-view="account" data-account-panel="profile">
 
     <div class="card-heading">
 
@@ -2732,7 +3235,7 @@
      ACCOUNT SETTINGS
 ============================================= -->
 
-<section class="dashboard-card">
+<section class="dashboard-card dashboard-view-block account-panel" id="account-security-card" data-dashboard-view="account" data-account-panel="security">
 
     <div class="card-heading">
 
@@ -2881,7 +3384,7 @@
                  DISCLAIMER
             ============================================== -->
 
-            <section class="disclaimer">
+            <section class="disclaimer dashboard-view-block is-active-view" data-dashboard-view="overview">
 
                 <strong>
                     Important
@@ -2897,6 +3400,47 @@
             </section>
 
 
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <nav class="mobile-dashboard-nav" aria-label="Mobile dashboard navigation">
+
+                <button type="button" class="mobile-nav-button is-active" data-dashboard-target="overview">
+                    <span>⌂</span>
+                    Overview
+                </button>
+
+                <button type="button" class="mobile-nav-button" data-dashboard-target="pension">
+                    <span>₵</span>
+                    Pension
+                </button>
+
+                <button type="button" class="mobile-nav-button" data-dashboard-target="planning">
+                    <span>◇</span>
+                    Plan
+                </button>
+
+                <button type="button" class="mobile-nav-button" data-dashboard-target="contributions">
+                    <span>▤</span>
+                    Records
+                </button>
+
+                <button type="button" class="mobile-nav-button" data-dashboard-target="reports">
+                    <span>▧</span>
+                    Reports
+                </button>
+
+                <button type="button" class="mobile-nav-button" data-dashboard-target="account">
+                    <span>⚙</span>
+                    Account
+                </button>
+
+            </nav>
+
         </section>
 
 
@@ -2905,20 +3449,45 @@
              FOOTER
         ================================================== -->
 
-        <footer>
+        <footer class="product-footer">
 
-            <strong>
-                PensionIQ Ghana
-            </strong>
+            <div>
+                <strong>
+                    PensionIQ Ghana
+                </strong>
 
-            <p>
-                Retirement Intelligence Platform
-            </p>
+                <p>
+                    Retirement Intelligence Platform
+                </p>
+            </div>
+
+
+            <div class="footer-company-credit">
+                <span>
+                    Built by
+                </span>
+
+                <strong>
+                    JustBenLabs
+                </strong>
+
+                <small>
+                    An emerging fintech company
+                </small>
+            </div>
 
         </footer>
 
     </main>
 
+
+    <div
+        id="pensioniq-toast-region"
+        class="pensioniq-toast-region"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+    ></div>
 
     <script src="api-config.js"></script>
 <script src="dashboard.js"></script>

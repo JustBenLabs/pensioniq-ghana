@@ -9,6 +9,11 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="Secure member sign in for PensionIQ Ghana retirement intelligence."
+    >
+
     <title>Login | PensionIQ Ghana</title>
 
     <link
@@ -17,43 +22,140 @@
     >
 </head>
 
-
 <body>
+
+    <div
+        class="math-background"
+        aria-hidden="true"
+    >
+        <span class="math-symbol symbol-1">∑</span>
+        <span class="math-symbol symbol-2">∫</span>
+        <span class="math-symbol symbol-3">σ²</span>
+        <span class="math-symbol symbol-4">qₓ</span>
+        <span class="math-symbol symbol-5">pₓ</span>
+        <span class="math-symbol symbol-6">μₓ</span>
+        <span class="math-symbol symbol-7">E[X]</span>
+        <span class="math-symbol symbol-8">vᵗ</span>
+        <span class="math-symbol symbol-9">∞</span>
+        <span class="math-symbol symbol-10">λ</span>
+        <span class="math-symbol symbol-11">PR(M)</span>
+        <span class="math-symbol symbol-12">(1+i)⁻ᵗ</span>
+        <span class="math-symbol symbol-13">B₃</span>
+        <span class="math-symbol symbol-14">37.5% → 60%</span>
+        <span class="math-symbol symbol-15">180 → 420</span>
+    </div>
+
 
     <main class="auth-page">
 
         <section class="auth-brand-panel">
 
-            <div class="brand">
-                <div class="brand-icon">
-                    P
+            <div class="brand-panel-inner">
+
+                <div class="brand">
+
+                    <div class="brand-icon">
+                        P
+                    </div>
+
+                    <div class="brand-copy">
+
+                        <h1>
+                            PensionIQ Ghana
+                        </h1>
+
+                        <span>
+                            Retirement Intelligence Platform
+                        </span>
+
+                    </div>
+
                 </div>
 
-                <div>
-                    <h1>PensionIQ Ghana</h1>
+
+                <div class="brand-message">
+
+                    <span class="eyebrow">
+                        MEMBER ACCESS
+                    </span>
+
+                    <h2>
+                        Retirement planning
+                        <span>
+                            powered by actuarial intelligence.
+                        </span>
+                    </h2>
+
+                    <p>
+                        Sign in to understand your pension position,
+                        contribution health and retirement outlook
+                        in one secure workspace.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="actuarial-formula-card"
+                    aria-label="PensionIQ retirement formula"
+                >
 
                     <span>
-                        Retirement Intelligence Platform
+                        RETIREMENT MATHEMATICS
                     </span>
+
+                    <strong>
+                        P = B₃ × PR(M) × RF
+                    </strong>
+
+                    <small>
+                        Salary basis × pension right × retirement-age factor
+                    </small>
+
                 </div>
-            </div>
 
 
-            <div class="brand-message">
+                <div
+                    class="model-facts"
+                    aria-label="PensionIQ model highlights"
+                >
 
-                <span class="eyebrow">
-                    MEMBER ACCESS
-                </span>
+                    <div>
+                        <strong>180</strong>
+                        <span>Month threshold</span>
+                    </div>
 
-                <h2>
-                    Your pension journey,
-                    in one secure place.
-                </h2>
+                    <div>
+                        <strong>60%</strong>
+                        <span>Maximum pension right</span>
+                    </div>
 
-                <p>
-                    Sign in to access your pension position,
-                    contribution health and retirement analysis.
-                </p>
+                    <div>
+                        <strong>55–60</strong>
+                        <span>Retirement ages modeled</span>
+                    </div>
+
+                </div>
+
+
+                <div class="brand-panel-footer">
+
+                    <a
+                        href="index.html"
+                        class="calculator-return-link"
+                    >
+                        ← Back to Retirement Calculator
+                    </a>
+
+                    <div class="company-credit">
+                        <span>Built by</span>
+                        <strong>JustBenLabs</strong>
+                        <small>
+                            An emerging fintech company
+                        </small>
+                    </div>
+
+                </div>
 
             </div>
 
@@ -64,6 +166,12 @@
 
             <div class="auth-container">
 
+                <div class="secure-access-badge">
+                    <span class="secure-dot"></span>
+                    Secure member access
+                </div>
+
+
                 <div class="auth-heading">
 
                     <span class="eyebrow">
@@ -71,11 +179,11 @@
                     </span>
 
                     <h2>
-                        Sign in
+                        Sign in to PensionIQ
                     </h2>
 
                     <p>
-                        Enter your PensionIQ account details.
+                        Access your personal retirement control centre.
                     </p>
 
                 </div>
@@ -84,6 +192,8 @@
                 <div
                     id="login-error"
                     class="message error-message hidden"
+                    role="alert"
+                    aria-live="polite"
                 >
                 </div>
 
@@ -96,39 +206,73 @@
                             Email Address
                         </label>
 
-                        <input
-                            type="email"
-                            id="email"
-                            autocomplete="email"
-                            placeholder="you@example.com"
-                            required
-                        >
+                        <div class="field-shell">
+
+                            <span
+                                class="field-icon"
+                                aria-hidden="true"
+                            >
+                                @
+                            </span>
+
+                            <input
+                                type="email"
+                                id="email"
+                                autocomplete="email"
+                                placeholder="you@example.com"
+                                required
+                            >
+
+                        </div>
 
                     </div>
 
 
                     <div class="form-group">
 
-                        <label for="password">
-                            Password
-                        </label>
+                        <div class="label-row">
 
-                        <input
-                            type="password"
-                            id="password"
-                            autocomplete="current-password"
-                            placeholder="Enter your password"
-                            required
-                        >
+                            <label for="password">
+                                Password
+                            </label>
+
+                            <a href="forgot-password.html">
+                                Forgot password?
+                            </a>
+
+                        </div>
+
+                        <div class="field-shell password-shell">
+
+                            <span
+                                class="field-icon"
+                                aria-hidden="true"
+                            >
+                                •
+                            </span>
+
+                            <input
+                                type="password"
+                                id="password"
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="password-toggle"
+                                class="password-toggle"
+                                aria-controls="password"
+                                aria-label="Show password"
+                                aria-pressed="false"
+                            >
+                                Show
+                            </button>
+
+                        </div>
 
                     </div>
-                    <div class="forgot-password-row">
-
-    <a href="forgot-password.html">
-        Forgot password?
-    </a>
-
-</div>
 
 
                     <button
@@ -136,7 +280,14 @@
                         id="login-button"
                         class="primary-button"
                     >
-                        Sign In
+                        <span id="login-button-label">
+                            Sign In
+                        </span>
+
+                        <span
+                            class="button-spinner"
+                            aria-hidden="true"
+                        ></span>
                     </button>
 
                 </form>
@@ -157,9 +308,15 @@
 
                 <div class="auth-note">
 
-                    PensionIQ is an independent retirement
-                    planning platform and is not an official
-                    SSNIT portal.
+                    <strong>
+                        Independent planning platform
+                    </strong>
+
+                    <p>
+                        PensionIQ Ghana is not an official SSNIT portal.
+                        Official SSNIT records and benefit determinations
+                        govern actual payments.
+                    </p>
 
                 </div>
 
@@ -171,7 +328,7 @@
 
 
     <script src="api-config.js"></script>
-<script src="login.js"></script>
+    <script src="login.js"></script>
 
 </body>
 

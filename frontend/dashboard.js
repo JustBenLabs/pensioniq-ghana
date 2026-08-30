@@ -142,7 +142,7 @@ const cancelPasswordButton =
 const passwordSuccess =
     document.getElementById(
         "password-success"
-    );    
+    );
 // ==========================================================
 // EVENT LISTENERS
 // ==========================================================
@@ -489,6 +489,11 @@ function showPasswordSuccess(
         "hidden"
     );
 
+    showPensionIQToast(
+        message,
+        "success"
+    );
+
 }
 
 
@@ -725,6 +730,7 @@ async function initialiseDashboard() {
         await refreshCurrentDashboard();
         await loadSavedRetirementPlan();
         await loadSavedRetirementGoal();
+        syncPlannerSaveBadges();
 
 
         dashboardLoading.classList.add(
@@ -865,6 +871,11 @@ function displayRetirementReadiness(
     if (!readiness) {
         return;
     }
+
+
+    syncSidebarReadiness(
+        readiness
+    );
 
 
     // ------------------------------------------------------
@@ -1172,6 +1183,22 @@ function displayRetirementReadiness(
 
     progressBar.style.width =
         `${progressPercent}%`;
+
+
+    const readinessScoreVisual =
+        document.querySelector(
+            ".readiness-score-value"
+        );
+
+
+    if (readinessScoreVisual) {
+
+        readinessScoreVisual.style.setProperty(
+            "--readiness-angle",
+            `${progressPercent * 3.6}deg`
+        );
+
+    }
 
 
     // ------------------------------------------------------
@@ -1700,12 +1727,17 @@ function displayPensionPosition(
         "Yes"
         :
         "No";
+
+    syncRetirementJourney(
+        position
+    );
+
     document.getElementById(
     "profile-contribution-months"
 ).textContent =
     Number(
         position.contribution_months
-    ).toLocaleString();    
+    ).toLocaleString();
 
 
     // ------------------------------------------------------
@@ -1806,6 +1838,66 @@ function displayPensionPosition(
             ),
             100
         );
+
+
+    const contributionMetricCard =
+        document.querySelector(
+            ".metric-contribution-card"
+        );
+
+
+    const pensionRightMetricCard =
+        document.querySelector(
+            ".metric-right-card"
+        );
+
+
+    if (contributionMetricCard) {
+
+        const contributionJourneyProgress =
+            Math.min(
+                Math.max(
+                    (months / maximum) * 100,
+                    0
+                ),
+                100
+            );
+
+
+        contributionMetricCard.style.setProperty(
+            "--metric-progress",
+            `${contributionJourneyProgress}%`
+        );
+
+    }
+
+
+    if (pensionRightMetricCard) {
+
+        const pensionRightValue =
+            Number(
+                position.pension_right_percent
+                ||
+                0
+            );
+
+
+        const pensionRightProgress =
+            Math.min(
+                Math.max(
+                    (pensionRightValue / 60) * 100,
+                    0
+                ),
+                100
+            );
+
+
+        pensionRightMetricCard.style.setProperty(
+            "--metric-progress",
+            `${pensionRightProgress}%`
+        );
+
+    }
 
 
     document.getElementById(
@@ -3668,6 +3760,11 @@ function showContributionSuccess(
         "hidden"
     );
 
+    showPensionIQToast(
+        message,
+        "success"
+    );
+
 }
 
 
@@ -4179,6 +4276,11 @@ function showProfileSuccess(
         "hidden"
     );
 
+    showPensionIQToast(
+        message,
+        "success"
+    );
+
 }
 
 
@@ -4195,8 +4297,874 @@ function hideProfileSuccess() {
 }
 
 // ==========================================================
+// DASHBOARD CONTROL CENTRE NAVIGATION
+// ==========================================================
+
+const DASHBOARD_VIEW_COPY = {
+
+    overview: {
+        title: "Overview",
+        description:
+            "Your retirement position at a glance."
+    },
+
+    pension: {
+        title: "My Pension",
+        description:
+            "Review your pension right, eligibility and retirement position."
+    },
+
+    planning: {
+        title: "Planning",
+        description:
+            "Explore What-If scenarios or work backwards from a retirement goal."
+    },
+
+    contributions: {
+        title: "Contributions",
+        description:
+            "Manage contribution records and review the quality of your stored history."
+    },
+
+    reports: {
+        title: "Reports",
+        description:
+            "Generate your personal PensionIQ retirement planning report."
+    },
+
+    account: {
+        title: "Account",
+        description:
+            "Manage your member profile and account security."
+    }
+
+};
+
+
+function setDashboardView(
+    targetView,
+    options = {}
+) {
+
+    const viewCopy =
+        DASHBOARD_VIEW_COPY[
+            targetView
+        ];
+
+
+    if (!viewCopy) {
+        return;
+    }
+
+
+    const viewBlocks =
+        document.querySelectorAll(
+            "[data-dashboard-view]"
+        );
+
+
+    viewBlocks.forEach(
+        (element) => {
+
+            element.classList.toggle(
+                "is-active-view",
+                element.dataset.dashboardView
+                ===
+                targetView
+            );
+
+        }
+    );
+
+
+    const navigationButtons =
+        document.querySelectorAll(
+            ".dashboard-nav-button, .mobile-nav-button"
+        );
+
+
+    navigationButtons.forEach(
+        (button) => {
+
+            const isActive =
+                button.dataset.dashboardTarget
+                ===
+                targetView;
+
+
+            button.classList.toggle(
+                "is-active",
+                isActive
+            );
+
+
+            if (isActive) {
+
+                button.setAttribute(
+                    "aria-current",
+                    "page"
+                );
+
+            }
+
+            else {
+
+                button.removeAttribute(
+                    "aria-current"
+                );
+
+            }
+
+        }
+    );
+
+
+    const titleElement =
+        document.getElementById(
+            "dashboard-view-title"
+        );
+
+
+    const descriptionElement =
+        document.getElementById(
+            "dashboard-view-description"
+        );
+
+
+    if (titleElement) {
+
+        titleElement.textContent =
+            viewCopy.title;
+
+    }
+
+
+    if (descriptionElement) {
+
+        descriptionElement.textContent =
+            viewCopy.description;
+
+    }
+
+
+    document.body.dataset.dashboardView =
+        targetView;
+
+
+    if (
+        options.scroll
+        !==
+        false
+    ) {
+
+        window.scrollTo(
+            {
+                top: 0,
+                behavior: "smooth"
+            }
+        );
+
+    }
+
+}
+
+
+function setPlanningPanel(
+    targetPanel
+) {
+
+    if (
+        targetPanel !== "what-if"
+        &&
+        targetPanel !== "goal"
+    ) {
+
+        return;
+
+    }
+
+
+    const panels =
+        document.querySelectorAll(
+            "[data-planner-panel]"
+        );
+
+
+    panels.forEach(
+        (panel) => {
+
+            panel.classList.toggle(
+                "is-active-planner",
+                panel.dataset.plannerPanel
+                ===
+                targetPanel
+            );
+
+        }
+    );
+
+
+    const tabs =
+        document.querySelectorAll(
+            ".planning-tab"
+        );
+
+
+    tabs.forEach(
+        (tab) => {
+
+            const isActive =
+                tab.dataset.plannerTarget
+                ===
+                targetPanel;
+
+
+            tab.classList.toggle(
+                "is-active",
+                isActive
+            );
+
+
+            tab.setAttribute(
+                "aria-selected",
+                String(
+                    isActive
+                )
+            );
+
+        }
+    );
+
+}
+
+
+function initialiseDashboardNavigation() {
+
+    const targetButtons =
+        document.querySelectorAll(
+            "[data-dashboard-target]"
+        );
+
+
+    targetButtons.forEach(
+        (button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const targetView =
+                        button.dataset.dashboardTarget;
+
+
+                    const plannerTarget =
+                        button.dataset.plannerTarget;
+
+
+                    const contributionTarget =
+                        button.dataset.contributionTarget;
+
+
+                    const accountTarget =
+                        button.dataset.accountTarget;
+
+
+                    if (plannerTarget) {
+
+                        setPlanningPanel(
+                            plannerTarget
+                        );
+
+                    }
+
+
+                    if (contributionTarget) {
+
+                        setContributionPanel(
+                            contributionTarget
+                        );
+
+                    }
+
+
+                    if (accountTarget) {
+
+                        setAccountPanel(
+                            accountTarget
+                        );
+
+                    }
+
+
+                    setDashboardView(
+                        targetView
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    const planningTabs =
+        document.querySelectorAll(
+            ".planning-tab"
+        );
+
+
+    planningTabs.forEach(
+        (tab) => {
+
+            tab.addEventListener(
+                "click",
+                () => {
+
+                    setPlanningPanel(
+                        tab.dataset.plannerTarget
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    setPlanningPanel(
+        "what-if"
+    );
+
+
+    setDashboardView(
+        "overview",
+        {
+            scroll: false
+        }
+    );
+
+}
+
+
+function syncSidebarReadiness(
+    readiness
+) {
+
+    const scoreElement =
+        document.getElementById(
+            "sidebar-readiness-score"
+        );
+
+
+    const ratingElement =
+        document.getElementById(
+            "sidebar-readiness-rating"
+        );
+
+
+    if (!scoreElement || !ratingElement) {
+        return;
+    }
+
+
+    const score =
+        readiness
+        &&
+        readiness.score !== null
+        &&
+        readiness.score !== undefined
+        ?
+        Number(
+            readiness.score
+        )
+        :
+        null;
+
+
+    scoreElement.textContent =
+        score !== null
+        &&
+        Number.isFinite(
+            score
+        )
+        ?
+        score.toFixed(
+            0
+        )
+        :
+        "-";
+
+
+    ratingElement.textContent =
+        (
+            readiness
+            &&
+            readiness.rating
+        )
+        ||
+        "Incomplete";
+
+}
+
+
+// ==========================================================
+// STAGE 3 — PLANNER SAVE-STATE BADGES
+// ==========================================================
+
+
+function syncPlannerSaveBadges() {
+
+    const scenarioTab =
+        document.querySelector(
+            '.planning-tab[data-planner-target="what-if"]'
+        );
+
+
+    const goalTab =
+        document.querySelector(
+            '.planning-tab[data-planner-target="goal"]'
+        );
+
+
+    const scenarioSaved =
+        Boolean(
+            currentSavedRetirementPlan
+            &&
+            currentSavedRetirementPlan.scenario
+            &&
+            currentSavedRetirementPlan.scenario.saved
+        );
+
+
+    const goalSaved =
+        Boolean(
+            currentSavedRetirementPlan
+            &&
+            currentSavedRetirementPlan.goal
+            &&
+            currentSavedRetirementPlan.goal.saved
+        );
+
+
+    if (scenarioTab) {
+
+        scenarioTab.dataset.saved =
+            scenarioSaved
+            ?
+            "true"
+            :
+            "false";
+
+    }
+
+
+    if (goalTab) {
+
+        goalTab.dataset.saved =
+            goalSaved
+            ?
+            "true"
+            :
+            "false";
+
+    }
+
+}
+
+
+// ==========================================================
+// STAGE 4 — FINTECH PRODUCT POLISH
+// ==========================================================
+
+function syncRetirementJourney(position) {
+    const months = Number(position?.contribution_months || 0);
+    const minimum = Number(position?.minimum_months_required || 180);
+    const maximum = Number(position?.maximum_pension_right_months || 420);
+    const safeMaximum = maximum > 0 ? maximum : 420;
+    const progressPercent = Math.max(0, Math.min(100, (months / safeMaximum) * 100));
+
+    const fill = document.getElementById("journey-progress-fill");
+    const marker = document.getElementById("journey-current-marker");
+    const currentMonths = document.getElementById("journey-current-months");
+    const headline = document.getElementById("journey-headline");
+    const detail = document.getElementById("journey-detail");
+    const statusChip = document.getElementById("journey-status-chip");
+
+    if (fill) fill.style.width = `${progressPercent}%`;
+    if (marker) marker.style.left = `${progressPercent}%`;
+    if (currentMonths) currentMonths.textContent = `${months.toLocaleString()} months`;
+    if (!headline || !detail || !statusChip) return;
+
+    statusChip.classList.remove(
+        "journey-status-building",
+        "journey-status-eligible",
+        "journey-status-maximum"
+    );
+
+    if (months < minimum) {
+        const remaining = Math.max(0, minimum - months);
+        headline.textContent = `${remaining.toLocaleString()} months to the minimum threshold`;
+        detail.textContent =
+            "Your recorded contribution total is still below the 180-month monthly-pension threshold used in PensionIQ planning.";
+        statusChip.textContent = "Building";
+        statusChip.classList.add("journey-status-building");
+        return;
+    }
+
+    if (months < maximum) {
+        const remaining = Math.max(0, maximum - months);
+        headline.textContent = `${remaining.toLocaleString()} months to the maximum-right level`;
+        detail.textContent =
+            "You have reached the minimum monthly-pension threshold. Additional qualifying contribution months can continue to strengthen your pension-right percentage up to the cap.";
+        statusChip.textContent = "Eligible";
+        statusChip.classList.add("journey-status-eligible");
+        return;
+    }
+
+    headline.textContent = "Maximum pension-right contribution level reached";
+    detail.textContent =
+        "Your recorded contribution months have reached the 420-month level used for the maximum 60% pension right in PensionIQ planning.";
+    statusChip.textContent = "Maximum level";
+    statusChip.classList.add("journey-status-maximum");
+}
+
+function syncScenarioLiftSummary(baseline, scenario, impact) {
+    setScenarioText(
+        "scenario-lift-baseline",
+        formatScenarioPension(baseline?.monthly_pension)
+    );
+    setScenarioText(
+        "scenario-lift-projected",
+        formatScenarioPension(scenario?.monthly_pension)
+    );
+    setScenarioText(
+        "scenario-lift-change",
+        formatScenarioCurrencyChange(impact?.monthly_pension_change)
+    );
+}
+
+function syncGoalProgress(current, goal) {
+    const card = document.getElementById("goal-progress-card");
+    const fill = document.getElementById("goal-progress-fill");
+    const percentElement = document.getElementById("goal-progress-percent");
+    const currentElement = document.getElementById("goal-progress-current");
+    const targetElement = document.getElementById("goal-progress-target-label");
+    if (!card || !fill || !percentElement || !currentElement || !targetElement) return;
+
+    const rawCurrent = current?.projected_monthly_pension ?? current?.estimated_monthly_pension;
+    const rawTarget = goal?.target_monthly_pension;
+    const currentPension = rawCurrent === null || rawCurrent === undefined ? NaN : Number(rawCurrent);
+    const targetPension = rawTarget === null || rawTarget === undefined ? NaN : Number(rawTarget);
+
+    if (!Number.isFinite(currentPension) || !Number.isFinite(targetPension) || targetPension <= 0) {
+        card.classList.add("hidden");
+        return;
+    }
+
+    const progress = Math.max(0, Math.min(100, (currentPension / targetPension) * 100));
+    fill.style.width = `${progress}%`;
+    percentElement.textContent = `${progress.toFixed(0)}% of target`;
+    currentElement.textContent = `Current: ${formatGoalCurrency(currentPension)}`;
+    targetElement.textContent = `Target: ${formatGoalCurrency(targetPension)}`;
+    card.classList.remove("hidden");
+}
+
+let pensionIQToastTimer = null;
+
+function showPensionIQToast(message, type = "success") {
+    const region = document.getElementById("pensioniq-toast-region");
+    if (!region || !message) return;
+
+    if (pensionIQToastTimer) clearTimeout(pensionIQToastTimer);
+    region.replaceChildren();
+
+    const toast = document.createElement("div");
+    toast.className = `pensioniq-toast pensioniq-toast-${type}`;
+
+    const icon = document.createElement("span");
+    icon.className = "pensioniq-toast-icon";
+    icon.textContent = type === "error" ? "!" : "✓";
+
+    const text = document.createElement("span");
+    text.textContent = String(message);
+
+    toast.append(icon, text);
+    region.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.classList.add("is-visible");
+    });
+
+    pensionIQToastTimer = setTimeout(() => {
+        toast.classList.remove("is-visible");
+        setTimeout(() => {
+            if (toast.parentNode === region) toast.remove();
+        }, 220);
+    }, 3200);
+}
+
+// ==========================================================
 // START APPLICATION
 // ==========================================================
+
+
+// ==========================================================
+// STAGE 2 — COMPACT WORKSPACE INTERACTIONS
+// ==========================================================
+
+
+function setContributionPanel(
+    targetPanel
+) {
+
+    if (
+        targetPanel !== "entry"
+        &&
+        targetPanel !== "history"
+        &&
+        targetPanel !== "health"
+    ) {
+
+        return;
+
+    }
+
+
+    const panels =
+        document.querySelectorAll(
+            "[data-contribution-panel]"
+        );
+
+
+    panels.forEach(
+        (panel) => {
+
+            panel.classList.toggle(
+                "is-active-subpanel",
+                panel.dataset.contributionPanel
+                ===
+                targetPanel
+            );
+
+        }
+    );
+
+
+    const tabs =
+        document.querySelectorAll(
+            "[data-contribution-target]"
+        );
+
+
+    tabs.forEach(
+        (tab) => {
+
+            const isActive =
+                tab.dataset.contributionTarget
+                ===
+                targetPanel;
+
+
+            tab.classList.toggle(
+                "is-active",
+                isActive
+            );
+
+
+            tab.setAttribute(
+                "aria-selected",
+                String(
+                    isActive
+                )
+            );
+
+        }
+    );
+
+}
+
+
+function setAccountPanel(
+    targetPanel
+) {
+
+    if (
+        targetPanel !== "profile"
+        &&
+        targetPanel !== "security"
+    ) {
+
+        return;
+
+    }
+
+
+    const panels =
+        document.querySelectorAll(
+            "[data-account-panel]"
+        );
+
+
+    panels.forEach(
+        (panel) => {
+
+            panel.classList.toggle(
+                "is-active-subpanel",
+                panel.dataset.accountPanel
+                ===
+                targetPanel
+            );
+
+        }
+    );
+
+
+    const tabs =
+        document.querySelectorAll(
+            "[data-account-target]"
+        );
+
+
+    tabs.forEach(
+        (tab) => {
+
+            const isActive =
+                tab.dataset.accountTarget
+                ===
+                targetPanel;
+
+
+            tab.classList.toggle(
+                "is-active",
+                isActive
+            );
+
+
+            tab.setAttribute(
+                "aria-selected",
+                String(
+                    isActive
+                )
+            );
+
+        }
+    );
+
+}
+
+
+function initialiseCompactWorkspaces() {
+
+    document
+    .querySelectorAll(
+        "[data-contribution-target]"
+    )
+    .forEach(
+        (button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    setContributionPanel(
+                        button.dataset
+                        .contributionTarget
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    document
+    .querySelectorAll(
+        "[data-account-target]"
+    )
+    .forEach(
+        (button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    setAccountPanel(
+                        button.dataset
+                        .accountTarget
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    const readinessCard =
+        document.getElementById(
+            "retirement-readiness-card"
+        );
+
+
+    const readinessToggle =
+        document.getElementById(
+            "readiness-details-toggle"
+        );
+
+
+    if (
+        readinessCard
+        &&
+        readinessToggle
+    ) {
+
+        readinessToggle.addEventListener(
+            "click",
+            () => {
+
+                const expanded =
+                    readinessCard.classList
+                    .toggle(
+                        "is-expanded"
+                    );
+
+
+                readinessToggle.setAttribute(
+                    "aria-expanded",
+                    String(
+                        expanded
+                    )
+                );
+
+
+                readinessToggle.textContent =
+                    expanded
+                    ?
+                    "Hide detailed readiness"
+                    :
+                    "View detailed readiness";
+
+            }
+        );
+
+    }
+
+
+    setContributionPanel(
+        "entry"
+    );
+
+
+    setAccountPanel(
+        "profile"
+    );
+
+}
+
+
+initialiseDashboardNavigation();
+initialiseCompactWorkspaces();
 
 initialiseDashboard();
 
@@ -4422,6 +5390,24 @@ function setScenarioSavePlanStatus(
     status.classList.add(
         type
     );
+
+
+    queueMicrotask(
+        syncPlannerSaveBadges
+    );
+
+    if (
+        type !== "error"
+        &&
+        /saved|deleted|updated|loaded and recalculated/i.test(
+            String(message)
+        )
+    ) {
+        showPensionIQToast(
+            message,
+            "success"
+        );
+    }
 
 }
 
@@ -5808,6 +6794,11 @@ function displayRetirementScenario(
         )
     );
 
+    syncScenarioLiftSummary(
+        baseline,
+        scenario,
+        impact
+    );
 
     // ------------------------------------------------------
     // DATA QUALITY
@@ -7152,6 +8143,24 @@ function setGoalSavePlanStatus(
         type
     );
 
+
+    queueMicrotask(
+        syncPlannerSaveBadges
+    );
+
+    if (
+        type !== "error"
+        &&
+        /saved|deleted|updated|loaded and recalculated/i.test(
+            String(message)
+        )
+    ) {
+        showPensionIQToast(
+            message,
+            "success"
+        );
+    }
+
 }
 
 
@@ -8177,6 +9186,10 @@ function displayRetirementGoal(
         result.achievable
     );
 
+    syncGoalProgress(
+        current,
+        goal
+    );
 
     // ------------------------------------------------------
     // ACHIEVABLE PANEL

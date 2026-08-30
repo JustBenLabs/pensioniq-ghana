@@ -24,9 +24,27 @@ const loginButton =
     );
 
 
+const loginButtonLabel =
+    document.getElementById(
+        "login-button-label"
+    );
+
+
 const errorBox =
     document.getElementById(
         "login-error"
+    );
+
+
+const passwordInput =
+    document.getElementById(
+        "password"
+    );
+
+
+const passwordToggle =
+    document.getElementById(
+        "password-toggle"
     );
 
 
@@ -73,6 +91,61 @@ if (
 
 
 // ==========================================================
+// PASSWORD VISIBILITY
+// ==========================================================
+
+passwordToggle.addEventListener(
+    "click",
+    () => {
+
+        const showingPassword =
+            passwordInput.type ===
+            "text";
+
+
+        passwordInput.type =
+            showingPassword
+            ?
+            "password"
+            :
+            "text";
+
+
+        passwordToggle.textContent =
+            showingPassword
+            ?
+            "Show"
+            :
+            "Hide";
+
+
+        passwordToggle.setAttribute(
+            "aria-label",
+            showingPassword
+            ?
+            "Show password"
+            :
+            "Hide password"
+        );
+
+
+        passwordToggle.setAttribute(
+            "aria-pressed",
+            showingPassword
+            ?
+            "false"
+            :
+            "true"
+        );
+
+
+        passwordInput.focus();
+
+    }
+);
+
+
+// ==========================================================
 // LOGIN
 // ==========================================================
 
@@ -93,9 +166,7 @@ loginForm.addEventListener(
 
 
         const password =
-            document.getElementById(
-                "password"
-            ).value;
+            passwordInput.value;
 
 
         if (
@@ -290,7 +361,23 @@ function setLoading(
         loading;
 
 
-    loginButton.textContent =
+    loginButton.classList.toggle(
+        "is-loading",
+        loading
+    );
+
+
+    loginButton.setAttribute(
+        "aria-busy",
+        loading
+        ?
+        "true"
+        :
+        "false"
+    );
+
+
+    loginButtonLabel.textContent =
         loading
         ?
         "Signing In..."

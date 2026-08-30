@@ -433,7 +433,7 @@ function displayPensionResult(
 
     }
 
- 
+
     // ------------------------------------------------------
     // Contribution progress
     // ------------------------------------------------------
@@ -1338,6 +1338,13 @@ function displayComparison(
 
 
     displayPresentValueAnalysis(
+        scenarios,
+        annualDiscountRate,
+        projectionAge
+    );
+
+
+    decorateOrdinaryComparisonInsights(
         scenarios,
         annualDiscountRate,
         projectionAge
@@ -2296,6 +2303,11 @@ function displayEPVComparison(
         data
     );
 
+
+    decorateEPVComparisonInsights(
+        scenarios
+    );
+
 }
 
 
@@ -2577,7 +2589,7 @@ function displayEPVSummary(
             "epv-summary"
         );
 
-        
+
 
 
     const validScenarios =
@@ -3123,5 +3135,700 @@ function setComparisonLoading(
         "Running Actuarial Analysis..."
         :
         "Compare Retirement Ages";
+
+
+    const loadingState =
+        document.getElementById(
+            "comparison-loading-state"
+        );
+
+
+    if (loadingState) {
+
+        loadingState.classList.toggle(
+            "hidden",
+            !isLoading
+        );
+
+    }
+
+
+    if (isLoading) {
+
+        comparisonResults.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// STAGE 3 — VISUAL ACTUARIAL ANALYSIS HELPERS
+// ==========================================================
+
+function updateComparisonInsightCard(
+    cardId,
+    valueText,
+    detailText,
+    tone = "neutral"
+) {
+
+    const card =
+        document.getElementById(
+            cardId
+        );
+
+
+    if (!card) {
+        return;
+    }
+
+
+    card.classList.remove(
+        "is-positive",
+        "is-neutral",
+        "is-caution"
+    );
+
+
+    card.classList.add(
+        `is-${tone}`
+    );
+
+
+    const value =
+        card.querySelector(
+            "strong"
+        );
+
+    const detail =
+        card.querySelector(
+            "small"
+        );
+
+
+    if (value) {
+        value.textContent =
+            valueText;
+    }
+
+
+    if (detail) {
+        detail.textContent =
+            detailText;
+    }
+
+}
+
+
+function appendComparisonMetricTag(
+    parent,
+    label
+) {
+
+    if (!parent) {
+        return;
+    }
+
+
+    const existing =
+        parent.querySelector(
+            ".metric-highlight-tag"
+        );
+
+
+    if (existing) {
+        return;
+    }
+
+
+    const tag =
+        document.createElement(
+            "span"
+        );
+
+    tag.className =
+        "metric-highlight-tag";
+
+    tag.textContent =
+        label;
+
+
+    parent.appendChild(
+        tag
+    );
+
+}
+
+
+function animateComparisonBar(
+    bar
+) {
+
+    if (!bar) {
+        return;
+    }
+
+
+    const targetWidth =
+        bar.style.width;
+
+
+    if (!targetWidth) {
+        return;
+    }
+
+
+    bar.style.width =
+        "0%";
+
+
+    requestAnimationFrame(
+        () => {
+            bar.style.width =
+                targetWidth;
+        }
+    );
+
+}
+
+
+function decorateOrdinaryComparisonInsights(
+    scenarios,
+    annualDiscountRate,
+    projectionAge
+) {
+
+    const validScenarios =
+        Array.isArray(scenarios)
+        ?
+        scenarios
+        :
+        [];
+
+
+    const monthlyValues =
+        validScenarios.map(
+            scenario =>
+                Number(
+                    scenario.monthly_benefit
+                    ||
+                    0
+                )
+        );
+
+
+    const highestMonthly =
+        monthlyValues.length
+        ?
+        Math.max(
+            ...monthlyValues
+        )
+        :
+        0;
+
+
+    const highestMonthlyIndex =
+        highestMonthly > 0
+        ?
+        monthlyValues.findIndex(
+            value =>
+                Math.abs(
+                    value
+                    -
+                    highestMonthly
+                )
+                <
+                0.01
+        )
+        :
+        -1;
+
+
+    if (highestMonthlyIndex >= 0) {
+
+        const highestScenario =
+            validScenarios[
+                highestMonthlyIndex
+            ];
+
+
+        updateComparisonInsightCard(
+            "monthly-pension-insight",
+            `Age ${highestScenario.retirement_age}`,
+            `${formatCurrency(highestMonthly)} per month is the highest estimated monthly pension in this comparison.`,
+            "positive"
+        );
+
+    }
+    else {
+
+        updateComparisonInsightCard(
+            "monthly-pension-insight",
+            "No monthly pension",
+            "No eligible monthly pension scenario was available in this comparison.",
+            "neutral"
+        );
+
+    }
+
+
+    const retirementRows =
+        document.querySelectorAll(
+            "#retirement-chart .chart-row"
+        );
+
+
+    retirementRows.forEach(
+        (row, index) => {
+
+            const scenario =
+                validScenarios[index];
+
+            const bar =
+                row.querySelector(
+                    ".chart-bar"
+                );
+
+
+            animateComparisonBar(
+                bar
+            );
+
+
+            if (!scenario) {
+                return;
+            }
+
+
+            const amount =
+                Number(
+                    scenario.monthly_benefit
+                    ||
+                    0
+                );
+
+
+            row.title =
+                amount > 0
+                ?
+                `Age ${scenario.retirement_age}: ${formatCurrency(amount)} estimated monthly pension`
+                :
+                `Age ${scenario.retirement_age}: no monthly pension available`;
+
+
+            if (index === highestMonthlyIndex) {
+
+                row.classList.add(
+                    "is-best-metric"
+                );
+
+
+                appendComparisonMetricTag(
+                    row.querySelector(
+                        ".chart-age"
+                    ),
+                    "Highest"
+                );
+
+            }
+
+        }
+    );
+
+
+    const comparisonRows =
+        document.querySelectorAll(
+            "#comparison-body tr"
+        );
+
+
+    if (
+        highestMonthlyIndex >= 0
+        &&
+        comparisonRows[
+            highestMonthlyIndex
+        ]
+    ) {
+
+        comparisonRows[
+            highestMonthlyIndex
+        ].classList.add(
+            "metric-winner-row"
+        );
+
+    }
+
+
+    const age55Scenario =
+        validScenarios.find(
+            scenario =>
+                Number(
+                    scenario.retirement_age
+                )
+                ===
+                55
+        );
+
+    const age60Scenario =
+        validScenarios.find(
+            scenario =>
+                Number(
+                    scenario.retirement_age
+                )
+                ===
+                60
+        );
+
+
+    if (
+        age55Scenario
+        &&
+        age60Scenario
+    ) {
+
+        const breakEvenAge =
+            calculateBreakEvenAge(
+                55,
+                Number(
+                    age55Scenario.monthly_benefit
+                    ||
+                    0
+                ),
+                Number(
+                    age60Scenario.monthly_benefit
+                    ||
+                    0
+                )
+            );
+
+
+        updateComparisonInsightCard(
+            "breakeven-insight",
+            breakEvenAge === null
+            ?
+            "No crossover"
+            :
+            formatAge(
+                breakEvenAge
+            ),
+            breakEvenAge === null
+            ?
+            "For age 55 versus age 60, no cumulative undiscounted cash-flow crossover occurs before age 100 in this model."
+            :
+            `For age 55 versus age 60, the age-60 strategy catches up around ${formatAge(breakEvenAge)} in cumulative undiscounted pension payments.`,
+            "neutral"
+        );
+
+
+        const benchmarkCard =
+            document.querySelector(
+                "#breakeven-results .breakeven-item"
+            );
+
+
+        if (benchmarkCard) {
+
+            benchmarkCard.classList.add(
+                "is-benchmark"
+            );
+
+
+            appendComparisonMetricTag(
+                benchmarkCard,
+                "Benchmark"
+            );
+
+        }
+
+    }
+    else {
+
+        updateComparisonInsightCard(
+            "breakeven-insight",
+            "Unavailable",
+            "Age 55 and age 60 pension data are required for the crossover benchmark.",
+            "neutral"
+        );
+
+    }
+
+
+    const monthlyRate =
+        Math.pow(
+            1
+            +
+            annualDiscountRate,
+            1 / 12
+        )
+        -
+        1;
+
+
+    const presentValues =
+        validScenarios.map(
+            scenario =>
+                calculatePensionPresentValue(
+                    scenario.retirement_age,
+                    Number(
+                        scenario.monthly_benefit
+                        ||
+                        0
+                    ),
+                    projectionAge,
+                    monthlyRate
+                )
+        );
+
+
+    const highestPV =
+        presentValues.length
+        ?
+        Math.max(
+            ...presentValues
+        )
+        :
+        0;
+
+
+    const highestPVIndex =
+        highestPV > 0
+        ?
+        presentValues.findIndex(
+            value =>
+                Math.abs(
+                    value
+                    -
+                    highestPV
+                )
+                <
+                0.01
+        )
+        :
+        -1;
+
+
+    if (highestPVIndex >= 0) {
+
+        const highestScenario =
+            validScenarios[
+                highestPVIndex
+            ];
+
+
+        updateComparisonInsightCard(
+            "pv-insight",
+            `Age ${highestScenario.retirement_age}`,
+            `${formatCurrency(highestPV)} is the highest discounted present value measured at age 55 under the selected assumptions.`,
+            "positive"
+        );
+
+
+        const pvCards =
+            document.querySelectorAll(
+                "#pv-results .pv-item"
+            );
+
+
+        const winningCard =
+            pvCards[
+                highestPVIndex
+            ];
+
+
+        if (winningCard) {
+
+            winningCard.classList.add(
+                "is-best-metric"
+            );
+
+
+            appendComparisonMetricTag(
+                winningCard,
+                "Highest PV"
+            );
+
+        }
+
+    }
+    else {
+
+        updateComparisonInsightCard(
+            "pv-insight",
+            "No PV available",
+            "No positive discounted pension value was available under the selected assumptions.",
+            "neutral"
+        );
+
+    }
+
+}
+
+
+function decorateEPVComparisonInsights(
+    scenarios
+) {
+
+    const validScenarios =
+        Array.isArray(scenarios)
+        ?
+        scenarios
+        :
+        [];
+
+
+    const epvValues =
+        validScenarios.map(
+            scenario =>
+                Number(
+                    scenario.expected_present_value
+                    ||
+                    0
+                )
+        );
+
+
+    const highestEPV =
+        epvValues.length
+        ?
+        Math.max(
+            ...epvValues
+        )
+        :
+        0;
+
+
+    const highestEPVIndex =
+        highestEPV > 0
+        ?
+        epvValues.findIndex(
+            value =>
+                Math.abs(
+                    value
+                    -
+                    highestEPV
+                )
+                <
+                0.01
+        )
+        :
+        -1;
+
+
+    if (highestEPVIndex >= 0) {
+
+        const highestScenario =
+            validScenarios[
+                highestEPVIndex
+            ];
+
+
+        updateComparisonInsightCard(
+            "epv-insight",
+            `Age ${highestScenario.retirement_age}`,
+            `${formatCurrency(highestEPV)} is the highest mortality-adjusted EPV under the selected assumptions.`,
+            "positive"
+        );
+
+    }
+    else {
+
+        updateComparisonInsightCard(
+            "epv-insight",
+            "No EPV available",
+            "No eligible monthly pension scenario was available for mortality-adjusted comparison.",
+            "neutral"
+        );
+
+    }
+
+
+    const epvRows =
+        document.querySelectorAll(
+            "#epv-chart .epv-chart-row"
+        );
+
+
+    epvRows.forEach(
+        (row, index) => {
+
+            const scenario =
+                validScenarios[index];
+
+            const bar =
+                row.querySelector(
+                    ".epv-chart-bar"
+                );
+
+
+            animateComparisonBar(
+                bar
+            );
+
+
+            if (!scenario) {
+                return;
+            }
+
+
+            const epv =
+                Number(
+                    scenario.expected_present_value
+                    ||
+                    0
+                );
+
+
+            row.title =
+                epv > 0
+                ?
+                `Age ${scenario.retirement_age}: ${formatCurrency(epv)} mortality-adjusted EPV`
+                :
+                `Age ${scenario.retirement_age}: no EPV available`;
+
+
+            if (index === highestEPVIndex) {
+
+                row.classList.add(
+                    "is-best-metric"
+                );
+
+
+                appendComparisonMetricTag(
+                    row.querySelector(
+                        ".epv-chart-age"
+                    ),
+                    "Highest"
+                );
+
+            }
+
+        }
+    );
+
+
+    const epvTableRows =
+        document.querySelectorAll(
+            "#epv-table-body tr"
+        );
+
+
+    if (
+        highestEPVIndex >= 0
+        &&
+        epvTableRows[
+            highestEPVIndex
+        ]
+    ) {
+
+        epvTableRows[
+            highestEPVIndex
+        ].classList.add(
+            "metric-winner-row"
+        );
+
+    }
 
 }
