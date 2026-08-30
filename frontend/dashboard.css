@@ -3335,6 +3335,61 @@ tbody tr:hover {
     margin-top: 20px;
 }
 
+.scenario-form-actions {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+
+.scenario-form-actions button {
+    flex: 1 1 180px;
+}
+
+
+#scenario-save-plan-button:disabled {
+    cursor: not-allowed;
+}
+
+
+.plan-save-status {
+    margin-top: 12px;
+
+    padding: 11px 14px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+.plan-save-status.success {
+    background: #ecfdf3;
+
+    border: 1px solid #bbf7d0;
+
+    color: #166534;
+}
+
+
+.plan-save-status.error {
+    background: #fef2f2;
+
+    border: 1px solid #fecaca;
+
+    color: #991b1b;
+}
+
+.plan-delete-button {
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+
+.plan-delete-button:hover {
+    background: #fef2f2;
+}
 
 .scenario-error {
     margin-top: 16px;
@@ -4379,4 +4434,21 @@ tbody tr:hover {
         text-align: center;
     }
 
+}
+
+.goal-planner-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+
+.goal-planner-actions button {
+    flex: 1 1 180px;
+    width: auto;
+}
+
+
+#goal-save-plan-button:disabled {
+    cursor: not-allowed;
 }

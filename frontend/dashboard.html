@@ -747,15 +747,41 @@
 
         <div class="scenario-form-actions">
 
-            <button
-                type="submit"
-                id="scenario-submit-button"
-                class="primary-button"
-            >
-                Run What-If Scenario
-            </button>
+    <button
+        type="submit"
+        id="scenario-submit-button"
+        class="primary-button"
+    >
+        Run What-If Scenario
+    </button>
 
-        </div>
+
+    <button
+        type="button"
+        id="scenario-save-plan-button"
+        class="secondary-button"
+        disabled
+    >
+        Save Plan
+    </button>
+    <button
+    type="button"
+    id="scenario-delete-plan-button"
+    class="secondary-button plan-delete-button hidden"
+>
+    Delete Saved Plan
+</button>
+
+</div>
+
+
+<div
+    id="scenario-save-plan-status"
+    class="plan-save-status hidden"
+    role="status"
+    aria-live="polite"
+>
+</div>
 
     </form>
 
@@ -1144,6 +1170,7 @@
      RETIREMENT GOAL PLANNER
 ================================================== -->
 
+
 <section
     class="dashboard-card goal-planner-card"
     id="retirement-goal-card"
@@ -1302,15 +1329,34 @@
 
         <div class="goal-planner-actions">
 
-            <button
-                type="submit"
-                id="goal-submit-button"
-                class="primary-button"
-            >
-                Analyse My Goal
-            </button>
+    <button
+        type="submit"
+        id="goal-submit-button"
+        class="primary-button"
+    >
+        Analyse My Goal
+    </button>
 
-        </div>
+
+    <button
+        type="button"
+        id="goal-save-plan-button"
+        class="secondary-button"
+        disabled
+    >
+        Save Goal
+    </button>
+
+</div>
+
+
+<div
+    id="goal-save-plan-status"
+    class="plan-save-status hidden"
+    role="status"
+    aria-live="polite"
+>
+</div>
 
     </form>
 

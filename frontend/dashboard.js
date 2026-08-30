@@ -723,6 +723,8 @@ async function initialiseDashboard() {
         // --------------------------------------------------
 
         await refreshCurrentDashboard();
+        await loadSavedRetirementPlan();
+        await loadSavedRetirementGoal();
 
 
         dashboardLoading.classList.add(
@@ -4380,6 +4382,350 @@ function prepareRetirementScenario(
 
 }
 
+// ==========================================================
+// SAVED SCENARIO STATE
+// ==========================================================
+
+
+let lastSuccessfulScenarioAssumptions = null;
+
+let currentSavedRetirementPlan = null;
+
+
+function setScenarioSavePlanStatus(
+    message,
+    type = "success"
+) {
+
+    const status =
+        document.getElementById(
+            "scenario-save-plan-status"
+        );
+
+
+    if (!status) {
+        return;
+    }
+
+
+    status.textContent =
+        message;
+
+
+    status.classList.remove(
+        "hidden",
+        "success",
+        "error"
+    );
+
+
+    status.classList.add(
+        type
+    );
+
+}
+
+
+function hideScenarioSavePlanStatus() {
+
+    const status =
+        document.getElementById(
+            "scenario-save-plan-status"
+        );
+
+
+    if (!status) {
+        return;
+    }
+
+
+    status.textContent = "";
+
+    status.classList.add(
+        "hidden"
+    );
+
+}
+
+// ==========================================================
+// LOAD SAVED RETIREMENT PLAN
+// ==========================================================
+
+
+async function loadSavedRetirementPlan() {
+
+    if (!currentMemberId) {
+        return;
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "scenario-save-plan-button"
+        );
+
+
+    const deleteButton =
+        document.getElementById(
+            "scenario-delete-plan-button"
+        );
+
+
+    try {
+
+        const response =
+            await authenticatedFetch(
+
+                (
+                    `${API_BASE_URL}/members/`
+                    +
+                    `${currentMemberId}/`
+                    +
+                    "retirement-plan"
+                )
+
+            );
+
+
+        if (response.status === 404) {
+
+            currentSavedRetirementPlan =
+                null;
+
+
+            if (deleteButton) {
+
+                deleteButton.classList.add(
+                    "hidden"
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    "Unable to load your saved retirement plan."
+                )
+            );
+
+        }
+
+
+        currentSavedRetirementPlan =
+            data;
+
+
+        if (deleteButton) {
+
+            deleteButton.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        // --------------------------------------------------
+        // No What-If scenario is saved.
+        // The row may contain only a Goal Planner plan.
+        // --------------------------------------------------
+
+        if (
+            !data.scenario
+            ||
+            !data.scenario.saved
+        ) {
+
+            return;
+
+        }
+
+
+        // --------------------------------------------------
+        // Restore saved assumptions into form
+        // --------------------------------------------------
+
+        const monthsInput =
+            document.getElementById(
+                "scenario-additional-months"
+            );
+
+
+        const salaryInput =
+            document.getElementById(
+                "scenario-projected-salary"
+            );
+
+
+        const ageInput =
+            document.getElementById(
+                "scenario-retirement-age"
+            );
+
+
+        if (monthsInput) {
+
+            monthsInput.value =
+                data.scenario
+                .additional_contribution_months;
+
+        }
+
+
+        if (salaryInput) {
+
+            salaryInput.value =
+                data.scenario
+                .projected_annual_salary;
+
+        }
+
+
+        if (ageInput) {
+
+            ageInput.value =
+                data.scenario
+                .retirement_age;
+
+        }
+
+
+        // --------------------------------------------------
+        // Saved assumptions are still valid.
+        // GET already freshly recalculated them.
+        // --------------------------------------------------
+
+        if (
+            data.scenario.calculation_status
+            ===
+            "CALCULATED"
+            &&
+            data.scenario.result
+        ) {
+
+            lastSuccessfulScenarioAssumptions = {
+
+                additional_contribution_months:
+                    data.scenario
+                    .additional_contribution_months,
+
+                projected_annual_salary:
+                    data.scenario
+                    .projected_annual_salary,
+
+                retirement_age:
+                    data.scenario
+                    .retirement_age
+
+            };
+
+
+            displayRetirementScenario({
+
+    ...data.scenario.result,
+
+    assumptions: {
+
+        additional_contribution_months:
+            data.scenario
+            .additional_contribution_months,
+
+        projected_annual_salary:
+            data.scenario
+            .projected_annual_salary,
+
+        retirement_age:
+            data.scenario
+            .retirement_age
+
+    },
+
+    data_quality:
+        data.data_quality
+        ||
+        {}
+
+});
+
+            if (saveButton) {
+
+                saveButton.disabled =
+                    false;
+
+                saveButton.textContent =
+                    "Update Saved Plan";
+
+            }
+
+
+            setScenarioSavePlanStatus(
+                "Saved retirement plan loaded and recalculated."
+            );
+
+
+            return;
+
+        }
+
+
+        // --------------------------------------------------
+        // Saved assumptions exist but are no longer valid.
+        // Preserve them so the member can review/delete them,
+        // but require the scenario to be rerun before updating.
+        // --------------------------------------------------
+
+        lastSuccessfulScenarioAssumptions =
+            null;
+
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                true;
+
+            saveButton.textContent =
+                "Update Saved Plan";
+
+        }
+
+
+        setScenarioSavePlanStatus(
+
+            (
+                data.scenario
+                .calculation_error
+                ||
+                "Your saved scenario needs to be recalculated."
+            ),
+
+            "error"
+
+        );
+
+    }
+
+    catch (error) {
+
+        setScenarioSavePlanStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
 
 // ==========================================================
 // RUN SCENARIO
@@ -4577,8 +4923,42 @@ async function runRetirementScenario(
             data
         );
 
-    }
 
+        lastSuccessfulScenarioAssumptions = {
+
+            additional_contribution_months:
+                additionalMonths,
+
+            projected_annual_salary:
+                projectedSalary.toFixed(
+                    2
+                ),
+
+            retirement_age:
+                retirementAge
+
+        };
+
+
+        const savePlanButton =
+            document.getElementById(
+                "scenario-save-plan-button"
+            );
+
+
+        if (savePlanButton) {
+
+            savePlanButton.disabled =
+                false;
+
+        }
+
+
+        setScenarioSavePlanStatus(
+            "Scenario ready to save."
+        );
+
+    }
     catch (error) {
 
         showScenarioError(
@@ -4586,12 +4966,478 @@ async function runRetirementScenario(
         );
 
     }
-
     finally {
 
         setScenarioLoading(
             false
         );
+
+    }
+
+}
+
+// ==========================================================
+// SAVE WHAT-IF SCENARIO
+// ==========================================================
+
+
+async function saveRetirementScenarioPlan() {
+
+    hideScenarioSavePlanStatus();
+
+
+    if (!currentMemberId) {
+
+        setScenarioSavePlanStatus(
+            "No authenticated member profile is available.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!lastSuccessfulScenarioAssumptions) {
+
+        setScenarioSavePlanStatus(
+            "Run a valid What-If scenario before saving.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "scenario-save-plan-button"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.disabled =
+            true;
+
+        saveButton.textContent =
+            "Saving...";
+
+    }
+
+
+    try {
+
+        const planUrl =
+            (
+                `${API_BASE_URL}/members/`
+                +
+                `${currentMemberId}/`
+                +
+                "retirement-plan"
+            );
+
+
+        // --------------------------------------------------
+        // Check whether a plan already exists.
+        //
+        // This also lets us preserve a Goal Planner plan
+        // if one is already stored in the same database row.
+        // --------------------------------------------------
+
+        const existingResponse =
+            await authenticatedFetch(
+                planUrl
+            );
+
+
+        let existingPlan = null;
+
+
+        if (
+            existingResponse.status
+            ===
+            200
+        ) {
+
+            existingPlan =
+                await existingResponse.json();
+
+        }
+
+        else if (
+            existingResponse.status
+            !==
+            404
+        ) {
+
+            const errorData =
+                await existingResponse.json();
+
+
+            throw new Error(
+                getApiErrorMessage(
+                    errorData,
+                    "Unable to check the saved retirement plan."
+                )
+            );
+
+        }
+
+
+        // --------------------------------------------------
+        // Scenario assumptions
+        // --------------------------------------------------
+
+        const payload = {
+
+            scenario_additional_contribution_months:
+                lastSuccessfulScenarioAssumptions
+                .additional_contribution_months,
+
+            scenario_projected_annual_salary:
+                lastSuccessfulScenarioAssumptions
+                .projected_annual_salary,
+
+            scenario_retirement_age:
+                lastSuccessfulScenarioAssumptions
+                .retirement_age
+
+        };
+
+
+        // --------------------------------------------------
+        // Preserve an existing saved Goal Planner analysis.
+        //
+        // PUT is a full replacement in our backend, so we
+        // must not accidentally erase the goal assumptions.
+        // --------------------------------------------------
+
+        if (
+            existingPlan
+            &&
+            existingPlan.goal
+            &&
+            existingPlan.goal.saved
+        ) {
+
+            payload.goal_target_monthly_pension =
+                existingPlan
+                .goal
+                .target_monthly_pension;
+
+
+            payload.goal_projected_annual_salary =
+                existingPlan
+                .goal
+                .projected_annual_salary;
+
+
+            payload.goal_retirement_age =
+                existingPlan
+                .goal
+                .retirement_age;
+
+        }
+
+
+        const method =
+            existingPlan
+            ?
+            "PUT"
+            :
+            "POST";
+
+
+        const saveResponse =
+            await authenticatedFetch(
+
+                planUrl,
+
+                {
+
+                    method:
+                        method,
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+
+                }
+
+            );
+
+
+        const savedPlan =
+            await saveResponse.json();
+
+
+        if (!saveResponse.ok) {
+
+            throw new Error(
+                getApiErrorMessage(
+                    savedPlan,
+                    "Unable to save the retirement plan."
+                )
+            );
+
+        }
+
+
+        setScenarioSavePlanStatus(
+            existingPlan
+            ?
+            "Saved retirement plan updated successfully."
+            :
+            "Retirement plan saved successfully."
+        );
+        currentSavedRetirementPlan =
+    savedPlan;
+
+
+const deleteButton =
+    document.getElementById(
+        "scenario-delete-plan-button"
+    );
+
+
+if (deleteButton) {
+
+    deleteButton.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+        if (saveButton) {
+
+            saveButton.textContent =
+                "Update Saved Plan";
+
+        }
+
+    }
+
+    catch (error) {
+
+        setScenarioSavePlanStatus(
+            error.message,
+            "error"
+        );
+
+
+        if (saveButton) {
+
+            saveButton.textContent =
+                "Save Plan";
+
+        }
+
+    }
+
+    finally {
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                false;
+
+        }
+
+    }
+
+}
+
+
+// ==========================================================
+// DELETE SAVED RETIREMENT PLAN
+// ==========================================================
+
+
+async function deleteSavedRetirementPlan() {
+
+    if (!currentMemberId) {
+
+        setScenarioSavePlanStatus(
+            "No authenticated member profile is available.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const hasSavedGoal =
+        (
+            currentSavedRetirementPlan
+            &&
+            currentSavedRetirementPlan.goal
+            &&
+            currentSavedRetirementPlan.goal.saved
+        );
+
+
+    const confirmationMessage =
+        hasSavedGoal
+        ?
+        (
+            "This will delete your entire saved retirement plan, "
+            +
+            "including your saved Goal Planner assumptions. Continue?"
+        )
+        :
+        (
+            "Delete this saved retirement plan?"
+        );
+
+
+    if (
+        !window.confirm(
+            confirmationMessage
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const deleteButton =
+        document.getElementById(
+            "scenario-delete-plan-button"
+        );
+
+
+    const saveButton =
+        document.getElementById(
+            "scenario-save-plan-button"
+        );
+
+
+    if (deleteButton) {
+
+        deleteButton.disabled =
+            true;
+
+        deleteButton.textContent =
+            "Deleting...";
+
+    }
+
+
+    try {
+
+        const response =
+            await authenticatedFetch(
+
+                (
+                    `${API_BASE_URL}/members/`
+                    +
+                    `${currentMemberId}/`
+                    +
+                    "retirement-plan"
+                ),
+
+                {
+                    method:
+                        "DELETE"
+                }
+
+            );
+
+
+        let data = null;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        }
+
+        catch {
+
+            data = null;
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                getApiErrorMessage(
+                    data,
+                    "Unable to delete the saved retirement plan."
+                )
+            );
+
+        }
+
+
+        currentSavedRetirementPlan =
+            null;
+
+
+        if (deleteButton) {
+
+            deleteButton.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (saveButton) {
+
+            saveButton.textContent =
+                "Save Plan";
+
+            saveButton.disabled =
+                (
+                    !lastSuccessfulScenarioAssumptions
+                );
+
+        }
+
+
+        setScenarioSavePlanStatus(
+            "Saved retirement plan deleted successfully."
+        );
+
+    }
+
+    catch (error) {
+
+        setScenarioSavePlanStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+    finally {
+
+        if (deleteButton) {
+
+            deleteButton.disabled =
+                false;
+
+            deleteButton.textContent =
+                "Delete Saved Plan";
+
+        }
 
     }
 
@@ -5663,10 +6509,507 @@ if (retirementScenarioForm) {
 
 }
 
+const scenarioSavePlanButton =
+    document.getElementById(
+        "scenario-save-plan-button"
+    );
+
+
+if (scenarioSavePlanButton) {
+
+    scenarioSavePlanButton.addEventListener(
+        "click",
+        saveRetirementScenarioPlan
+    );
+
+}
+
+
+const scenarioDeletePlanButton =
+    document.getElementById(
+        "scenario-delete-plan-button"
+    );
+
+
+if (scenarioDeletePlanButton) {
+
+    scenarioDeletePlanButton.addEventListener(
+        "click",
+        deleteSavedRetirementPlan
+    );
+
+}
+
+function invalidateScenarioSaveState() {
+
+    if (!lastSuccessfulScenarioAssumptions) {
+        return;
+    }
+
+
+    lastSuccessfulScenarioAssumptions =
+        null;
+
+
+    if (scenarioSavePlanButton) {
+
+        scenarioSavePlanButton.disabled =
+            true;
+
+        scenarioSavePlanButton.textContent =
+            "Save Plan";
+
+    }
+
+
+    hideScenarioSavePlanStatus();
+
+}
+
+
+if (retirementScenarioForm) {
+
+    retirementScenarioForm.addEventListener(
+        "input",
+        invalidateScenarioSaveState
+    );
+
+
+    retirementScenarioForm.addEventListener(
+        "change",
+        invalidateScenarioSaveState
+    );
+
+}
+
 // ==========================================================
 // RETIREMENT GOAL PLANNER
 // ==========================================================
 
+let lastSuccessfulGoalAssumptions = null;
+
+// ==========================================================
+// SAVED GOAL RESULT ADAPTER
+// ==========================================================
+
+
+function savedGoalRatioToPercent(
+    value
+) {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return null;
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    return (
+        number
+        *
+        100
+    )
+    .toFixed(
+        2
+    );
+
+}
+
+
+function buildSavedGoalDisplayData(
+    result
+) {
+
+    return {
+
+        goal: {
+
+            target_monthly_pension:
+                result
+                .target_monthly_pension,
+
+            projected_annual_salary:
+                result
+                .projected_annual_salary,
+
+            retirement_age:
+                result
+                .retirement_age,
+
+            retirement_date:
+                result
+                .retirement_date,
+
+            retirement_age_factor_percent:
+                savedGoalRatioToPercent(
+                    result
+                    .retirement_age_factor
+                )
+
+        },
+
+
+        current_position: {
+
+            contribution_months:
+                result
+                .current_contribution_months,
+
+            projected_monthly_pension:
+                result
+                .current_projected_monthly_pension,
+
+            estimated_monthly_pension:
+                result
+                .current_projected_monthly_pension
+
+        },
+
+
+        contribution_capacity: {
+
+            months_available_before_retirement:
+                result
+                .available_contribution_months,
+
+            maximum_attainable_contribution_months:
+                result
+                .maximum_attainable_contribution_months
+
+        },
+
+
+        requirement: {
+
+            required_contribution_months:
+                result
+                .required_contribution_months,
+
+            additional_contribution_months_required:
+                result
+                .additional_contribution_months_required,
+
+            estimated_monthly_pension:
+                result
+                .estimated_monthly_pension_at_required_months,
+
+            pension_right_percent:
+                savedGoalRatioToPercent(
+                    result
+                    .pension_right_at_required_months
+                )
+
+        },
+
+
+        maximum_position: {
+
+            contribution_months:
+                result
+                .maximum_attainable_contribution_months,
+
+            estimated_monthly_pension:
+                result
+                .maximum_attainable_monthly_pension,
+
+            pension_right_percent:
+                savedGoalRatioToPercent(
+                    result
+                    .maximum_attainable_pension_right
+                )
+
+        },
+
+
+        gap_analysis: {
+
+            pension_gap_at_maximum:
+                result
+                .pension_gap_at_maximum,
+
+            approximate_annual_salary_required:
+                result
+                .approximate_annual_salary_required_at_maximum_months
+
+        },
+
+
+        goal_result: {
+
+            achievable:
+                result
+                .goal_achievable,
+
+            status:
+                result
+                .goal_status
+
+        }
+
+    };
+
+}
+
+// ==========================================================
+// LOAD SAVED RETIREMENT GOAL
+// ==========================================================
+
+
+async function loadSavedRetirementGoal() {
+
+    const plan =
+        currentSavedRetirementPlan;
+
+
+    if (
+        !plan
+        ||
+        !plan.goal
+        ||
+        !plan.goal.saved
+    ) {
+
+        return;
+
+    }
+
+
+    const savedGoal =
+        plan.goal;
+
+
+    const targetInput =
+        document.getElementById(
+            "goal-monthly-pension"
+        );
+
+
+    const salaryInput =
+        document.getElementById(
+            "goal-projected-salary"
+        );
+
+
+    const ageInput =
+        document.getElementById(
+            "goal-retirement-age"
+        );
+
+
+    const saveButton =
+        document.getElementById(
+            "goal-save-plan-button"
+        );
+
+
+    // ------------------------------------------------------
+    // Restore saved assumptions
+    // ------------------------------------------------------
+
+
+    if (targetInput) {
+
+        targetInput.value =
+            savedGoal
+            .target_monthly_pension;
+
+    }
+
+
+    if (salaryInput) {
+
+        salaryInput.value =
+            savedGoal
+            .projected_annual_salary;
+
+    }
+
+
+    if (ageInput) {
+
+        ageInput.value =
+            savedGoal
+            .retirement_age;
+
+    }
+
+
+    if (saveButton) {
+
+        saveButton.textContent =
+            "Update Saved Goal";
+
+    }
+
+
+    // ------------------------------------------------------
+    // Saved goal was successfully recalculated by GET
+    // ------------------------------------------------------
+
+
+    if (
+        savedGoal.calculation_status
+        ===
+        "CALCULATED"
+        &&
+        savedGoal.result
+    ) {
+
+        lastSuccessfulGoalAssumptions = {
+
+            target_monthly_pension:
+                savedGoal
+                .target_monthly_pension,
+
+            projected_annual_salary:
+                savedGoal
+                .projected_annual_salary,
+
+            retirement_age:
+                savedGoal
+                .retirement_age
+
+        };
+
+
+        const displayData =
+            buildSavedGoalDisplayData(
+                savedGoal.result
+            );
+
+
+        displayRetirementGoal(
+            displayData
+        );
+
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                false;
+
+        }
+
+
+        setGoalSavePlanStatus(
+            "Saved retirement goal loaded and recalculated."
+        );
+
+
+        return;
+
+    }
+
+
+    // ------------------------------------------------------
+    // Saved assumptions still exist, but current engines
+    // can no longer calculate them.
+    // ------------------------------------------------------
+
+
+    lastSuccessfulGoalAssumptions =
+        null;
+
+
+    if (saveButton) {
+
+        saveButton.disabled =
+            true;
+
+    }
+
+
+    setGoalSavePlanStatus(
+
+        (
+            savedGoal.error
+            ||
+            savedGoal.calculation_error
+            ||
+            "Your saved retirement goal needs to be recalculated."
+        ),
+
+        "error"
+
+    );
+
+}
+
+function setGoalSavePlanStatus(
+    message,
+    type = "success"
+) {
+
+    const status =
+        document.getElementById(
+            "goal-save-plan-status"
+        );
+
+
+    if (!status) {
+        return;
+    }
+
+
+    status.textContent =
+        message;
+
+
+    status.classList.remove(
+        "hidden",
+        "success",
+        "error"
+    );
+
+
+    status.classList.add(
+        type
+    );
+
+}
+
+
+function hideGoalSavePlanStatus() {
+
+    const status =
+        document.getElementById(
+            "goal-save-plan-status"
+        );
+
+
+    if (!status) {
+        return;
+    }
+
+
+    status.textContent = "";
+
+    status.classList.add(
+        "hidden"
+    );
+
+}
 
 function prepareRetirementGoal(
     member
@@ -5899,7 +7242,56 @@ async function runRetirementGoal(
             data
         );
 
-    }
+        lastSuccessfulGoalAssumptions = {
+
+    target_monthly_pension:
+        target.toFixed(
+            2
+        ),
+
+    projected_annual_salary:
+        salary.toFixed(
+            2
+        ),
+
+    retirement_age:
+        retirementAge
+
+};
+
+
+const goalSaveButton =
+    document.getElementById(
+        "goal-save-plan-button"
+    );
+
+
+if (goalSaveButton) {
+
+    goalSaveButton.disabled =
+        false;
+
+
+    goalSaveButton.textContent =
+        (
+            currentSavedRetirementPlan
+            &&
+            currentSavedRetirementPlan.goal
+            &&
+            currentSavedRetirementPlan.goal.saved
+        )
+        ?
+        "Update Saved Goal"
+        :
+        "Save Goal";
+
+}
+
+
+setGoalSavePlanStatus(
+    "Goal analysis ready to save."
+);
+       }
 
     catch (error) {
 
@@ -5914,6 +7306,286 @@ async function runRetirementGoal(
         setGoalLoading(
             false
         );
+
+    }
+
+}
+
+// ==========================================================
+// SAVE RETIREMENT GOAL
+// ==========================================================
+
+
+async function saveRetirementGoalPlan() {
+
+    hideGoalSavePlanStatus();
+
+
+    if (!currentMemberId) {
+
+        setGoalSavePlanStatus(
+            "No authenticated member profile is available.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!lastSuccessfulGoalAssumptions) {
+
+        setGoalSavePlanStatus(
+            "Analyse a valid retirement goal before saving.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "goal-save-plan-button"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.disabled =
+            true;
+
+        saveButton.textContent =
+            "Saving...";
+
+    }
+
+
+    try {
+
+        const planUrl =
+            (
+                `${API_BASE_URL}/members/`
+                +
+                `${currentMemberId}/`
+                +
+                "retirement-plan"
+            );
+
+
+        // --------------------------------------------------
+        // Load existing saved plan first.
+        // --------------------------------------------------
+
+        const existingResponse =
+            await authenticatedFetch(
+                planUrl
+            );
+
+
+        let existingPlan =
+            null;
+
+
+        if (
+            existingResponse.status
+            ===
+            200
+        ) {
+
+            existingPlan =
+                await existingResponse.json();
+
+        }
+
+        else if (
+            existingResponse.status
+            !==
+            404
+        ) {
+
+            const errorData =
+                await existingResponse.json();
+
+
+            throw new Error(
+                getApiErrorMessage(
+                    errorData,
+                    "Unable to check the saved retirement plan."
+                )
+            );
+
+        }
+
+
+        // --------------------------------------------------
+        // Goal assumptions
+        // --------------------------------------------------
+
+        const payload = {
+
+            goal_target_monthly_pension:
+                lastSuccessfulGoalAssumptions
+                .target_monthly_pension,
+
+            goal_projected_annual_salary:
+                lastSuccessfulGoalAssumptions
+                .projected_annual_salary,
+
+            goal_retirement_age:
+                lastSuccessfulGoalAssumptions
+                .retirement_age
+
+        };
+
+
+        // --------------------------------------------------
+        // Preserve an existing What-If scenario.
+        //
+        // PUT replaces the complete saved-plan assumptions,
+        // therefore the scenario must be included again.
+        // --------------------------------------------------
+
+        if (
+            existingPlan
+            &&
+            existingPlan.scenario
+            &&
+            existingPlan.scenario.saved
+        ) {
+
+            payload
+                .scenario_additional_contribution_months =
+                    existingPlan
+                    .scenario
+                    .additional_contribution_months;
+
+
+            payload
+                .scenario_projected_annual_salary =
+                    existingPlan
+                    .scenario
+                    .projected_annual_salary;
+
+
+            payload
+                .scenario_retirement_age =
+                    existingPlan
+                    .scenario
+                    .retirement_age;
+
+        }
+
+
+        const method =
+            existingPlan
+            ?
+            "PUT"
+            :
+            "POST";
+
+
+        const response =
+            await authenticatedFetch(
+
+                planUrl,
+
+                {
+
+                    method:
+                        method,
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+
+                }
+
+            );
+
+
+        const savedPlan =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                getApiErrorMessage(
+                    savedPlan,
+                    "Unable to save the retirement goal."
+                )
+            );
+
+        }
+
+
+        currentSavedRetirementPlan =
+            savedPlan;
+
+
+        setGoalSavePlanStatus(
+            existingPlan
+            ?
+            "Saved retirement goal updated successfully."
+            :
+            "Retirement goal saved successfully."
+        );
+
+
+        if (saveButton) {
+
+            saveButton.textContent =
+                "Update Saved Goal";
+
+        }
+
+    }
+
+    catch (error) {
+
+        setGoalSavePlanStatus(
+            error.message,
+            "error"
+        );
+
+
+        if (saveButton) {
+
+            saveButton.textContent =
+                (
+                    currentSavedRetirementPlan
+                    &&
+                    currentSavedRetirementPlan.goal
+                    &&
+                    currentSavedRetirementPlan.goal.saved
+                )
+                ?
+                "Update Saved Goal"
+                :
+                "Save Goal";
+
+        }
+
+    }
+
+    finally {
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                false;
+
+        }
 
     }
 
@@ -6775,6 +8447,74 @@ if (retirementGoalForm) {
 
 }
 
+const goalSavePlanButton =
+    document.getElementById(
+        "goal-save-plan-button"
+    );
+
+
+if (goalSavePlanButton) {
+
+    goalSavePlanButton.addEventListener(
+        "click",
+        saveRetirementGoalPlan
+    );
+
+}
+
+
+function invalidateGoalSaveState() {
+
+    if (!lastSuccessfulGoalAssumptions) {
+        return;
+    }
+
+
+    lastSuccessfulGoalAssumptions =
+        null;
+
+
+    if (goalSavePlanButton) {
+
+        goalSavePlanButton.disabled =
+            true;
+
+
+        goalSavePlanButton.textContent =
+            (
+                currentSavedRetirementPlan
+                &&
+                currentSavedRetirementPlan.goal
+                &&
+                currentSavedRetirementPlan.goal.saved
+            )
+            ?
+            "Update Saved Goal"
+            :
+            "Save Goal";
+
+    }
+
+
+    hideGoalSavePlanStatus();
+
+}
+
+
+if (retirementGoalForm) {
+
+    retirementGoalForm.addEventListener(
+        "input",
+        invalidateGoalSaveState
+    );
+
+
+    retirementGoalForm.addEventListener(
+        "change",
+        invalidateGoalSaveState
+    );
+
+}
 // ==========================================================
 // PERSONAL RETIREMENT REPORT
 // ==========================================================
