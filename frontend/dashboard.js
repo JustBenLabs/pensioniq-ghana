@@ -4529,11 +4529,19 @@ async function loadSavedRetirementPlan() {
 
         if (deleteButton) {
 
-            deleteButton.classList.remove(
-                "hidden"
-            );
+    deleteButton.classList.toggle(
 
-        }
+        "hidden",
+
+        !(
+            data.scenario
+            &&
+            data.scenario.saved
+        )
+
+    );
+
+}
 
 
         // --------------------------------------------------
@@ -5260,11 +5268,14 @@ if (deleteButton) {
 
 
 // ==========================================================
-// DELETE SAVED RETIREMENT PLAN
+// DELETE SAVED WHAT-IF SCENARIO
 // ==========================================================
 
 
 async function deleteSavedRetirementPlan() {
+
+    hideScenarioSavePlanStatus();
+
 
     if (!currentMemberId) {
 
@@ -5278,13 +5289,33 @@ async function deleteSavedRetirementPlan() {
     }
 
 
+    const plan =
+        currentSavedRetirementPlan;
+
+
+    if (
+        !plan
+        ||
+        !plan.scenario
+        ||
+        !plan.scenario.saved
+    ) {
+
+        setScenarioSavePlanStatus(
+            "There is no saved What-If scenario to delete.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     const hasSavedGoal =
-        (
-            currentSavedRetirementPlan
+        Boolean(
+            plan.goal
             &&
-            currentSavedRetirementPlan.goal
-            &&
-            currentSavedRetirementPlan.goal.saved
+            plan.goal.saved
         );
 
 
@@ -5292,14 +5323,12 @@ async function deleteSavedRetirementPlan() {
         hasSavedGoal
         ?
         (
-            "This will delete your entire saved retirement plan, "
+            "Delete your saved What-If scenario? "
             +
-            "including your saved Goal Planner assumptions. Continue?"
+            "Your saved retirement Goal will be kept."
         )
         :
-        (
-            "Delete this saved retirement plan?"
-        );
+        "Delete your saved What-If scenario?";
 
 
     if (
@@ -5338,26 +5367,98 @@ async function deleteSavedRetirementPlan() {
 
     try {
 
-        const response =
-            await authenticatedFetch(
-
-                (
-                    `${API_BASE_URL}/members/`
-                    +
-                    `${currentMemberId}/`
-                    +
-                    "retirement-plan"
-                ),
-
-                {
-                    method:
-                        "DELETE"
-                }
-
+        const planUrl =
+            (
+                `${API_BASE_URL}/members/`
+                +
+                `${currentMemberId}/`
+                +
+                "retirement-plan"
             );
 
 
-        let data = null;
+        let response;
+
+
+        // --------------------------------------------------
+        // Goal also exists.
+        //
+        // PUT is a full replacement, so preserve the Goal
+        // while omitting the What-If scenario.
+        // --------------------------------------------------
+
+
+        if (hasSavedGoal) {
+
+            const payload = {
+
+                goal_target_monthly_pension:
+                    plan.goal
+                    .target_monthly_pension,
+
+                goal_projected_annual_salary:
+                    plan.goal
+                    .projected_annual_salary,
+
+                goal_retirement_age:
+                    plan.goal
+                    .retirement_age
+
+            };
+
+
+            response =
+                await authenticatedFetch(
+
+                    planUrl,
+
+                    {
+
+                        method:
+                            "PUT",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+
+                    }
+
+                );
+
+        }
+
+        // --------------------------------------------------
+        // Scenario is the only saved planner.
+        // Remove the database row completely.
+        // --------------------------------------------------
+
+        else {
+
+            response =
+                await authenticatedFetch(
+
+                    planUrl,
+
+                    {
+                        method:
+                            "DELETE"
+                    }
+
+                );
+
+        }
+
+
+        let data =
+            null;
 
 
         try {
@@ -5369,7 +5470,8 @@ async function deleteSavedRetirementPlan() {
 
         catch {
 
-            data = null;
+            data =
+                null;
 
         }
 
@@ -5377,17 +5479,50 @@ async function deleteSavedRetirementPlan() {
         if (!response.ok) {
 
             throw new Error(
+
                 getApiErrorMessage(
+
                     data,
-                    "Unable to delete the saved retirement plan."
+
+                    "Unable to delete the saved What-If scenario."
+
                 )
+
             );
 
         }
 
 
+        // --------------------------------------------------
+        // Update browser state
+        // --------------------------------------------------
+
+
         currentSavedRetirementPlan =
+            hasSavedGoal
+            ?
+            data
+            :
             null;
+
+
+        lastSuccessfulScenarioAssumptions =
+            null;
+
+
+        const results =
+            document.getElementById(
+                "scenario-results"
+            );
+
+
+        if (results) {
+
+            results.classList.add(
+                "hidden"
+            );
+
+        }
 
 
         if (deleteButton) {
@@ -5401,19 +5536,27 @@ async function deleteSavedRetirementPlan() {
 
         if (saveButton) {
 
+            saveButton.disabled =
+                true;
+
             saveButton.textContent =
                 "Save Plan";
-
-            saveButton.disabled =
-                (
-                    !lastSuccessfulScenarioAssumptions
-                );
 
         }
 
 
         setScenarioSavePlanStatus(
-            "Saved retirement plan deleted successfully."
+
+            hasSavedGoal
+            ?
+            (
+                "Saved What-If scenario deleted. "
+                +
+                "Your retirement Goal was kept."
+            )
+            :
+            "Saved What-If scenario deleted."
+
         );
 
     }
@@ -5435,14 +5578,13 @@ async function deleteSavedRetirementPlan() {
                 false;
 
             deleteButton.textContent =
-                "Delete Saved Plan";
+                "Delete Saved What-If";
 
         }
 
     }
 
 }
-
 
 // ==========================================================
 // DISPLAY SCENARIO
@@ -6782,6 +6924,21 @@ async function loadSavedRetirementGoal() {
         currentSavedRetirementPlan;
 
 
+    const deleteButton =
+        document.getElementById(
+            "goal-delete-plan-button"
+        );
+
+
+    if (deleteButton) {
+
+        deleteButton.classList.add(
+            "hidden"
+        );
+
+    }
+
+
     if (
         !plan
         ||
@@ -6791,6 +6948,15 @@ async function loadSavedRetirementGoal() {
     ) {
 
         return;
+
+    }
+
+
+    if (deleteButton) {
+
+        deleteButton.classList.remove(
+            "hidden"
+        );
 
     }
 
@@ -6861,7 +7027,6 @@ async function loadSavedRetirementGoal() {
             "Update Saved Goal";
 
     }
-
 
     // ------------------------------------------------------
     // Saved goal was successfully recalculated by GET
@@ -7591,6 +7756,322 @@ async function saveRetirementGoalPlan() {
 
 }
 
+// ==========================================================
+// DELETE SAVED RETIREMENT GOAL
+// ==========================================================
+
+
+async function deleteSavedRetirementGoalPlan() {
+
+    hideGoalSavePlanStatus();
+
+
+    if (!currentMemberId) {
+
+        setGoalSavePlanStatus(
+            "No authenticated member profile is available.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const plan =
+        currentSavedRetirementPlan;
+
+
+    if (
+        !plan
+        ||
+        !plan.goal
+        ||
+        !plan.goal.saved
+    ) {
+
+        setGoalSavePlanStatus(
+            "There is no saved retirement Goal to delete.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const hasSavedScenario =
+        Boolean(
+            plan.scenario
+            &&
+            plan.scenario.saved
+        );
+
+
+    const confirmationMessage =
+        hasSavedScenario
+        ?
+        (
+            "Delete your saved retirement Goal? "
+            +
+            "Your saved What-If scenario will be kept."
+        )
+        :
+        "Delete your saved retirement Goal?";
+
+
+    if (
+        !window.confirm(
+            confirmationMessage
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const deleteButton =
+        document.getElementById(
+            "goal-delete-plan-button"
+        );
+
+
+    const saveButton =
+        document.getElementById(
+            "goal-save-plan-button"
+        );
+
+
+    if (deleteButton) {
+
+        deleteButton.disabled =
+            true;
+
+        deleteButton.textContent =
+            "Deleting...";
+
+    }
+
+
+    try {
+
+        const planUrl =
+            (
+                `${API_BASE_URL}/members/`
+                +
+                `${currentMemberId}/`
+                +
+                "retirement-plan"
+            );
+
+
+        let response;
+
+
+        // --------------------------------------------------
+        // What-If also exists.
+        //
+        // Preserve it and remove only the Goal.
+        // --------------------------------------------------
+
+
+        if (hasSavedScenario) {
+
+            const payload = {
+
+                scenario_additional_contribution_months:
+                    plan.scenario
+                    .additional_contribution_months,
+
+                scenario_projected_annual_salary:
+                    plan.scenario
+                    .projected_annual_salary,
+
+                scenario_retirement_age:
+                    plan.scenario
+                    .retirement_age
+
+            };
+
+
+            response =
+                await authenticatedFetch(
+
+                    planUrl,
+
+                    {
+
+                        method:
+                            "PUT",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+
+                    }
+
+                );
+
+        }
+
+        // --------------------------------------------------
+        // Goal is the only saved planner.
+        // --------------------------------------------------
+
+        else {
+
+            response =
+                await authenticatedFetch(
+
+                    planUrl,
+
+                    {
+                        method:
+                            "DELETE"
+                    }
+
+                );
+
+        }
+
+
+        let data =
+            null;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        }
+
+        catch {
+
+            data =
+                null;
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+
+                getApiErrorMessage(
+
+                    data,
+
+                    "Unable to delete the saved retirement Goal."
+
+                )
+
+            );
+
+        }
+
+
+        // --------------------------------------------------
+        // Update browser state
+        // --------------------------------------------------
+
+
+        currentSavedRetirementPlan =
+            hasSavedScenario
+            ?
+            data
+            :
+            null;
+
+
+        lastSuccessfulGoalAssumptions =
+            null;
+
+
+        const results =
+            document.getElementById(
+                "goal-results"
+            );
+
+
+        if (results) {
+
+            results.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (deleteButton) {
+
+            deleteButton.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (saveButton) {
+
+            saveButton.disabled =
+                true;
+
+            saveButton.textContent =
+                "Save Goal";
+
+        }
+
+
+        setGoalSavePlanStatus(
+
+            hasSavedScenario
+            ?
+            (
+                "Saved retirement Goal deleted. "
+                +
+                "Your What-If scenario was kept."
+            )
+            :
+            "Saved retirement Goal deleted."
+
+        );
+
+    }
+
+    catch (error) {
+
+        setGoalSavePlanStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+    finally {
+
+        if (deleteButton) {
+
+            deleteButton.disabled =
+                false;
+
+            deleteButton.textContent =
+                "Delete Saved Goal";
+
+        }
+
+    }
+
+}
 
 // ==========================================================
 // DISPLAY GOAL RESULT
@@ -8458,6 +8939,20 @@ if (goalSavePlanButton) {
     goalSavePlanButton.addEventListener(
         "click",
         saveRetirementGoalPlan
+    );
+
+}
+const goalDeletePlanButton =
+    document.getElementById(
+        "goal-delete-plan-button"
+    );
+
+
+if (goalDeletePlanButton) {
+
+    goalDeletePlanButton.addEventListener(
+        "click",
+        deleteSavedRetirementGoalPlan
     );
 
 }
