@@ -35,49 +35,61 @@
 
     <header class="topbar">
 
-        <div class="brand">
+        <div class="header-actions">
 
-            <div class="brand-icon">
-                P
-            </div>
+            <div
+                class="header-profile-card"
+                aria-label="PensionIQ member profile"
+            >
 
-            <div class="brand-text">
+                <span
+                    class="header-profile-avatar"
+                    aria-hidden="true"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        role="img"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0"
+                        ></path>
+                    </svg>
+                </span>
 
-                <h1>
-                    PensionIQ Ghana
-                </h1>
+                <span class="header-profile-copy">
+                    <strong>
+                        My Profile
+                    </strong>
 
-                <span>
-                    Retirement Control Centre
+                    <small>
+                        Member
+                    </small>
                 </span>
 
             </div>
-
-        </div>
-
-
-        <div class="header-actions">
-
-            <a
-                href="index.html"
-                class="calculator-link"
-            >
-                Retirement Calculator
-            </a>
 
 
             <button
                 type="button"
                 id="logout-button"
-                class="logout-button"
+                class="logout-button logout-icon-button"
+                aria-label="Logout"
+                title="Logout"
             >
-                Logout
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path d="M10 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"></path>
+                    <path d="M14 8l4 4-4 4"></path>
+                    <path d="M18 12H9"></path>
+                </svg>
             </button>
 
         </div>
 
     </header>
-
 
 
     <!-- =====================================================
@@ -169,7 +181,8 @@
                             P
                         </div>
 
-                        <div>
+                        <div class="sidebar-brand-copy">
+
                             <strong>
                                 PensionIQ Ghana
                             </strong>
@@ -177,77 +190,120 @@
                             <span>
                                 Retirement Intelligence
                             </span>
+
                         </div>
 
                     </div>
 
 
-                    <nav class="dashboard-nav">
+                    <div class="sidebar-portal-label">
+                        Member Portal
+                    </div>
 
-                        <button type="button" class="dashboard-nav-button is-active" data-dashboard-target="overview">
-                            <span class="dashboard-nav-icon">⌂</span>
-                            <span>Overview</span>
+
+                    <nav
+                        class="dashboard-nav"
+                        aria-label="PensionIQ Control Centre sections"
+                    >
+
+                        <button
+                            type="button"
+                            class="dashboard-nav-button is-active"
+                            data-dashboard-target="overview"
+                        >
+                            <span class="dashboard-nav-number">01</span>
+                            <span class="dashboard-nav-label">Overview</span>
+                            <span class="dashboard-nav-arrow" aria-hidden="true">→</span>
                         </button>
 
-                        <button type="button" class="dashboard-nav-button" data-dashboard-target="pension">
-                            <span class="dashboard-nav-icon">₵</span>
-                            <span>My Pension</span>
+                        <button
+                            type="button"
+                            class="dashboard-nav-button"
+                            data-dashboard-target="pension"
+                        >
+                            <span class="dashboard-nav-number">02</span>
+                            <span class="dashboard-nav-label">My Pension</span>
+                            <span class="dashboard-nav-arrow" aria-hidden="true">→</span>
                         </button>
 
-                        <button type="button" class="dashboard-nav-button" data-dashboard-target="planning">
-                            <span class="dashboard-nav-icon">◇</span>
-                            <span>Planning</span>
+                        <button
+                            type="button"
+                            class="dashboard-nav-button"
+                            data-dashboard-target="planning"
+                        >
+                            <span class="dashboard-nav-number">03</span>
+                            <span class="dashboard-nav-label">Planning</span>
+                            <span class="dashboard-nav-arrow" aria-hidden="true">→</span>
                         </button>
 
-                        <button type="button" class="dashboard-nav-button" data-dashboard-target="contributions">
-                            <span class="dashboard-nav-icon">▤</span>
-                            <span>Contributions</span>
+                        <button
+                            type="button"
+                            class="dashboard-nav-button"
+                            data-dashboard-target="contributions"
+                        >
+                            <span class="dashboard-nav-number">04</span>
+                            <span class="dashboard-nav-label">Contributions</span>
+                            <span class="dashboard-nav-arrow" aria-hidden="true">→</span>
                         </button>
 
-                        <button type="button" class="dashboard-nav-button" data-dashboard-target="reports">
-                            <span class="dashboard-nav-icon">▧</span>
-                            <span>Reports</span>
+                        <button
+                            type="button"
+                            class="dashboard-nav-button"
+                            data-dashboard-target="reports"
+                        >
+                            <span class="dashboard-nav-number">05</span>
+                            <span class="dashboard-nav-label">Reports</span>
+                            <span class="dashboard-nav-arrow" aria-hidden="true">→</span>
                         </button>
 
-                        <button type="button" class="dashboard-nav-button" data-dashboard-target="account">
-                            <span class="dashboard-nav-icon">⚙</span>
-                            <span>Account</span>
+                        <button
+                            type="button"
+                            class="dashboard-nav-button"
+                            data-dashboard-target="account"
+                        >
+                            <span class="dashboard-nav-number">06</span>
+                            <span class="dashboard-nav-label">Account</span>
+                            <span class="dashboard-nav-arrow" aria-hidden="true">→</span>
                         </button>
 
                     </nav>
 
 
-                    <div class="sidebar-readiness">
+                    <div class="sidebar-lower">
 
-                        <span>
-                            Retirement readiness
-                        </span>
+                        <div class="sidebar-readiness">
 
-                        <div class="sidebar-readiness-value">
-                            <strong id="sidebar-readiness-score">-</strong>
-                            <small>/ 100</small>
+                            <span>
+                                Retirement Readiness
+                            </span>
+
+                            <div class="sidebar-readiness-value">
+                                <strong id="sidebar-readiness-score">-</strong>
+                                <small>/ 100</small>
+                            </div>
+
+                            <p id="sidebar-readiness-rating">
+                                Assessing your position
+                            </p>
+
                         </div>
 
-                        <p id="sidebar-readiness-rating">
-                            Assessing your position
-                        </p>
 
-                    </div>
+                        <div class="sidebar-company-credit">
 
+                            <span>
+                                Built by
+                            </span>
 
-                    <div class="sidebar-company-credit">
+                            <strong>
+                                JustBenLabs
+                            </strong>
 
-                        <span>
-                            Built by
-                        </span>
+                            <small>
+                                An emerging fintech company
+                            </small>
 
-                        <strong>
-                            JustBenLabs
-                        </strong>
-
-                        <small>
-                            An emerging fintech company
-                        </small>
+                        </div>
 
                     </div>
 
